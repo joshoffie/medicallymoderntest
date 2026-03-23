@@ -480,6 +480,20 @@
     }
   });
 
+  // ---- Reviews Carousel ----
+  var reviewsTrack = document.getElementById('reviewsTrack');
+  var reviewsPrev = document.getElementById('reviewsPrev');
+  var reviewsNext = document.getElementById('reviewsNext');
+
+  if (reviewsTrack && reviewsPrev && reviewsNext) {
+    reviewsNext.addEventListener('click', function() {
+      reviewsTrack.scrollBy({ left: 296, behavior: 'smooth' });
+    });
+    reviewsPrev.addEventListener('click', function() {
+      reviewsTrack.scrollBy({ left: -296, behavior: 'smooth' });
+    });
+  }
+
   // ---- Init ----
   function init() {
     updateProgress(1);
