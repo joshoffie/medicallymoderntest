@@ -196,9 +196,10 @@
       const stepNum = stepEl.dataset.step;
       funnelData['step_' + stepNum] = value;
 
-      // Track insurance type for later use
+      // Track insurance type and update the insurance ID step
       if (stepNum === '3') {
         selectedInsuranceType = value;
+        setupInsuranceIdStep();
       }
 
       // Visual feedback
