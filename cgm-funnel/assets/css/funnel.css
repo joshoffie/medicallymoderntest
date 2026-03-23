@@ -225,6 +225,14 @@ body {
   text-align: center;
 }
 
+/* Center CTA buttons on validation steps */
+#step5 .cta-btn,
+#step5b .cta-btn {
+  display: flex;
+  margin: 24px auto 0;
+  width: fit-content;
+}
+
 .qualify-badge {
   display: inline-flex;
   align-items: center;
