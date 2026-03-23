@@ -59,7 +59,8 @@
     if (prevEl) {
       prevEl.classList.add('active');
       currentStep = prevStep;
-      updateProgress(typeof prevStep === 'number' ? prevStep : 1.5);
+      var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5 };
+      updateProgress(typeof prevStep === 'number' ? prevStep : (progressMap[prevStep] || 1));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       updateBackButton();
     }
@@ -73,7 +74,7 @@
     }
 
     // Add back button to steps 2-8 and string steps like blood-sugar (not on step 1 or confirmation)
-    if ((typeof currentStep === 'number' && currentStep >= 2 && currentStep <= 8) || currentStep === 'blood-sugar' || currentStep === 'insurance-picker') {
+    if ((typeof currentStep === 'number' && currentStep >= 2 && currentStep <= 8) || currentStep === 'blood-sugar' || currentStep === 'insurance-picker' || currentStep === '5b') {
       const activeStep = container.querySelector('.step.active');
       if (activeStep) {
         const stepContent = activeStep.querySelector('.step-content');
@@ -89,7 +90,8 @@
   const stepIdMap = {
     'not-eligible': 'stepNotEligible',
     'blood-sugar': 'stepBloodSugar',
-    'insurance-picker': 'stepInsurancePicker'
+    'insurance-picker': 'stepInsurancePicker',
+    '5b': 'step5b'
   };
 
   function getStepElement(stepId) {
@@ -113,23 +115,33 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
     // Track step
-    if (typeof stepId === 'number') {
-      currentStep = stepId;
-      stepHistory.push(stepId);
-    } else {
-      // String step IDs (blood-sugar, not-eligible)
-      stepHistory.push(stepId);
-    }
+    currentStep = stepId;
+    stepHistory.push(stepId);
 
-    updateProgress(typeof stepId === 'number' ? stepId : (stepId === 'blood-sugar' ? 1.5 : totalSteps));
+    // Map string step IDs to progress values
+    var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5 };
+    updateProgress(typeof stepId === 'number' ? stepId : (progressMap[stepId] || currentStep));
 
     // Show phone on later steps
-    if (currentStep >= 4) {
+    if ((typeof currentStep === 'number' && currentStep >= 4) || currentStep === 'insurance-picker') {
       headerPhone.style.display = 'flex';
     }
 
     // Update back button visibility
     updateBackButton();
+  }
+
+  // ---- Validate Step Router (Medicare/Medicaid → step 5, Commercial → step 5b) ----
+  function goToValidateStep() {
+    if (selectedInsuranceType === 'medicare' || selectedInsuranceType === 'medicaid') {
+      goToStep(5);
+    } else {
+      // Populate benefits provider name
+      var providerName = funnelData.insuranceProvider || 'Your Insurance';
+      var providerEl = document.getElementById('benefitsProviderName');
+      if (providerEl) providerEl.textContent = providerName;
+      goToStep('5b');
+    }
   }
 
   // ---- Insurance ID Setup ----
@@ -172,12 +184,12 @@
       if (insuranceId.trim()) {
         funnelData.insuranceId = insuranceId;
       }
-      goToStep(5);
+      goToValidateStep();
     });
 
     skipInsuranceIdBtn.addEventListener('click', function(e) {
       e.preventDefault();
-      goToStep(5);
+      goToValidateStep();
     });
   }
 
@@ -237,12 +249,9 @@
 
       // Slight delay for visual feedback, then advance
       setTimeout(function() {
-        if (nextStep === 'not-eligible') {
-          goToStep('not-eligible');
-        } else if (nextStep === 'blood-sugar') {
-          goToStep('blood-sugar');
-        } else if (nextStep === 'insurance-picker') {
-          goToStep('insurance-picker');
+        // If it's a known string step ID, route as string; otherwise parse as number
+        if (stepIdMap[nextStep]) {
+          goToStep(nextStep);
         } else {
           goToStep(parseInt(nextStep));
         }
@@ -410,25 +419,48 @@
   // ---- Insurance Provider Picker ----
   const insuranceGrid = document.getElementById('insuranceGrid');
   const insuranceOtherBtn = document.getElementById('insuranceOtherBtn');
+  const insuranceSearch = document.getElementById('insuranceSearch');
+  const insuranceNoResults = document.getElementById('insuranceNoResults');
 
   if (insuranceGrid) {
     insuranceGrid.addEventListener('click', function(e) {
-      const card = e.target.closest('.insurance-card');
-      if (!card) return;
+      const item = e.target.closest('.ins-item');
+      if (!item) return;
 
-      const provider = card.dataset.provider;
+      const provider = item.dataset.provider;
       funnelData.insuranceProvider = provider;
 
-      // Visual feedback — highlight selected card
-      insuranceGrid.querySelectorAll('.insurance-card').forEach(function(c) {
+      // Visual feedback
+      insuranceGrid.querySelectorAll('.ins-item').forEach(function(c) {
         c.classList.remove('selected');
       });
-      card.classList.add('selected');
+      item.classList.add('selected');
 
-      // Advance to step 4 (insurance ID) after brief delay
       setTimeout(function() {
         goToStep(4);
-      }, 400);
+      }, 350);
+    });
+  }
+
+  // Search/filter
+  if (insuranceSearch && insuranceGrid) {
+    insuranceSearch.addEventListener('input', function() {
+      var query = this.value.toLowerCase().trim();
+      var items = insuranceGrid.querySelectorAll('.ins-item');
+      var visibleCount = 0;
+
+      items.forEach(function(item) {
+        var label = (item.querySelector('.ins-label') || {}).textContent || '';
+        var provider = item.dataset.provider || '';
+        var match = label.toLowerCase().indexOf(query) !== -1 ||
+                    provider.toLowerCase().indexOf(query) !== -1;
+        item.style.display = match ? '' : 'none';
+        if (match) visibleCount++;
+      });
+
+      if (insuranceNoResults) {
+        insuranceNoResults.style.display = visibleCount === 0 ? '' : 'none';
+      }
     });
   }
 

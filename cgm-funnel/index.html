@@ -6,7 +6,7 @@
   <title>Check Your CGM Coverage | Medically Modern</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/funnel.css?v=3">
+  <link rel="stylesheet" href="assets/css/funnel.css?v=4">
 </head>
 <body>
 
@@ -102,93 +102,98 @@
     <!-- ========== INSURANCE PROVIDER PICKER (Private Insurance) ========== -->
     <section class="step" data-step="insurance-picker" id="stepInsurancePicker">
       <div class="step-content">
-        <h1 class="step-question">Select your insurance provider</h1>
-        <p class="step-subtitle">We're in-network with all of these plans. Tap yours to continue.</p>
-        <div class="insurance-grid" id="insuranceGrid">
-          <button class="insurance-card" data-provider="Aetna">
-            <img src="https://logo.clearbit.com/aetna.com" alt="Aetna" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Aetna</span>
-            <span class="insurance-name">Aetna</span>
+        <h1 class="step-question">Who's your insurance provider?</h1>
+        <p class="step-subtitle">We're in-network with all of these plans.</p>
+        <div class="ins-search-wrap">
+          <svg class="ins-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="ins-search-input" id="insuranceSearch" placeholder="Search insurance providers..." autocomplete="off">
+        </div>
+        <div class="ins-list" id="insuranceGrid">
+          <button class="ins-item" data-provider="Aetna" data-color="#7B2D8E">
+            <span class="ins-icon" style="background:#7B2D8E">A</span>
+            <span class="ins-label">Aetna</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="Anthem BCBS">
-            <img src="https://logo.clearbit.com/anthem.com" alt="Anthem BCBS" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Anthem</span>
-            <span class="insurance-name">Anthem BCBS</span>
+          <button class="ins-item" data-provider="Anthem BCBS" data-color="#003DA5">
+            <span class="ins-icon" style="background:#003DA5">A</span>
+            <span class="ins-label">Anthem Blue Cross Blue Shield</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="BCBS NJ / Horizon">
-            <img src="https://logo.clearbit.com/horizonblue.com" alt="BCBS NJ / Horizon" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Horizon</span>
-            <span class="insurance-name">BCBS NJ / Horizon</span>
+          <button class="ins-item" data-provider="BCBS FL / Florida Blue" data-color="#0072CE">
+            <span class="ins-icon" style="background:#0072CE">B</span>
+            <span class="ins-label">BCBS Florida / Florida Blue</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="BCBS FL / Florida Blue">
-            <img src="https://logo.clearbit.com/floridablue.com" alt="BCBS FL" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">FL Blue</span>
-            <span class="insurance-name">BCBS FL / Florida Blue</span>
+          <button class="ins-item" data-provider="BCBS NJ / Horizon" data-color="#003DA5">
+            <span class="ins-icon" style="background:#003DA5">H</span>
+            <span class="ins-label">BCBS New Jersey / Horizon</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="BCBS TN">
-            <img src="https://logo.clearbit.com/bcbst.com" alt="BCBS TN" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">BCBS TN</span>
-            <span class="insurance-name">BCBS TN</span>
+          <button class="ins-item" data-provider="BCBS TN" data-color="#003DA5">
+            <span class="ins-icon" style="background:#003DA5">B</span>
+            <span class="ins-label">BCBS Tennessee</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="BCBS WY">
-            <img src="https://logo.clearbit.com/bcbswy.com" alt="BCBS WY" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">BCBS WY</span>
-            <span class="insurance-name">BCBS WY</span>
+          <button class="ins-item" data-provider="BCBS WY" data-color="#003DA5">
+            <span class="ins-icon" style="background:#003DA5">B</span>
+            <span class="ins-label">BCBS Wyoming</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="Cigna">
-            <img src="https://logo.clearbit.com/cigna.com" alt="Cigna" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Cigna</span>
-            <span class="insurance-name">Cigna</span>
+          <button class="ins-item" data-provider="Cigna" data-color="#E47025">
+            <span class="ins-icon" style="background:#E47025">C</span>
+            <span class="ins-label">Cigna</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="Fidelis Care">
-            <img src="https://logo.clearbit.com/fideliscare.org" alt="Fidelis Care" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Fidelis</span>
-            <span class="insurance-name">Fidelis Care</span>
+          <button class="ins-item" data-provider="Fidelis Care" data-color="#00A651">
+            <span class="ins-icon" style="background:#00A651">F</span>
+            <span class="ins-label">Fidelis Care</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="Humana">
-            <img src="https://logo.clearbit.com/humana.com" alt="Humana" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Humana</span>
-            <span class="insurance-name">Humana</span>
+          <button class="ins-item" data-provider="Humana" data-color="#5A8A00">
+            <span class="ins-icon" style="background:#5A8A00">H</span>
+            <span class="ins-label">Humana</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="MagnaCare">
-            <img src="https://logo.clearbit.com/magnacare.com" alt="MagnaCare" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">MagnaCare</span>
-            <span class="insurance-name">MagnaCare</span>
+          <button class="ins-item" data-provider="MagnaCare" data-color="#1E4D8C">
+            <span class="ins-icon" style="background:#1E4D8C">M</span>
+            <span class="ins-label">MagnaCare</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="NYSHIP / Empire">
-            <img src="https://logo.clearbit.com/empireblue.com" alt="NYSHIP Empire" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Empire</span>
-            <span class="insurance-name">NYSHIP / Empire</span>
+          <button class="ins-item" data-provider="NYSHIP / Empire" data-color="#003DA5">
+            <span class="ins-icon" style="background:#003DA5">E</span>
+            <span class="ins-label">NYSHIP / Empire Blue Cross</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="Oregon Health Plan">
-            <img src="https://logo.clearbit.com/oregon.gov" alt="Oregon Health Plan" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">OHP</span>
-            <span class="insurance-name">Oregon Health Plan</span>
+          <button class="ins-item" data-provider="Oregon Health Plan" data-color="#00594C">
+            <span class="ins-icon" style="background:#00594C">O</span>
+            <span class="ins-label">Oregon Health Plan</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="UMR">
-            <img src="https://logo.clearbit.com/umr.com" alt="UMR" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">UMR</span>
-            <span class="insurance-name">UMR</span>
+          <button class="ins-item" data-provider="UMR" data-color="#D71920">
+            <span class="ins-icon" style="background:#D71920">U</span>
+            <span class="ins-label">UMR</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="United Healthcare">
-            <img src="https://logo.clearbit.com/uhc.com" alt="United Healthcare" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">UHC</span>
-            <span class="insurance-name">United Healthcare</span>
+          <button class="ins-item" data-provider="United Healthcare" data-color="#002677">
+            <span class="ins-icon" style="background:#002677">U</span>
+            <span class="ins-label">United Healthcare (UHC)</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="Wellcare">
-            <img src="https://logo.clearbit.com/wellcare.com" alt="Wellcare" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">Wellcare</span>
-            <span class="insurance-name">Wellcare</span>
+          <button class="ins-item" data-provider="Wellcare" data-color="#00A3E0">
+            <span class="ins-icon" style="background:#00A3E0">W</span>
+            <span class="ins-label">Wellcare</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
-          <button class="insurance-card" data-provider="1199SEIU">
-            <img src="https://logo.clearbit.com/1199seiubenefits.org" alt="1199SEIU" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-            <span class="insurance-fallback" style="display:none">1199</span>
-            <span class="insurance-name">1199SEIU</span>
+          <button class="ins-item" data-provider="1199SEIU" data-color="#8B1A4A">
+            <span class="ins-icon" style="background:#8B1A4A">1</span>
+            <span class="ins-label">1199SEIU Benefits Fund</span>
+            <svg class="ins-check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
           </button>
         </div>
-        <button class="option-btn insurance-other-btn" id="insuranceOtherBtn" style="margin-top:16px;">
-          <span class="option-text">My insurance isn't listed</span>
-          <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        <p class="ins-no-results" id="insuranceNoResults" style="display:none;">No matching providers found.</p>
+        <button class="ins-other-btn" id="insuranceOtherBtn">
+          <span>My insurance isn't listed</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
     </section>
@@ -240,6 +245,111 @@
       </div>
     </section>
 
+    <!-- ========== STEP 5B: VALIDATE — Commercial Benefits Verification ========== -->
+    <section class="step" data-step="5b" id="step5b">
+      <div class="step-content">
+        <div class="benefits-header">
+          <div class="benefits-badge">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+          </div>
+          <div>
+            <h1 class="step-question" style="margin-bottom:4px;">Your benefits summary</h1>
+            <p class="step-subtitle" style="margin-bottom:0;">Based on your plan, here's what we found for DME / CGM coverage.</p>
+          </div>
+        </div>
+
+        <div class="benefits-card">
+          <div class="benefits-provider-row">
+            <span class="benefits-provider-name" id="benefitsProviderName">United Healthcare</span>
+            <span class="benefits-status active">Active</span>
+          </div>
+
+          <table class="benefits-table">
+            <tbody>
+              <tr>
+                <td class="bt-label">
+                  <strong>Annual Deductible</strong>
+                  <span class="bt-hint">Amount you pay before insurance kicks in</span>
+                </td>
+                <td class="bt-value">
+                  <span class="bt-amount">$1,500</span>
+                  <span class="bt-met">$1,120 met</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="bt-label">
+                  <strong>Remaining Deductible</strong>
+                  <span class="bt-hint">What's left before insurance pays</span>
+                </td>
+                <td class="bt-value">
+                  <span class="bt-amount highlight">$380</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="bt-label">
+                  <strong>Out-of-Pocket Maximum</strong>
+                  <span class="bt-hint">Most you'll pay in a year — then insurance covers 100%</span>
+                </td>
+                <td class="bt-value">
+                  <span class="bt-amount">$4,000</span>
+                  <span class="bt-met">$1,820 met</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="bt-label">
+                  <strong>Coinsurance (DME)</strong>
+                  <span class="bt-hint">Your share after deductible is met</span>
+                </td>
+                <td class="bt-value">
+                  <span class="bt-amount">20%</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="bt-label">
+                  <strong>Copay</strong>
+                  <span class="bt-hint">Fixed amount per order (if applicable)</span>
+                </td>
+                <td class="bt-value">
+                  <span class="bt-amount">$0</span>
+                </td>
+              </tr>
+              <tr class="bt-row-highlight">
+                <td class="bt-label">
+                  <strong>DME / CGM Coverage</strong>
+                  <span class="bt-hint">Durable Medical Equipment benefit status</span>
+                </td>
+                <td class="bt-value">
+                  <span class="bt-amount covered">Covered</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="benefits-estimate">
+            <div class="estimate-header">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              <strong>Estimated cost for a 90-day CGM supply</strong>
+            </div>
+            <div class="estimate-range">
+              <span class="estimate-low">$45</span>
+              <div class="estimate-bar">
+                <div class="estimate-fill"></div>
+              </div>
+              <span class="estimate-high">$120</span>
+            </div>
+            <p class="estimate-note">Final cost depends on your specific plan, deductible status, and CGM model. We'll confirm the exact amount before shipping.</p>
+          </div>
+        </div>
+
+        <p class="benefits-disclaimer">This is a preliminary estimate based on standard plan data. Actual benefits will be verified directly with your insurer via pVerify/Availity before any order is placed.</p>
+
+        <button class="cta-btn" data-next="6">
+          Continue — takes about 60 seconds
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </section>
+
     <!-- ========== STEP 6: COLLECT — Doctor Details ========== -->
     <section class="step" data-step="6" id="step6">
       <div class="step-content">
@@ -273,17 +383,45 @@
         <h1 class="step-question">Do you have a CGM preference?</h1>
         <p class="step-subtitle">Don't worry if you're not sure — we'll help you find the best fit.</p>
         <div class="options product-options">
-          <button class="option-btn product-btn" data-next="8" data-value="dexcom">
+          <button class="option-btn product-btn" data-next="8" data-value="dexcom-g7-10day">
             <div class="product-info">
-              <span class="product-name">Dexcom G7</span>
-              <span class="product-desc">Most popular. 10-day sensor, no scanning needed.</span>
+              <span class="product-name">Dexcom G7 (10-Day)</span>
+              <span class="product-desc">Most popular. Real-time readings, no scanning, 10-day wear.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="8" data-value="libre">
+          <button class="option-btn product-btn" data-next="8" data-value="dexcom-g7-15day">
+            <div class="product-info">
+              <span class="product-name">Dexcom G7 (15-Day)</span>
+              <span class="product-desc">Extended wear. Same accuracy, fewer sensor changes.</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn product-btn" data-next="8" data-value="libre-3-plus">
             <div class="product-info">
               <span class="product-name">FreeStyle Libre 3 Plus</span>
-              <span class="product-desc">14-day sensor, continuous readings, slim design.</span>
+              <span class="product-desc">14-day sensor, continuous readings, smallest design.</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn product-btn" data-next="8" data-value="libre-2-plus">
+            <div class="product-info">
+              <span class="product-name">FreeStyle Libre 2 Plus</span>
+              <span class="product-desc">14-day sensor, scan-to-read, affordable option.</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn product-btn" data-next="8" data-value="medtronic-instinct">
+            <div class="product-info">
+              <span class="product-name">Medtronic InPen / Instinct</span>
+              <span class="product-desc">Integrated smart insulin system with CGM pairing.</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn product-btn" data-next="8" data-value="guardian-4">
+            <div class="product-info">
+              <span class="product-name">Guardian 4</span>
+              <span class="product-desc">Medtronic's standalone CGM. 7-day sensor, real-time alerts.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
@@ -444,6 +582,6 @@
 
   </main>
 
-  <script src="assets/js/funnel.js?v=3"></script>
+  <script src="assets/js/funnel.js?v=4"></script>
 </body>
 </html>
