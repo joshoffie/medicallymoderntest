@@ -99,8 +99,26 @@
       </div>
     </section>
 
-    <!-- ========== STEP 4: VALIDATE — "You Likely Qualify" ========== -->
+    <!-- ========== STEP 4: COLLECT — Insurance ID ========== -->
     <section class="step" data-step="4" id="step4">
+      <div class="step-content">
+        <h1 class="step-question" id="insuranceIdQuestion">What's your Medicare ID number?</h1>
+        <p class="step-subtitle" id="insuranceIdHint">Found on your red, white, and blue Medicare card. Format: 1EG4-TE5-MK72</p>
+        <form class="intake-form" id="insuranceIdForm">
+          <div class="form-group">
+            <input type="text" id="insuranceId" name="insuranceId" placeholder="1EG4-TE5-MK72" autocomplete="off">
+          </div>
+          <button type="submit" class="cta-btn submit-btn">
+            Continue
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <a href="#" class="skip-link" id="skipInsuranceIdBtn">Skip for now</a>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== STEP 5: VALIDATE — "You Likely Qualify" ========== -->
+    <section class="step" data-step="5" id="step5">
       <div class="step-content interstitial">
         <div class="qualify-badge">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -121,34 +139,61 @@
             <span>We ship your CGM directly to your door</span>
           </div>
         </div>
-        <button class="cta-btn" data-next="5">
+        <button class="cta-btn" data-next="6">
           Continue — takes about 60 seconds
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
       </div>
     </section>
 
-    <!-- ========== STEP 5: ROUTE — CGM Preference ========== -->
-    <section class="step" data-step="5" id="step5">
+    <!-- ========== STEP 6: COLLECT — Doctor Details ========== -->
+    <section class="step" data-step="6" id="step6">
+      <div class="step-content">
+        <h1 class="step-question">Do you have your doctor's info handy?</h1>
+        <p class="step-subtitle">If we have your doctor's details, we can get started right away — no phone call needed.</p>
+        <form class="intake-form" id="doctorForm">
+          <div class="form-group">
+            <label for="doctorName">Doctor's Full Name</label>
+            <input type="text" id="doctorName" name="doctorName" placeholder="Dr. Smith" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="doctorPhone">Doctor's Phone Number</label>
+            <input type="tel" id="doctorPhone" name="doctorPhone" placeholder="(000) 000-0000" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="practiceName">Practice/Office Name <span class="optional">(optional)</span></label>
+            <input type="text" id="practiceName" name="practiceName" placeholder="Medical Associates" autocomplete="off">
+          </div>
+          <button type="submit" class="cta-btn submit-btn">
+            Continue
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <a href="#" class="skip-link" id="skipDoctorBtn">Skip — I'll provide this later</a>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== STEP 7: ROUTE — CGM Preference ========== -->
+    <section class="step" data-step="7" id="step7">
       <div class="step-content">
         <h1 class="step-question">Do you have a CGM preference?</h1>
         <p class="step-subtitle">Don't worry if you're not sure — we'll help you find the best fit.</p>
         <div class="options product-options">
-          <button class="option-btn product-btn" data-next="6" data-value="dexcom">
+          <button class="option-btn product-btn" data-next="8" data-value="dexcom">
             <div class="product-info">
               <span class="product-name">Dexcom G7</span>
               <span class="product-desc">Most popular. 10-day sensor, no scanning needed.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="6" data-value="libre">
+          <button class="option-btn product-btn" data-next="8" data-value="libre">
             <div class="product-info">
               <span class="product-name">FreeStyle Libre 3 Plus</span>
               <span class="product-desc">14-day sensor, continuous readings, slim design.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="6" data-value="not-sure-cgm">
+          <button class="option-btn product-btn" data-next="8" data-value="not-sure-cgm">
             <div class="product-info">
               <span class="product-name">Not sure yet</span>
               <span class="product-desc">Help me decide what's best for my situation.</span>
@@ -159,8 +204,8 @@
       </div>
     </section>
 
-    <!-- ========== STEP 6: COLLECT — Patient Info ========== -->
-    <section class="step" data-step="6" id="step6">
+    <!-- ========== STEP 8: COLLECT — Patient Info ========== -->
+    <section class="step" data-step="8" id="step8">
       <div class="step-content">
         <h1 class="step-question">Almost there — let's get you set up.</h1>
         <p class="step-subtitle">We'll use this info to check your specific coverage and get the process started.</p>
@@ -187,10 +232,6 @@
             <label for="email">Email Address</label>
             <input type="email" id="email" name="email" required placeholder="your@email.com" autocomplete="email">
           </div>
-          <div class="form-group">
-            <label for="doctor">Doctor's Name <span class="optional">(optional)</span></label>
-            <input type="text" id="doctor" name="doctor" placeholder="Dr. Smith">
-          </div>
           <button type="submit" class="cta-btn submit-btn">
             Check My Coverage
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -200,14 +241,14 @@
       </div>
     </section>
 
-    <!-- ========== STEP 7: CONNECT — Confirmation + Instant Engagement ========== -->
-    <section class="step" data-step="7" id="step7">
+    <!-- ========== STEP 9: CONNECT — Confirmation + Instant Engagement ========== -->
+    <section class="step" data-step="9" id="step9">
       <div class="step-content interstitial confirmation">
         <div class="qualify-badge">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <h1 class="step-question qualify-headline">You're all set, <span id="patientFirstName">friend</span>!</h1>
-        <p class="step-subtitle qualify-subtitle">Here's what happens next:</p>
+        <h1 class="step-question qualify-headline" id="confirmationHeadline">You're all set, <span id="patientFirstName">friend</span>!</h1>
+        <p class="step-subtitle qualify-subtitle" id="confirmationSubtitle">Here's what happens next:</p>
 
         <div class="next-steps">
           <div class="next-step">

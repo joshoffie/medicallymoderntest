@@ -469,21 +469,37 @@ body {
 
 /* ---- BACK BUTTON ---- */
 .back-btn {
-  position: absolute;
-  top: 100px;
-  left: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: none;
   border: none;
   color: var(--mm-gray-400);
   cursor: pointer;
   font-size: 0.875rem;
-  display: flex;
-  align-items: center;
-  gap: 4px;
   transition: var(--mm-transition);
+  margin-bottom: 24px;
+  font-weight: 500;
+  font-family: inherit;
 }
 
 .back-btn:hover {
+  color: var(--mm-teal);
+}
+
+/* ---- SKIP LINK ---- */
+.skip-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  color: var(--mm-gray-600);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: var(--mm-transition);
+  cursor: pointer;
+}
+
+.skip-link:hover {
   color: var(--mm-teal);
 }
 
