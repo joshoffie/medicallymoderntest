@@ -117,25 +117,38 @@
   }
 
   // ---- Insurance ID Setup ----
-  function setupInsuranceIdStep() {
-    const insuranceIdForm = document.getElementById('insuranceIdForm');
-    const skipInsuranceIdBtn = document.getElementById('skipInsuranceIdBtn');
+  let insuranceIdListenersAdded = false;
+
+  function updateInsuranceIdText() {
     const insuranceIdQuestion = document.getElementById('insuranceIdQuestion');
     const insuranceIdHint = document.getElementById('insuranceIdHint');
+    const insuranceIdInput = document.getElementById('insuranceId');
+    if (!insuranceIdQuestion) return;
 
-    if (!insuranceIdForm) return;
-
-    // Update question and hint based on insurance type
     if (selectedInsuranceType === 'medicare') {
       insuranceIdQuestion.textContent = "What's your Medicare ID number?";
       insuranceIdHint.textContent = "Found on your red, white, and blue Medicare card. Format: 1EG4-TE5-MK72";
+      insuranceIdInput.placeholder = "1EG4-TE5-MK72";
     } else if (selectedInsuranceType === 'medicaid') {
       insuranceIdQuestion.textContent = "What's your Medicaid ID number?";
       insuranceIdHint.textContent = "Found on your state Medicaid card";
-    } else {
+      insuranceIdInput.placeholder = "Your Medicaid ID";
+    } else if (selectedInsuranceType === 'private') {
       insuranceIdQuestion.textContent = "What's your Member ID?";
       insuranceIdHint.textContent = "Found on your insurance card — front or back";
+      insuranceIdInput.placeholder = "Member ID";
+    } else {
+      insuranceIdQuestion.textContent = "What's your insurance ID?";
+      insuranceIdHint.textContent = "Found on your insurance card";
+      insuranceIdInput.placeholder = "Insurance ID";
     }
+  }
+
+  function setupInsuranceIdStep() {
+    const insuranceIdForm = document.getElementById('insuranceIdForm');
+    const skipInsuranceIdBtn = document.getElementById('skipInsuranceIdBtn');
+    if (!insuranceIdForm || insuranceIdListenersAdded) return;
+    insuranceIdListenersAdded = true;
 
     insuranceIdForm.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -196,10 +209,10 @@
       const stepNum = stepEl.dataset.step;
       funnelData['step_' + stepNum] = value;
 
-      // Track insurance type and update the insurance ID step
+      // Track insurance type and update the insurance ID step text
       if (stepNum === '3') {
         selectedInsuranceType = value;
-        setupInsuranceIdStep();
+        updateInsuranceIdText();
       }
 
       // Visual feedback
