@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medically Modern | Delivered to Your Door</title>
+  <title>Medically Modern | Diabetes Supplies, CGMs & Insulin Pumps</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Slab:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/main.css">
 </head>
 <body>
@@ -13,27 +13,45 @@
   <!-- Header / Navigation -->
   <header class="header">
     <div class="header-container">
-      <div class="logo">
-        <span class="logo-text">Medically<br><strong>Modern</strong></span>
-      </div>
+      <a href="/" class="logo">
+        <img src="https://medicallymodern.com/wp-content/uploads/2025/08/logo-1-1024x333.png" alt="Medically Modern" class="logo-img">
+      </a>
       <nav class="nav">
-        <a href="#about" class="nav-link">About</a>
-        <a href="#cgm" class="nav-link">CGM</a>
-        <a href="#insulin-pumps" class="nav-link">Insulin Pumps</a>
+        <div class="nav-item has-dropdown">
+          <a href="#about" class="nav-link">About Medically Modern <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1l4 4 4-4"/></svg></a>
+          <div class="dropdown">
+            <a href="#" class="dropdown-link">How It Works</a>
+            <a href="#" class="dropdown-link">CGM Insurance Simplified</a>
+            <a href="#" class="dropdown-link">Accepted Insurances</a>
+          </div>
+        </div>
+        <div class="nav-item has-dropdown">
+          <a href="#cgm" class="nav-link">Continuous Glucose Monitors <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1l4 4 4-4"/></svg></a>
+          <div class="dropdown">
+            <a href="cgm-funnel/" class="dropdown-link">Initial Coverage</a>
+            <a href="cgm-funnel/" class="dropdown-link">Lower My Out-of-Pocket Cost</a>
+          </div>
+        </div>
+        <div class="nav-item has-dropdown">
+          <a href="#" class="nav-link">Insulin Pumps <svg width="10" height="6" viewBox="0 0 10 6" fill="currentColor"><path d="M1 1l4 4 4-4"/></svg></a>
+          <div class="dropdown">
+            <a href="#" class="dropdown-link">Insulin Pump & Supplies</a>
+          </div>
+        </div>
         <a href="#providers" class="nav-link">Providers</a>
         <a href="#faq" class="nav-link">FAQs</a>
-        <a href="#contact" class="nav-link">Contact</a>
       </nav>
-      <a href="tel:3475037148" class="header-phone">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-        <span>(347) 503-7148</span>
-      </a>
+      <a href="#contact" class="header-contact-btn">Contact</a>
+      <button class="mobile-menu-toggle" aria-label="Menu Toggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
     </div>
   </header>
 
   <!-- Hero Section -->
   <section class="hero">
     <div class="container">
+      <div class="hero-animated-text" id="animatedText">Continuous Glucose Monitors</div>
       <h1 class="hero-headline">Delivered to Your Door</h1>
       <p class="hero-subtitle">Insurance covered. Patient-first. Hassle-free</p>
     </div>
@@ -42,94 +60,68 @@
   <!-- Product Grid Section -->
   <section class="products" id="cgm">
     <div class="container">
-      <h2 class="section-title">Our CGM & Insulin Pump Options</h2>
       <div class="product-grid">
         <a href="cgm-funnel/" class="product-card">
-          <div class="product-icon">🔔</div>
-          <h3 class="product-name">Freestyle Libre 3 Plus</h3>
-          <p class="product-desc">14-day wear, continuous readings, slim design</p>
-          <div class="product-cta">Learn More →</div>
+          <span class="product-name">Freestyle Libre 3 Plus</span>
+          <img src="https://medicallymodern.com/wp-content/uploads/2025/07/FreeStyle-Libre-3.png" alt="FreeStyle Libre 3 Plus" class="product-img">
+          <span class="product-arrow"><svg width="20" height="20" viewBox="0 0 256 512" fill="currentColor"><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
         </a>
         <a href="cgm-funnel/" class="product-card">
-          <div class="product-icon">🔔</div>
-          <h3 class="product-name">Freestyle Libre 2 Plus</h3>
-          <p class="product-desc">14-day sensor, mobile app integration</p>
-          <div class="product-cta">Learn More →</div>
+          <span class="product-name">Freestyle Libre 2 Plus</span>
+          <img src="https://medicallymodern.com/wp-content/uploads/2025/07/FreeStyle-Libre-2.png" alt="FreeStyle Libre 2 Plus" class="product-img">
+          <span class="product-arrow"><svg width="20" height="20" viewBox="0 0 256 512" fill="currentColor"><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
         </a>
         <a href="cgm-funnel/" class="product-card">
-          <div class="product-icon">🔔</div>
-          <h3 class="product-name">Dexcom G7</h3>
-          <p class="product-desc">10-day sensor, no scanning needed, real-time alerts</p>
-          <div class="product-cta">Learn More →</div>
+          <span class="product-name">Dexcom G6</span>
+          <img src="https://medicallymodern.com/wp-content/uploads/2025/07/Dexcom-G6-e1753508375972.png" alt="Dexcom G6" class="product-img">
+          <span class="product-arrow"><svg width="20" height="20" viewBox="0 0 256 512" fill="currentColor"><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
         </a>
         <a href="cgm-funnel/" class="product-card">
-          <div class="product-icon">🔔</div>
-          <h3 class="product-name">Dexcom G6</h3>
-          <p class="product-desc">10-day sensor, smartphone integration</p>
-          <div class="product-cta">Learn More →</div>
+          <span class="product-name">Dexcom G7</span>
+          <img src="https://medicallymodern.com/wp-content/uploads/2025/07/Dexcom-G7-e1753509007250.png" alt="Dexcom G7" class="product-img">
+          <span class="product-arrow"><svg width="20" height="20" viewBox="0 0 256 512" fill="currentColor"><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
         </a>
         <a href="cgm-funnel/" class="product-card">
-          <div class="product-icon">💉</div>
-          <h3 class="product-name">Tandem Mobi System</h3>
-          <p class="product-desc">Smallest insulin pump, touchscreen display</p>
-          <div class="product-cta">Learn More →</div>
+          <span class="product-name">Tandem Mobi System</span>
+          <img src="https://medicallymodern.com/wp-content/uploads/2025/07/insulin-pump-tandem-mobi.png" alt="Tandem Mobi System" class="product-img">
+          <span class="product-arrow"><svg width="20" height="20" viewBox="0 0 256 512" fill="currentColor"><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
         </a>
         <a href="cgm-funnel/" class="product-card">
-          <div class="product-icon">💉</div>
-          <h3 class="product-name">Tandem t:slim X2</h3>
-          <p class="product-desc">Advanced features, Dexcom integration</p>
-          <div class="product-cta">Learn More →</div>
+          <span class="product-name">Tandem t:slim X2</span>
+          <img src="https://medicallymodern.com/wp-content/uploads/2025/07/tslim-1.png" alt="Tandem t:slim X2" class="product-img">
+          <span class="product-arrow"><svg width="20" height="20" viewBox="0 0 256 512" fill="currentColor"><path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"/></svg></span>
         </a>
       </div>
-    </div>
-  </section>
 
-  <!-- How We Help Section -->
-  <section class="how-we-help">
-    <div class="container">
-      <h2 class="section-title">How We Help Our Patients</h2>
-      <p class="section-subtitle">We understand the frustrations of managing diabetes. Here are the challenges we solve:</p>
-      <div class="bubbles-grid">
-        <div class="bubble">
-          <div class="bubble-title">Get off the fingerprick</div>
-        </div>
-        <div class="bubble">
-          <div class="bubble-title">Pharmacy is too expensive</div>
-        </div>
-        <div class="bubble">
-          <div class="bubble-title">Insurance denials</div>
-        </div>
-        <div class="bubble">
-          <div class="bubble-title">Doctor only provided some samples</div>
-        </div>
-        <div class="bubble">
-          <div class="bubble-title">Issues with my supplier / sensors</div>
+      <div class="learn-more-section">
+        <h3 class="learn-more-title">Learn more about our Diabetes Products</h3>
+        <div class="learn-more-btns">
+          <a href="cgm-funnel/" class="learn-more-btn">Continuous Glucose Monitors</a>
+          <a href="#" class="learn-more-btn">Insulin Pumps</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Trust Section -->
+  <!-- Trust / Partner Section -->
   <section class="trust" id="providers">
     <div class="container">
-      <h2 class="section-title">Your Dedicated Partner For Everything Diabetes</h2>
-      <div class="trust-grid">
-        <div class="trust-card">
-          <div class="trust-icon">✓</div>
-          <h3>In-network with all major insurances</h3>
-          <p>Medicare, Medicaid, BCBS, UHC, Aetna, Cigna, and more</p>
-        </div>
-        <div class="trust-card">
-          <div class="trust-icon">✓</div>
-          <h3>White-glove high-touch service</h3>
-          <p>Real people, real support. We're here when you need us.</p>
-        </div>
-        <div class="trust-card">
-          <div class="trust-icon">✓</div>
-          <h3>90-day supplies delivered on time</h3>
-          <p>Never run out. Reliable, fast shipping to your door.</p>
-        </div>
-      </div>
+      <h2 class="trust-headline">Your <strong>Dedicated Partner</strong><br>For Everything <strong>Diabetes</strong></h2>
+      <p class="trust-subtitle">Finally, a partner you can trust for Continuous Glucose Monitors & Insulin Pump supplies</p>
+      <ul class="trust-checklist">
+        <li>
+          <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#1a3a4a"/><path d="M7 12.5l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          In-network with all major insurances
+        </li>
+        <li>
+          <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#1a3a4a"/><path d="M7 12.5l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          White-glove, high-touch service
+        </li>
+        <li>
+          <svg class="check-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#1a3a4a"/><path d="M7 12.5l3 3 7-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          90-day supplies delivered on time
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -139,13 +131,11 @@
       <div class="cta-grid">
         <a href="cgm-funnel/" class="cta-card">
           <h3>Get Initial Coverage</h3>
-          <p>Check if your insurance covers a CGM and get started today</p>
-          <div class="cta-arrow">→</div>
+          <span class="cta-card-btn">Start My Coverage Check →</span>
         </a>
         <a href="cgm-funnel/" class="cta-card">
           <h3>Lower My Out-of-Pocket Costs</h3>
-          <p>We'll find ways to reduce what you pay for your diabetes care</p>
-          <div class="cta-arrow">→</div>
+          <span class="cta-card-btn">Start My Coverage Check →</span>
         </a>
       </div>
     </div>
@@ -154,64 +144,62 @@
   <!-- Reviews Section -->
   <section class="reviews">
     <div class="container">
-      <div class="reviews-card">
-        <div class="reviews-stars">★★★★★</div>
-        <p class="reviews-rating">Excellent</p>
-        <p class="reviews-count">Based on 117 Google reviews</p>
+      <h2 class="reviews-heading">See why real patients choose Medically Modern</h2>
+      <div class="reviews-layout">
+        <div class="reviews-summary">
+          <p class="reviews-excellent">EXCELLENT</p>
+          <div class="reviews-stars">★★★★★</div>
+          <p class="reviews-count">Based on <strong>117 reviews</strong></p>
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/300px-Google_2015_logo.svg.png" alt="Google" class="google-logo">
+        </div>
+        <div class="reviews-carousel">
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#4285f4;">M</div>
+              <div>
+                <p class="review-name">Melinda Bates</p>
+                <p class="review-date">6 months ago</p>
+              </div>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/24px-Google_%22G%22_logo.svg.png" alt="" class="review-g-icon">
+            </div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">I was told it is really difficult to get insurance approval to cover a CGM if you have Type 2 Diabetes. However, Corey...</p>
+          </div>
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#34a853;">A</div>
+              <div>
+                <p class="review-name">Alan Oberman</p>
+                <p class="review-date">8 months ago</p>
+              </div>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/24px-Google_%22G%22_logo.svg.png" alt="" class="review-g-icon">
+            </div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">After having US Med tell me I didn't qualify, Medically Modern worked with me and my doctor to get the...</p>
+          </div>
+          <div class="review-card">
+            <div class="review-header">
+              <div class="review-avatar" style="background:#673ab7;">B</div>
+              <div>
+                <p class="review-name">Bob Mccanlis</p>
+                <p class="review-date">9 months ago</p>
+              </div>
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/24px-Google_%22G%22_logo.svg.png" alt="" class="review-g-icon">
+            </div>
+            <div class="review-stars">★★★★★</div>
+            <p class="review-text">Very, very helpful. Corey did everything for me. Secured glucose monitor system that CVS said wasn't covered. Thanks</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ Section -->
-  <section class="faq" id="faq">
+  <!-- Contact CTA -->
+  <section class="contact-cta">
     <div class="container">
-      <h2 class="section-title">Frequently Asked Questions</h2>
-      <div class="accordion">
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>How do I know if my insurance covers a CGM?</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="accordion-content">
-            <p>Most Medicare and private insurance plans cover CGMs for insulin-dependent diabetics. We'll verify your specific coverage in our funnel — it only takes a minute.</p>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>Do I need a prescription from my doctor?</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="accordion-content">
-            <p>Yes, a prescription is required. We contact your doctor directly to get it — no phone calls from you needed. If you have your doctor's details handy, we can get started right away.</p>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>How quickly will my CGM arrive?</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="accordion-content">
-            <p>Typical timeline is 3–5 business days after we verify your coverage and get the prescription. We'll text you with updates every step of the way.</p>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>What if my insurance denies the claim?</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="accordion-content">
-            <p>We handle appeals and work with your insurance company. If coverage isn't approved, we discuss options to make it affordable for you.</p>
-          </div>
-        </div>
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>Can I switch to a different CGM later?</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
-          </button>
-          <div class="accordion-content">
-            <p>Absolutely. Your preferences may change, and we can help you transition to a different device whenever you're ready.</p>
-          </div>
-        </div>
+      <div class="contact-cta-card">
+        <h2>Have Questions? Get Answers</h2>
+        <a href="#contact" class="contact-cta-btn">Contact Us</a>
       </div>
     </div>
   </section>
@@ -221,7 +209,7 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-section">
-          <h4>Medically Modern</h4>
+          <img src="https://medicallymodern.com/wp-content/uploads/2025/08/logo-1-1024x333.png" alt="Medically Modern" class="footer-logo">
           <p>Making diabetes care simpler, more accessible, and affordable for everyone.</p>
         </div>
         <div class="footer-section">

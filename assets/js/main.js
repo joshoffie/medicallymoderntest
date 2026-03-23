@@ -1,32 +1,42 @@
-/**
- * Medically Modern Homepage
- * Accordion interactions
- */
+// ============================================
+// MEDICALLY MODERN — HOMEPAGE JS
+// ============================================
 
 (function() {
   'use strict';
 
-  // Accordion functionality
-  const accordionHeaders = document.querySelectorAll('.accordion-header');
+  // ---- Animated Hero Text (cycles like original site) ----
+  var phrases = ['Continuous Glucose Monitors', 'Insulin Pumps'];
+  var colors = ['#80adaa', '#a9d1d0'];
+  var currentIndex = 0;
+  var animatedEl = document.getElementById('animatedText');
 
-  accordionHeaders.forEach(header => {
-    header.addEventListener('click', function() {
-      const item = this.closest('.accordion-item');
-      const isOpen = item.classList.contains('open');
+  function cycleText() {
+    if (!animatedEl) return;
+    animatedEl.style.opacity = '0';
+    setTimeout(function() {
+      currentIndex = (currentIndex + 1) % phrases.length;
+      animatedEl.textContent = phrases[currentIndex];
+      animatedEl.style.color = colors[currentIndex];
+      animatedEl.style.opacity = '1';
+    }, 400);
+  }
 
-      // Close all other items
-      document.querySelectorAll('.accordion-item').forEach(el => {
-        el.classList.remove('open');
-      });
+  if (animatedEl) {
+    animatedEl.style.color = colors[0];
+    setInterval(cycleText, 2500);
+  }
 
-      // Toggle current item
-      if (!isOpen) {
-        item.classList.add('open');
-      }
+  // ---- Mobile Menu Toggle ----
+  var menuToggle = document.querySelector('.mobile-menu-toggle');
+  var nav = document.querySelector('.nav');
+
+  if (menuToggle && nav) {
+    menuToggle.addEventListener('click', function() {
+      nav.classList.toggle('nav-open');
+      var isOpen = nav.classList.contains('nav-open');
+      menuToggle.setAttribute('aria-expanded', isOpen);
     });
-  });
-
-  // Mobile menu (if nav links should be hidden on mobile, already done in CSS)
-  // This keeps the JS minimal and clean
+  }
 
 })();
