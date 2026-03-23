@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Check Your CGM Coverage | Medically Modern</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/funnel.css">
+</head>
+<body>
+
+  <!-- Progress Bar -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="funnel-header">
+    <div class="logo">
+      <span class="logo-text">Medically<br><strong>Modern</strong></span>
+    </div>
+    <a href="#" class="header-phone" id="headerPhone" style="display:none;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      (347) 503-7148
+    </a>
+  </header>
+
+  <!-- Funnel Container -->
+  <main class="funnel-container" id="funnelContainer">
+
+    <!-- ========== STEP 1: QUALIFY — Diabetes Check ========== -->
+    <section class="step active" data-step="1" id="step1">
+      <div class="step-content">
+        <h1 class="step-question">Have you been diagnosed with diabetes?</h1>
+        <p class="step-subtitle">This helps us check if your insurance covers a Continuous Glucose Monitor.</p>
+        <div class="options">
+          <button class="option-btn" data-next="2" data-value="yes-diabetes">
+            <span class="option-text">Yes, I have diabetes</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="2" data-value="prediabetes">
+            <span class="option-text">I have prediabetes</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="not-eligible" data-value="no-diabetes">
+            <span class="option-text">No, I don't have diabetes</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STEP 2: QUALIFY — Insulin Check ========== -->
+    <section class="step" data-step="2" id="step2">
+      <div class="step-content">
+        <h1 class="step-question">Do you use insulin?</h1>
+        <p class="step-subtitle">Insulin-dependent patients typically qualify for full CGM coverage.</p>
+        <div class="options">
+          <button class="option-btn" data-next="3" data-value="yes-insulin">
+            <span class="option-text">Yes, I use insulin</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="3" data-value="no-insulin">
+            <span class="option-text">No, I don't use insulin</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="3" data-value="unsure-insulin">
+            <span class="option-text">I'm not sure</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STEP 3: QUALIFY — Insurance Type ========== -->
+    <section class="step" data-step="3" id="step3">
+      <div class="step-content">
+        <h1 class="step-question">What type of insurance do you have?</h1>
+        <p class="step-subtitle">We're in-network with most major insurers.</p>
+        <div class="options">
+          <button class="option-btn" data-next="4" data-value="medicare">
+            <span class="option-text">Medicare</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="4" data-value="medicaid">
+            <span class="option-text">Medicaid</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="4" data-value="private">
+            <span class="option-text">Private insurance (Aetna, BCBS, UHC, etc.)</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="4" data-value="other-insurance">
+            <span class="option-text">Other / Not sure</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STEP 4: VALIDATE — "You Likely Qualify" ========== -->
+    <section class="step" data-step="4" id="step4">
+      <div class="step-content interstitial">
+        <div class="qualify-badge">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h1 class="step-question qualify-headline">Great news — your CGM should be covered.</h1>
+        <p class="step-subtitle qualify-subtitle">Based on your answers, your insurance likely covers a Continuous Glucose Monitor at little to no cost.</p>
+        <div class="trust-points">
+          <div class="trust-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>We contact your doctor for the prescription</span>
+          </div>
+          <div class="trust-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>We handle all the insurance paperwork</span>
+          </div>
+          <div class="trust-item">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>We ship your CGM directly to your door</span>
+          </div>
+        </div>
+        <button class="cta-btn" data-next="5">
+          Continue — takes about 60 seconds
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========== STEP 5: ROUTE — CGM Preference ========== -->
+    <section class="step" data-step="5" id="step5">
+      <div class="step-content">
+        <h1 class="step-question">Do you have a CGM preference?</h1>
+        <p class="step-subtitle">Don't worry if you're not sure — we'll help you find the best fit.</p>
+        <div class="options product-options">
+          <button class="option-btn product-btn" data-next="6" data-value="dexcom">
+            <div class="product-info">
+              <span class="product-name">Dexcom G7</span>
+              <span class="product-desc">Most popular. 10-day sensor, no scanning needed.</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn product-btn" data-next="6" data-value="libre">
+            <div class="product-info">
+              <span class="product-name">FreeStyle Libre 3 Plus</span>
+              <span class="product-desc">14-day sensor, continuous readings, slim design.</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn product-btn" data-next="6" data-value="not-sure-cgm">
+            <div class="product-info">
+              <span class="product-name">Not sure yet</span>
+              <span class="product-desc">Help me decide what's best for my situation.</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STEP 6: COLLECT — Patient Info ========== -->
+    <section class="step" data-step="6" id="step6">
+      <div class="step-content">
+        <h1 class="step-question">Almost there — let's get you set up.</h1>
+        <p class="step-subtitle">We'll use this info to check your specific coverage and get the process started.</p>
+        <form class="intake-form" id="intakeForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" name="firstName" required placeholder="First name" autocomplete="given-name">
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" name="lastName" required placeholder="Last name" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required placeholder="(000) 000-0000" autocomplete="tel">
+          </div>
+          <div class="form-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" name="dob" required autocomplete="bday">
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required placeholder="your@email.com" autocomplete="email">
+          </div>
+          <div class="form-group">
+            <label for="doctor">Doctor's Name <span class="optional">(optional)</span></label>
+            <input type="text" id="doctor" name="doctor" placeholder="Dr. Smith">
+          </div>
+          <button type="submit" class="cta-btn submit-btn">
+            Check My Coverage
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+          <p class="form-disclaimer">Your information is secure and HIPAA-compliant. We'll never share your data.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== STEP 7: CONNECT — Confirmation + Instant Engagement ========== -->
+    <section class="step" data-step="7" id="step7">
+      <div class="step-content interstitial confirmation">
+        <div class="qualify-badge">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h1 class="step-question qualify-headline">You're all set, <span id="patientFirstName">friend</span>!</h1>
+        <p class="step-subtitle qualify-subtitle">Here's what happens next:</p>
+
+        <div class="next-steps">
+          <div class="next-step">
+            <div class="step-number">1</div>
+            <div class="step-detail">
+              <strong>We verify your coverage</strong>
+              <span>We check your insurance benefits right away.</span>
+            </div>
+          </div>
+          <div class="next-step">
+            <div class="step-number">2</div>
+            <div class="step-detail">
+              <strong>We contact your doctor</strong>
+              <span>We handle getting the prescription — you don't have to.</span>
+            </div>
+          </div>
+          <div class="next-step">
+            <div class="step-number">3</div>
+            <div class="step-detail">
+              <strong>Your CGM ships to your door</strong>
+              <span>Typical timeline: 3–5 business days.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="connect-options">
+          <p class="connect-prompt">Want to get started even faster?</p>
+          <a href="tel:3475037148" class="cta-btn call-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Talk to a specialist now
+          </a>
+          <p class="connect-or">or</p>
+          <p class="connect-sms">We'll text you shortly to help finish getting your monitor covered.</p>
+        </div>
+
+        <div class="social-proof">
+          <div class="stars">★★★★★</div>
+          <p>Rated Excellent based on 117 Google reviews</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== NOT ELIGIBLE SCREEN ========== -->
+    <section class="step" data-step="not-eligible" id="stepNotEligible">
+      <div class="step-content interstitial">
+        <h1 class="step-question">We may still be able to help.</h1>
+        <p class="step-subtitle">CGM coverage typically requires a diabetes diagnosis, but there may be other options available to you.</p>
+        <div class="connect-options">
+          <a href="tel:3475037148" class="cta-btn call-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Call us to discuss your options
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="assets/js/funnel.js"></script>
+</body>
+</html>
