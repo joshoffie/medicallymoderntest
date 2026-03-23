@@ -6,7 +6,7 @@
   <title>Check Your CGM Coverage | Medically Modern</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/funnel.css">
+  <link rel="stylesheet" href="assets/css/funnel.css?v=3">
 </head>
 <body>
 
@@ -43,7 +43,7 @@
             <span class="option-text">I have prediabetes</span>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn" data-next="not-eligible" data-value="no-diabetes">
+          <button class="option-btn" data-next="blood-sugar" data-value="no-diabetes">
             <span class="option-text">No, I don't have diabetes</span>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
@@ -87,7 +87,7 @@
             <span class="option-text">Medicaid</span>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn" data-next="4" data-value="private">
+          <button class="option-btn" data-next="insurance-picker" data-value="private">
             <span class="option-text">Private insurance (Aetna, BCBS, UHC, etc.)</span>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
@@ -96,6 +96,100 @@
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
         </div>
+      </div>
+    </section>
+
+    <!-- ========== INSURANCE PROVIDER PICKER (Private Insurance) ========== -->
+    <section class="step" data-step="insurance-picker" id="stepInsurancePicker">
+      <div class="step-content">
+        <h1 class="step-question">Select your insurance provider</h1>
+        <p class="step-subtitle">We're in-network with all of these plans. Tap yours to continue.</p>
+        <div class="insurance-grid" id="insuranceGrid">
+          <button class="insurance-card" data-provider="Aetna">
+            <img src="https://logo.clearbit.com/aetna.com" alt="Aetna" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Aetna</span>
+            <span class="insurance-name">Aetna</span>
+          </button>
+          <button class="insurance-card" data-provider="Anthem BCBS">
+            <img src="https://logo.clearbit.com/anthem.com" alt="Anthem BCBS" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Anthem</span>
+            <span class="insurance-name">Anthem BCBS</span>
+          </button>
+          <button class="insurance-card" data-provider="BCBS NJ / Horizon">
+            <img src="https://logo.clearbit.com/horizonblue.com" alt="BCBS NJ / Horizon" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Horizon</span>
+            <span class="insurance-name">BCBS NJ / Horizon</span>
+          </button>
+          <button class="insurance-card" data-provider="BCBS FL / Florida Blue">
+            <img src="https://logo.clearbit.com/floridablue.com" alt="BCBS FL" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">FL Blue</span>
+            <span class="insurance-name">BCBS FL / Florida Blue</span>
+          </button>
+          <button class="insurance-card" data-provider="BCBS TN">
+            <img src="https://logo.clearbit.com/bcbst.com" alt="BCBS TN" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">BCBS TN</span>
+            <span class="insurance-name">BCBS TN</span>
+          </button>
+          <button class="insurance-card" data-provider="BCBS WY">
+            <img src="https://logo.clearbit.com/bcbswy.com" alt="BCBS WY" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">BCBS WY</span>
+            <span class="insurance-name">BCBS WY</span>
+          </button>
+          <button class="insurance-card" data-provider="Cigna">
+            <img src="https://logo.clearbit.com/cigna.com" alt="Cigna" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Cigna</span>
+            <span class="insurance-name">Cigna</span>
+          </button>
+          <button class="insurance-card" data-provider="Fidelis Care">
+            <img src="https://logo.clearbit.com/fideliscare.org" alt="Fidelis Care" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Fidelis</span>
+            <span class="insurance-name">Fidelis Care</span>
+          </button>
+          <button class="insurance-card" data-provider="Humana">
+            <img src="https://logo.clearbit.com/humana.com" alt="Humana" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Humana</span>
+            <span class="insurance-name">Humana</span>
+          </button>
+          <button class="insurance-card" data-provider="MagnaCare">
+            <img src="https://logo.clearbit.com/magnacare.com" alt="MagnaCare" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">MagnaCare</span>
+            <span class="insurance-name">MagnaCare</span>
+          </button>
+          <button class="insurance-card" data-provider="NYSHIP / Empire">
+            <img src="https://logo.clearbit.com/empireblue.com" alt="NYSHIP Empire" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Empire</span>
+            <span class="insurance-name">NYSHIP / Empire</span>
+          </button>
+          <button class="insurance-card" data-provider="Oregon Health Plan">
+            <img src="https://logo.clearbit.com/oregon.gov" alt="Oregon Health Plan" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">OHP</span>
+            <span class="insurance-name">Oregon Health Plan</span>
+          </button>
+          <button class="insurance-card" data-provider="UMR">
+            <img src="https://logo.clearbit.com/umr.com" alt="UMR" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">UMR</span>
+            <span class="insurance-name">UMR</span>
+          </button>
+          <button class="insurance-card" data-provider="United Healthcare">
+            <img src="https://logo.clearbit.com/uhc.com" alt="United Healthcare" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">UHC</span>
+            <span class="insurance-name">United Healthcare</span>
+          </button>
+          <button class="insurance-card" data-provider="Wellcare">
+            <img src="https://logo.clearbit.com/wellcare.com" alt="Wellcare" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">Wellcare</span>
+            <span class="insurance-name">Wellcare</span>
+          </button>
+          <button class="insurance-card" data-provider="1199SEIU">
+            <img src="https://logo.clearbit.com/1199seiubenefits.org" alt="1199SEIU" class="insurance-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <span class="insurance-fallback" style="display:none">1199</span>
+            <span class="insurance-name">1199SEIU</span>
+          </button>
+        </div>
+        <button class="option-btn insurance-other-btn" id="insuranceOtherBtn" style="margin-top:16px;">
+          <span class="option-text">My insurance isn't listed</span>
+          <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </button>
       </div>
     </section>
 
@@ -247,7 +341,7 @@
         <div class="qualify-badge">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <h1 class="step-question qualify-headline" id="confirmationHeadline">You're all set, <span id="patientFirstName">friend</span>!</h1>
+        <h1 class="step-question qualify-headline" id="confirmationHeadline">Congrats, <span id="patientFirstName">friend</span>!</h1>
         <p class="step-subtitle qualify-subtitle" id="confirmationSubtitle">Here's what happens next:</p>
 
         <div class="next-steps">
@@ -284,9 +378,52 @@
           <p class="connect-sms">We'll text you shortly to help finish getting your monitor covered.</p>
         </div>
 
+        <!-- Data Export (Testing) -->
+        <div class="export-section">
+          <button class="export-btn" id="exportDataBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Intake Data (Testing)
+          </button>
+        </div>
+
         <div class="social-proof">
           <div class="stars">★★★★★</div>
           <p>Rated Excellent based on 117 Google reviews</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== BLOOD SUGAR CONCERNS STEP (for non-diabetic patients) ========== -->
+    <section class="step" data-step="blood-sugar" id="stepBloodSugar">
+      <div class="step-content">
+        <h1 class="step-question">Do you experience blood sugar concerns?</h1>
+        <p class="step-subtitle">Even without a diabetes diagnosis, a CGM can help you monitor and manage blood sugar levels.</p>
+        <div class="options">
+          <button class="option-btn" data-next="2" data-value="hypoglycemia">
+            <div class="product-info">
+              <span class="product-name">Hypoglycemia (Low Blood Sugar)</span>
+              <span class="product-desc">Blood glucose regularly drops below 70 mg/dL (3.9 mmol/L)</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="2" data-value="hyperglycemia">
+            <div class="product-info">
+              <span class="product-name">Hyperglycemia (High Blood Sugar)</span>
+              <span class="product-desc">Blood glucose regularly exceeds 180 mg/dL (10 mmol/L)</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="2" data-value="both-blood-sugar">
+            <div class="product-info">
+              <span class="product-name">Both / I'm not sure</span>
+              <span class="product-desc">I experience blood sugar swings or want monitoring</span>
+            </div>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" data-next="not-eligible" data-value="no-blood-sugar-issues">
+            <span class="option-text">No, I don't have any blood sugar concerns</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -295,7 +432,7 @@
     <section class="step" data-step="not-eligible" id="stepNotEligible">
       <div class="step-content interstitial">
         <h1 class="step-question">We may still be able to help.</h1>
-        <p class="step-subtitle">CGM coverage typically requires a diabetes diagnosis, but there may be other options available to you.</p>
+        <p class="step-subtitle">CGM coverage typically requires a diabetes diagnosis or documented blood sugar issues, but there may be other options available to you.</p>
         <div class="connect-options">
           <a href="tel:3475037148" class="cta-btn call-btn">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
@@ -307,6 +444,6 @@
 
   </main>
 
-  <script src="assets/js/funnel.js"></script>
+  <script src="assets/js/funnel.js?v=3"></script>
 </body>
 </html>
