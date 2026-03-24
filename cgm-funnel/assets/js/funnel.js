@@ -655,55 +655,57 @@
     var ctx = canvas.getContext('2d');
     var W = 128, H = 128;
     var teal = '#0e7c6b';
-    var lineW = 7;
+    var lineW = 6;
 
-    // M shape waypoints
+    // M shape waypoints — refined proportions
     var mPts = [
-      {x: 20, y: 100},
-      {x: 20, y: 28},
-      {x: 64, y: 72},
-      {x: 108, y: 28},
-      {x: 108, y: 100}
+      {x: 18, y: 100},
+      {x: 18, y: 26},
+      {x: 64, y: 68},
+      {x: 110, y: 26},
+      {x: 110, y: 100}
     ];
 
     function dist(a, b) { return Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y)); }
 
-    var mSegLens = [], totalMLen = 0;
+    var segLens = [], totalLen = 0;
     for (var i = 1; i < mPts.length; i++) {
       var d = dist(mPts[i-1], mPts[i]);
-      mSegLens.push(d);
-      totalMLen += d;
+      segLens.push(d);
+      totalLen += d;
     }
 
-    function mPointAtDist(d) {
-      d = Math.max(0, Math.min(d, totalMLen));
+    function pointAtDist(d) {
+      d = Math.max(0, Math.min(d, totalLen));
       var acc = 0;
-      for (var i = 0; i < mSegLens.length; i++) {
-        if (acc + mSegLens[i] >= d) {
-          var f = (d - acc) / mSegLens[i];
+      for (var i = 0; i < segLens.length; i++) {
+        if (acc + segLens[i] >= d) {
+          var f = (d - acc) / segLens[i];
           return {x: mPts[i].x+(mPts[i+1].x-mPts[i].x)*f, y: mPts[i].y+(mPts[i+1].y-mPts[i].y)*f};
         }
-        acc += mSegLens[i];
+        acc += segLens[i];
       }
-      return {x: mPts[4].x, y: mPts[4].y};
+      return {x: mPts[mPts.length-1].x, y: mPts[mPts.length-1].y};
     }
 
-    var numPts = 120;
+    var N = 200;
     var pathLR = [];
-    for (var i = 0; i <= numPts; i++) {
-      pathLR.push(mPointAtDist((i / numPts) * totalMLen));
-    }
+    for (var i = 0; i <= N; i++) pathLR.push(pointAtDist((i / N) * totalLen));
     var pathRL = pathLR.slice().reverse();
 
-    // 8-phase teeter-totter: draw L→R, hold, undraw L→R, pause, draw R→L, hold, undraw R→L, pause
+    function easeInOutCubic(t) {
+      return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+    }
+
     var phase = 0;
-    var progress = 0;
-    var drawSpeed = 1.0 / 800;
-    var holdDuration = 2500;
-    var pauseDuration = 300;
+    var rawProgress = 0;
+    var drawDuration = 900;
+    var holdDuration = 2000;
+    var pauseDuration = 200;
     var phaseTime = 0;
     var lastTime = 0;
     var running = true, forceM = false;
+    var blendIn = 0, blendOut = 1;
 
     function animate(time) {
       if (!running) return;
@@ -711,80 +713,110 @@
       var dt = Math.min(time - lastTime, 50);
       lastTime = time;
 
-      if (forceM) { drawFullM(); snakeAnim = requestAnimationFrame(animate); return; }
+      if (forceM) { drawStaticM(); snakeAnim = requestAnimationFrame(animate); return; }
 
       phaseTime += dt;
       var path = (phase < 4) ? pathLR : pathRL;
-      var headIdx, tailIdx;
 
       switch (phase) {
         case 0: case 4:
-          progress += drawSpeed * dt;
-          if (progress >= 1) { progress = 1; phase = (phase === 0) ? 1 : 5; phaseTime = 0; }
-          headIdx = Math.round(progress * numPts);
-          tailIdx = 0;
-          drawSegment(path, tailIdx, headIdx);
+          rawProgress = Math.min(phaseTime / drawDuration, 1);
+          var eased = easeInOutCubic(rawProgress);
+          var headIdx = Math.round(eased * N);
+          blendIn = Math.min(rawProgress / 0.15, 1);
+          drawSnakePath(path, 0, headIdx, blendIn, true);
+          if (rawProgress >= 1) { phase = (phase === 0) ? 1 : 5; phaseTime = 0; rawProgress = 0; }
           break;
         case 1: case 5:
-          drawGlowingM(phaseTime);
-          if (phaseTime >= holdDuration) { phase = (phase === 1) ? 2 : 6; phaseTime = 0; progress = 0; }
+          var glowBlend = Math.min(phaseTime / 250, 1);
+          drawGlowingM(phaseTime, glowBlend);
+          if (phaseTime >= holdDuration) { phase = (phase === 1) ? 2 : 6; phaseTime = 0; rawProgress = 0; }
           break;
         case 2: case 6:
-          progress += drawSpeed * dt;
-          if (progress >= 1) { progress = 1; phase = (phase === 2) ? 3 : 7; phaseTime = 0; }
-          tailIdx = Math.round(progress * numPts);
-          headIdx = numPts;
-          drawSegment(path, tailIdx, headIdx);
+          rawProgress = Math.min(phaseTime / drawDuration, 1);
+          var eased = easeInOutCubic(rawProgress);
+          var tailIdx = Math.round(eased * N);
+          blendOut = 1 - Math.max((rawProgress - 0.85) / 0.15, 0);
+          drawSnakePath(path, tailIdx, N, blendOut, false);
+          if (rawProgress >= 1) { phase = (phase === 2) ? 3 : 7; phaseTime = 0; rawProgress = 0; }
           break;
         case 3: case 7:
           ctx.clearRect(0, 0, W, H);
-          if (phaseTime >= pauseDuration) { phase = (phase === 3) ? 4 : 0; phaseTime = 0; progress = 0; }
+          if (phaseTime >= pauseDuration) { phase = (phase === 3) ? 4 : 0; phaseTime = 0; rawProgress = 0; }
           break;
       }
 
       snakeAnim = requestAnimationFrame(animate);
     }
 
-    function drawSegment(path, startIdx, endIdx) {
+    function drawSnakePath(path, startIdx, endIdx, masterAlpha, isDrawing) {
       ctx.clearRect(0, 0, W, H);
-      if (endIdx <= startIdx) return;
+      if (endIdx <= startIdx + 1) return;
       var len = endIdx - startIdx;
-      ctx.lineWidth = lineW;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      for (var i = startIdx + 1; i <= endIdx; i++) {
-        var posInSegment = (i - startIdx) / len;
-        var alpha = 0.3 + posInSegment * 0.7;
+      ctx.lineWidth = lineW;
+      ctx.strokeStyle = teal;
+      var segments = 48;
+      for (var s = 0; s < segments; s++) {
+        var sStart = startIdx + Math.round(s * len / segments);
+        var sEnd = startIdx + Math.round((s + 1) * len / segments);
+        sEnd = Math.min(sEnd, endIdx);
+        if (sEnd <= sStart) continue;
+        var pos = (s + 0.5) / segments;
+        var alpha;
+        if (isDrawing) {
+          alpha = 0.12 + pos * pos * 0.88;
+        } else {
+          alpha = Math.min(pos * 4, 1);
+        }
+        alpha *= masterAlpha;
         ctx.globalAlpha = alpha;
-        ctx.strokeStyle = teal;
         ctx.beginPath();
-        ctx.moveTo(path[i-1].x, path[i-1].y);
-        ctx.lineTo(path[i].x, path[i].y);
+        ctx.moveTo(path[sStart].x, path[sStart].y);
+        for (var i = sStart + 1; i <= sEnd; i++) ctx.lineTo(path[i].x, path[i].y);
         ctx.stroke();
       }
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = teal;
-      ctx.beginPath();
-      ctx.arc(path[endIdx].x, path[endIdx].y, lineW / 2 + 1, 0, Math.PI * 2);
-      ctx.fill();
+      if (isDrawing) {
+        var headPt = path[endIdx];
+        ctx.globalAlpha = masterAlpha * 0.25;
+        ctx.fillStyle = teal;
+        ctx.beginPath();
+        ctx.arc(headPt.x, headPt.y, lineW * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalAlpha = masterAlpha;
+        ctx.beginPath();
+        ctx.arc(headPt.x, headPt.y, lineW * 0.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.globalAlpha = 1;
     }
 
-    function drawGlowingM(t) {
+    function drawGlowingM(t, blendIn) {
       ctx.clearRect(0, 0, W, H);
-      var pulse = Math.sin(t * Math.PI * 2 / 800);
-      var glowRadius = 8 + pulse * 5;
-      var glowAlpha = 0.12 + pulse * 0.08;
+      var breathe = (Math.sin(t * Math.PI * 2 / 1200 - Math.PI/2) + 1) / 2;
+      ctx.save();
       ctx.strokeStyle = teal;
-      ctx.lineWidth = lineW + glowRadius;
+      ctx.lineWidth = lineW;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
-      ctx.globalAlpha = glowAlpha;
+      var glowIntensity = 0.08 + breathe * 0.12;
+      var glowSize = 6 + breathe * 8;
+      ctx.shadowColor = teal;
+      ctx.shadowBlur = glowSize * blendIn;
+      ctx.globalAlpha = glowIntensity * blendIn;
       ctx.beginPath();
       ctx.moveTo(mPts[0].x, mPts[0].y);
       for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
       ctx.stroke();
+      ctx.shadowBlur = glowSize * 2 * blendIn;
+      ctx.globalAlpha = glowIntensity * 0.5 * blendIn;
+      ctx.stroke();
+      ctx.restore();
+      ctx.strokeStyle = teal;
       ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       ctx.globalAlpha = 1;
       ctx.beginPath();
       ctx.moveTo(mPts[0].x, mPts[0].y);
@@ -793,8 +825,21 @@
       ctx.globalAlpha = 1;
     }
 
-    function drawFullM() {
+    function drawStaticM() {
       ctx.clearRect(0, 0, W, H);
+      ctx.save();
+      ctx.strokeStyle = teal;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.shadowColor = teal;
+      ctx.shadowBlur = 8;
+      ctx.globalAlpha = 0.15;
+      ctx.beginPath();
+      ctx.moveTo(mPts[0].x, mPts[0].y);
+      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+      ctx.stroke();
+      ctx.restore();
       ctx.strokeStyle = teal;
       ctx.lineWidth = lineW;
       ctx.lineCap = 'round';
