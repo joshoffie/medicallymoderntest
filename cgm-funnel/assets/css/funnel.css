@@ -636,12 +636,6 @@ body {
 }
 
 /* ---- BENEFITS VERIFICATION TABLE (Commercial Insurance) ---- */
-.benefits-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 28px;
-}
 
 .benefits-badge {
   display: flex;
