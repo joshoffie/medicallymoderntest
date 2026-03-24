@@ -170,15 +170,8 @@
   }
 
   function goToBenefitsSummary() {
-    if (selectedInsuranceType === 'medicare' || selectedInsuranceType === 'medicaid') {
-      goToStep(5);
-    } else {
-      // Populate benefits provider name
-      var providerName = funnelData.insuranceProvider || 'Your Insurance';
-      var providerEl = document.getElementById('benefitsProviderName');
-      if (providerEl) providerEl.textContent = providerName;
-      goToStep('5b');
-    }
+    // All insurance types use the same benefits summary table
+    goToStep(5);
   }
 
   // ---- Insurance ID Setup ----
@@ -241,6 +234,16 @@
         funnelData.insuranceId = insuranceId;
       }
       goToValidateStep();
+    });
+  }
+
+  // ---- Review Skip Button ----
+  var reviewSkipBtn = document.getElementById('reviewSkipBtn');
+  if (reviewSkipBtn) {
+    reviewSkipBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (window._reviewTimeout) clearTimeout(window._reviewTimeout);
+      goToStep(3);
     });
   }
 
@@ -619,7 +622,7 @@
 
     // Total duration: ~25 seconds (enough for 5 slide rotations at ~5s each)
     var totalDuration = 25000;
-    var slideInterval = 4500;
+    var slideInterval = 5000;
     var progressStep = 100 / (totalDuration / 100);
 
     // Activate first slide
@@ -658,17 +661,19 @@
       var prevSlide = currentSlide;
       currentSlide = (currentSlide + 1) % totalSlides;
 
-      // Animate out current
+      // Animate out current slide
       slides[prevSlide].classList.add('exiting');
       slides[prevSlide].classList.remove('active');
 
-      // After exit animation, remove exiting class
+      // After exit animation completes, remove exiting class
       setTimeout(function() {
         slides[prevSlide].classList.remove('exiting');
-      }, 800);
+      }, 1000);
 
-      // Animate in next
-      slides[currentSlide].classList.add('active');
+      // Slight delay before showing next slide for cleaner crossfade
+      setTimeout(function() {
+        slides[currentSlide].classList.add('active');
+      }, 250);
 
       // Update dots
       for (var d = 0; d < dots.length; d++) {
