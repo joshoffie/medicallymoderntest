@@ -57,6 +57,15 @@
 
     const prevEl = getStepElement(prevStep);
     if (prevEl) {
+      // Clear any inline option selection styles on the step we're returning to
+      prevEl.querySelectorAll('.option-btn').forEach(function(btn) {
+        btn.style.borderColor = '';
+        btn.style.background = '';
+      });
+      prevEl.querySelectorAll('.ins-item').forEach(function(item) {
+        item.classList.remove('selected');
+      });
+
       prevEl.classList.add('active');
       currentStep = prevStep;
       var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5 };
