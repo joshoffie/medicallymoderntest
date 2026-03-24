@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Snake M Animation Test</title>
+<style>
+  body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    background: #f5f5f5;
+    font-family: Inter, sans-serif;
+  }
+  .verify-icon-wrap {
+    width: 80px;
+    height: 80px;
+    background: #eef8f6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  canvas {
+    width: 64px;
+    height: 64px;
+    display: block;
+  }
+  .controls {
+    margin-top: 30px;
+    display: flex;
+    gap: 10px;
+  }
+  button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #0e7c6b;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.9; }
+  .label { color: #666; font-size: 13px; margin-top: 8px; }
+
+  /* Benefits badge test */
+  .badge-test {
+    margin-top: 40px;
+    padding: 30px;
+    background: white;
+    border-radius: 16px;
+    text-align: center;
+  }
+  .benefits-badge-centered {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    background: #eef8f6;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<h3 style="color:#0f2b3c; margin-bottom: 4px;">Snake M Animation Preview</h3>
+<p class="label">Trail-based: head snakes through M, body follows</p>
+
+<div class="verify-icon-wrap">
+  <canvas id="snakeCanvas" width="128" height="128"></canvas>
+</div>
+<p class="label" id="phaseLabel">Phase: spinning</p>
+
+<div class="controls">
+  <button onclick="restart()">Restart</button>
+  <button onclick="ctrl.showM()">Force M</button>
+</div>
+
+<!-- Benefits badge test -->
+<div class="badge-test">
+  <p class="label" style="margin-bottom:12px">Benefits Badge (should be square):</p>
+  <div class="benefits-badge-centered">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="3"/>
+      <path d="M9 12l2 2 4-4"/>
+    </svg>
+  </div>
+</div>
+
+<script>
+var ctrl;
+var snakeAnim;
+
+function startSnakeAnimation() {
+  var canvas = document.getElementById('snakeCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = 128, H = 128;
+  var cx = W / 2, cy = H / 2, r = 40;
+  var teal = '#0e7c6b';
+  var lineW = 6;
+
+  // M shape waypoints
+  var mPts = [
+    { x: 22, y: 98 },   // bottom-left
+    { x: 22, y: 30 },   // top-left
+    { x: 64, y: 68 },   // center-bottom
+    { x: 106, y: 30 },  // top-right
+    { x: 106, y: 98 }   // bottom-right
+  ];
+
+  function dist(a, b) {
+    var dx = b.x - a.x, dy = b.y - a.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  // Compute total M path length
+  var mSegLens = [];
+  var totalMLen = 0;
+  for (var i = 1; i < mPts.length; i++) {
+    var d = dist(mPts[i - 1], mPts[i]);
+    mSegLens.push(d);
+    totalMLen += d;
+  }
+
+  // Get point along M path at distance d from start
+  function mPointAtDist(d) {
+    d = Math.max(0, Math.min(d, totalMLen));
+    var acc = 0;
+    for (var i = 0; i < mSegLens.length; i++) {
+      if (acc + mSegLens[i] >= d) {
+        var frac = (d - acc) / mSegLens[i];
+        return {
+          x: mPts[i].x + (mPts[i + 1].x - mPts[i].x) * frac,
+          y: mPts[i].y + (mPts[i + 1].y - mPts[i].y) * frac
+        };
+      }
+      acc += mSegLens[i];
+    }
+    return { x: mPts[mPts.length - 1].x, y: mPts[mPts.length - 1].y };
+  }
+
+  function circlePoint(angle) {
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  }
+
+  // Smooth easing for bridge
+  function easeInOut(t) {
+    return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  }
+
+  // ---- State ----
+  var trailLen = 80;
+  var trail = [];
+  var headAngle = -Math.PI / 2; // start at top
+  var circleSpeed = Math.PI * 1.8 / 1000; // rad/ms — one full loop ~3.5s
+  var mSpeed = totalMLen / 700; // px/ms — trace M in ~700ms
+  var mDist = 0;
+
+  var phase = 0;
+  // 0: spin circle
+  // 1: bridge circle → M start (head curves to M start)
+  // 2: trace M (head snakes along M, body peels off circle/bridge)
+  // 3: hold M (trail settles into M shape)
+  // 4: trace M reverse (head leaves M end, snakes back toward circle)
+  // 5: bridge M end → circle
+
+  var phaseTime = 0;
+  var spinDuration = 1500;
+  var holdDuration = 1200;
+  var bridgeDuration = 250;
+  var lastTime = 0;
+  var running = true;
+  var forceM = false;
+  var bridgeStart, bridgeEnd;
+
+  // Initialize trail on circle
+  for (var i = 0; i < trailLen; i++) {
+    var a = headAngle - (i / trailLen) * Math.PI * 1.5;
+    trail.push(circlePoint(a));
+  }
+
+  var phaseNames = ['spinning', 'bridge→M', 'tracing M', 'hold M', 'leaving M', 'bridge→circle'];
+
+  function animate(time) {
+    if (!running) return;
+    if (!lastTime) lastTime = time;
+    var dt = Math.min(time - lastTime, 50);
+    lastTime = time;
+
+    if (forceM) {
+      drawStaticM();
+      snakeAnim = requestAnimationFrame(animate);
+      return;
+    }
+
+    phaseTime += dt;
+    var headPos;
+    var addToTrail = true;
+
+    switch (phase) {
+      case 0: // Spinning circle
+        headAngle += circleSpeed * dt;
+        headPos = circlePoint(headAngle);
+        if (phaseTime >= spinDuration) {
+          phase = 1;
+          phaseTime = 0;
+          bridgeStart = { x: headPos.x, y: headPos.y };
+          bridgeEnd = { x: mPts[0].x, y: mPts[0].y };
+        }
+        break;
+
+      case 1: // Bridge: circle → M start
+        var t = easeInOut(Math.min(phaseTime / bridgeDuration, 1));
+        headPos = {
+          x: bridgeStart.x + (bridgeEnd.x - bridgeStart.x) * t,
+          y: bridgeStart.y + (bridgeEnd.y - bridgeStart.y) * t
+        };
+        if (phaseTime >= bridgeDuration) {
+          phase = 2;
+          phaseTime = 0;
+          mDist = 0;
+        }
+        break;
+
+      case 2: // Tracing M path — head snakes through M shape
+        mDist += mSpeed * dt;
+        if (mDist >= totalMLen) {
+          mDist = totalMLen;
+          headPos = mPointAtDist(totalMLen);
+          phase = 3;
+          phaseTime = 0;
+          // Settle trail: replace with evenly-spaced M points
+          // so the hold looks like a clean M
+          settleTrailToM();
+          addToTrail = false;
+        } else {
+          headPos = mPointAtDist(mDist);
+        }
+        break;
+
+      case 3: // Hold M — don't modify trail
+        addToTrail = false;
+        headPos = null;
+        if (phaseTime >= holdDuration) {
+          phase = 4;
+          phaseTime = 0;
+          mDist = totalMLen; // start from end of M
+        }
+        break;
+
+      case 4: // Leaving M — head retraces M in reverse back toward start, then bridges to circle
+        // Head moves backward along M from end toward start
+        mDist -= mSpeed * dt;
+        if (mDist <= 0) {
+          mDist = 0;
+          headPos = mPointAtDist(0);
+          // Now bridge from M start back to circle
+          phase = 5;
+          phaseTime = 0;
+          bridgeStart = { x: mPts[0].x, y: mPts[0].y };
+          // Re-enter circle at the angle closest to M start
+          var reentryAngle = Math.atan2(mPts[0].y - cy, mPts[0].x - cx);
+          bridgeEnd = circlePoint(reentryAngle);
+          headAngle = reentryAngle;
+        } else {
+          headPos = mPointAtDist(mDist);
+        }
+        break;
+
+      case 5: // Bridge: M start → circle
+        var t = easeInOut(Math.min(phaseTime / bridgeDuration, 1));
+        headPos = {
+          x: bridgeStart.x + (bridgeEnd.x - bridgeStart.x) * t,
+          y: bridgeStart.y + (bridgeEnd.y - bridgeStart.y) * t
+        };
+        if (phaseTime >= bridgeDuration) {
+          phase = 0;
+          phaseTime = 0;
+        }
+        break;
+    }
+
+    // Update trail
+    if (addToTrail && headPos) {
+      trail.unshift(headPos);
+      if (trail.length > trailLen) trail.pop();
+    }
+
+    // Draw
+    drawSnake(trail);
+
+    // Update label
+    var label = document.getElementById('phaseLabel');
+    if (label) label.textContent = 'Phase: ' + phaseNames[phase];
+
+    snakeAnim = requestAnimationFrame(animate);
+  }
+
+  function settleTrailToM() {
+    // Replace trail with evenly distributed M points
+    // Head (index 0) at end of M, tail at start
+    trail = [];
+    for (var i = 0; i < trailLen; i++) {
+      var frac = i / (trailLen - 1);
+      var d = totalMLen * (1 - frac); // head at end, tail at start
+      trail.push(mPointAtDist(d));
+    }
+  }
+
+  function drawSnake(pts) {
+    ctx.clearRect(0, 0, W, H);
+    if (pts.length < 2) return;
+
+    ctx.lineWidth = lineW;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    // Draw segments with fading opacity
+    for (var i = 1; i < pts.length; i++) {
+      var alpha = 1 - (i / pts.length) * 0.6;
+      ctx.globalAlpha = alpha;
+      ctx.strokeStyle = teal;
+      ctx.beginPath();
+      ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+      ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+    }
+
+    // Head dot
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = teal;
+    ctx.beginPath();
+    ctx.arc(pts[0].x, pts[0].y, lineW / 2 + 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawStaticM() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = teal;
+    ctx.lineWidth = lineW;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.moveTo(mPts[0].x, mPts[0].y);
+    for (var i = 1; i < mPts.length; i++) {
+      ctx.lineTo(mPts[i].x, mPts[i].y);
+    }
+    ctx.stroke();
+  }
+
+  running = true;
+  forceM = false;
+  snakeAnim = requestAnimationFrame(animate);
+
+  return {
+    stop: function () { running = false; if (snakeAnim) cancelAnimationFrame(snakeAnim); },
+    showM: function () { forceM = true; }
+  };
+}
+
+function restart() {
+  if (ctrl) ctrl.stop();
+  ctrl = startSnakeAnimation();
+}
+
+ctrl = startSnakeAnimation();
+</script>
+</body>
+</html>
