@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/funnel.css?v=7">
+  <link rel="stylesheet" href="assets/css/funnel.css?v=8">
 </head>
 <body>
 
@@ -18,9 +18,9 @@
 
   <!-- Header -->
   <header class="funnel-header">
-    <div class="logo">
-      <span class="logo-text">Medically<br><strong>Modern</strong></span>
-    </div>
+    <a href="../" class="logo">
+      <img src="https://medicallymodern.com/wp-content/uploads/2025/08/logo-1-1024x333.png" alt="Medically Modern" class="logo-img">
+    </a>
     <a href="#" class="header-phone" id="headerPhone" style="display:none;">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
       (347) 503-7148
@@ -378,49 +378,58 @@
         <h1 class="step-question">Do you have a CGM preference?</h1>
         <p class="step-subtitle">Don't worry if you're not sure — we'll help you find the best fit.</p>
         <div class="options product-options">
-          <button class="option-btn product-btn" data-next="8" data-value="dexcom-g7-10day">
+          <button class="option-btn product-btn cgm-card" data-next="8" data-value="dexcom-g7-10day" data-anim="tilt">
+            <img src="https://medicallymodern.com/wp-content/uploads/2025/07/Dexcom-G7-e1753509007250.png" alt="Dexcom G7" class="cgm-thumb" loading="lazy">
             <div class="product-info">
               <span class="product-name">Dexcom G7 (10-Day)</span>
               <span class="product-desc">Most popular. Real-time readings, no scanning, 10-day wear.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="8" data-value="dexcom-g7-15day">
+          <button class="option-btn product-btn cgm-card" data-next="8" data-value="dexcom-g7-15day" data-anim="pulse">
+            <img src="https://medicallymodern.com/wp-content/uploads/2025/07/Dexcom-G7-e1753509007250.png" alt="Dexcom G7" class="cgm-thumb" loading="lazy">
             <div class="product-info">
               <span class="product-name">Dexcom G7 (15-Day)</span>
               <span class="product-desc">Extended wear. Same accuracy, fewer sensor changes.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="8" data-value="libre-3-plus">
+          <button class="option-btn product-btn cgm-card" data-next="8" data-value="libre-3-plus" data-anim="float">
+            <img src="https://medicallymodern.com/wp-content/uploads/2025/07/FreeStyle-Libre-3.png" alt="FreeStyle Libre 3 Plus" class="cgm-thumb" loading="lazy">
             <div class="product-info">
               <span class="product-name">FreeStyle Libre 3 Plus</span>
               <span class="product-desc">14-day sensor, continuous readings, smallest design.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="8" data-value="libre-2-plus">
+          <button class="option-btn product-btn cgm-card" data-next="8" data-value="libre-2-plus" data-anim="spin">
+            <img src="https://medicallymodern.com/wp-content/uploads/2025/07/FreeStyle-Libre-2.png" alt="FreeStyle Libre 2 Plus" class="cgm-thumb" loading="lazy">
             <div class="product-info">
               <span class="product-name">FreeStyle Libre 2 Plus</span>
               <span class="product-desc">14-day sensor, scan-to-read, affordable option.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="8" data-value="medtronic-instinct">
+          <button class="option-btn product-btn cgm-card" data-next="8" data-value="medtronic-instinct" data-anim="rock">
+            <img src="https://medicallymodern.com/wp-content/uploads/2025/07/Dexcom-G7-e1753509007250.png" alt="Medtronic InPen" class="cgm-thumb" loading="lazy">
             <div class="product-info">
               <span class="product-name">Medtronic InPen / Instinct</span>
               <span class="product-desc">Integrated smart insulin system with CGM pairing.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="8" data-value="guardian-4">
+          <button class="option-btn product-btn cgm-card" data-next="8" data-value="guardian-4" data-anim="bounce">
+            <img src="https://medicallymodern.com/wp-content/uploads/2025/07/FreeStyle-Libre-3.png" alt="Guardian 4" class="cgm-thumb" loading="lazy">
             <div class="product-info">
               <span class="product-name">Guardian 4</span>
               <span class="product-desc">Medtronic's standalone CGM. 7-day sensor, real-time alerts.</span>
             </div>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn product-btn" data-next="8" data-value="not-sure-cgm">
+          <button class="option-btn product-btn cgm-card" data-next="8" data-value="not-sure-cgm">
+            <div class="cgm-thumb cgm-thumb-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
             <div class="product-info">
               <span class="product-name">Not sure yet</span>
               <span class="product-desc">Help me decide what's best for my situation.</span>
@@ -434,8 +443,8 @@
     <!-- ========== STEP 8: COLLECT — Patient Info ========== -->
     <section class="step" data-step="8" id="step8">
       <div class="step-content">
-        <h1 class="step-question">Almost there — let's get you set up.</h1>
-        <p class="step-subtitle">We'll use this info to check your specific coverage and get the process started.</p>
+        <h1 class="step-question">Almost there — create your account.</h1>
+        <p class="step-subtitle">Set up your Medically Modern account so we can check your coverage and get the process started.</p>
         <form class="intake-form" id="intakeForm">
           <div class="form-row">
             <div class="form-group">
@@ -459,8 +468,18 @@
             <label for="email">Email Address</label>
             <input type="email" id="email" name="email" required placeholder="your@email.com" autocomplete="email">
           </div>
+          <div class="form-group">
+            <label for="password">Create Password</label>
+            <div class="password-wrap">
+              <input type="password" id="password" name="password" required placeholder="At least 8 characters" autocomplete="new-password" minlength="8">
+              <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
+                <svg class="pw-eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="pw-eye-closed" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
+          </div>
           <button type="submit" class="cta-btn submit-btn">
-            Yes, let's get started →
+            Create account & get started →
           </button>
           <p class="form-disclaimer">Your information is secure and HIPAA-compliant. We'll never share your data.</p>
         </form>
@@ -690,6 +709,6 @@
 
   </main>
 
-  <script src="assets/js/funnel.js?v=7"></script>
+  <script src="assets/js/funnel.js?v=8"></script>
 </body>
 </html>

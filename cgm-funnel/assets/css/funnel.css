@@ -90,17 +90,15 @@ body {
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.logo-text {
-  font-family: 'Playfair Display', Georgia, serif;
-  font-size: 1.05rem;
-  line-height: 1.1;
-  color: var(--mm-navy);
-  letter-spacing: -0.03em;
-  font-weight: 600;
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
 }
 
-.logo-text strong {
-  font-weight: 700;
+.logo-img {
+  height: 38px;
+  width: auto;
 }
 
 .header-phone {
@@ -1224,6 +1222,134 @@ body {
 
 .carousel-next {
   right: -4px;
+}
+
+/* ---- CGM PRODUCT THUMBNAILS (Step 7) ---- */
+.cgm-card {
+  gap: 14px;
+}
+
+.cgm-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: all 0.4s var(--mm-ease);
+  will-change: transform;
+}
+
+.cgm-thumb-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: var(--mm-teal-light);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+/* Tilt animation — Dexcom G7 10-Day */
+.cgm-card[data-anim="tilt"]:hover .cgm-thumb {
+  transform: rotate(-12deg) scale(1.12);
+}
+
+/* Pulse animation — Dexcom G7 15-Day */
+.cgm-card[data-anim="pulse"]:hover .cgm-thumb {
+  animation: cgmPulse 0.6s var(--mm-ease-bounce);
+}
+
+@keyframes cgmPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.18); }
+  100% { transform: scale(1.08); }
+}
+
+/* Float animation — Libre 3 Plus */
+.cgm-card[data-anim="float"]:hover .cgm-thumb {
+  animation: cgmFloat 0.7s var(--mm-ease) forwards;
+}
+
+@keyframes cgmFloat {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px) scale(1.06); }
+  100% { transform: translateY(-3px) scale(1.08); }
+}
+
+/* Spin animation — Libre 2 Plus */
+.cgm-card[data-anim="spin"]:hover .cgm-thumb {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* Rock animation — Medtronic */
+.cgm-card[data-anim="rock"]:hover .cgm-thumb {
+  animation: cgmRock 0.5s var(--mm-ease);
+}
+
+@keyframes cgmRock {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(-8deg); }
+  75% { transform: rotate(8deg); }
+  100% { transform: rotate(-3deg) scale(1.06); }
+}
+
+/* Bounce animation — Guardian 4 */
+.cgm-card[data-anim="bounce"]:hover .cgm-thumb {
+  animation: cgmBounce 0.5s var(--mm-ease-bounce);
+}
+
+@keyframes cgmBounce {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(-2px) scale(1.05); }
+}
+
+/* ---- PASSWORD FIELD ---- */
+.password-wrap {
+  position: relative;
+}
+
+.password-wrap input {
+  width: 100%;
+  padding: 15px 50px 15px 18px;
+  border: 1.5px solid var(--mm-gray-200);
+  border-radius: var(--mm-radius);
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--mm-text);
+  transition: var(--mm-transition);
+  background: var(--mm-white);
+}
+
+.password-wrap input:focus {
+  outline: none;
+  border-color: var(--mm-teal);
+  box-shadow: var(--mm-shadow-focus);
+}
+
+.password-wrap input::placeholder {
+  color: var(--mm-gray-400);
+  font-weight: 400;
+}
+
+.pw-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--mm-gray-400);
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.pw-toggle:hover {
+  color: var(--mm-teal);
 }
 
 @media (max-width: 380px) {

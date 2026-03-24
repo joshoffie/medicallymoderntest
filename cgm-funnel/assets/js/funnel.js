@@ -109,6 +109,16 @@
     if (!nextEl || nextEl === currentEl) return;
 
     currentEl.classList.remove('active');
+
+    // Clear any inline option selection styles on the destination step
+    nextEl.querySelectorAll('.option-btn').forEach(function(btn) {
+      btn.style.borderColor = '';
+      btn.style.background = '';
+    });
+    nextEl.querySelectorAll('.ins-item').forEach(function(item) {
+      item.classList.remove('selected');
+    });
+
     nextEl.classList.add('active');
 
     // Scroll to top
@@ -491,6 +501,22 @@
     });
     reviewsPrev.addEventListener('click', function() {
       reviewsTrack.scrollBy({ left: -296, behavior: 'smooth' });
+    });
+  }
+
+  // ---- Password Toggle ----
+  var pwToggle = document.getElementById('pwToggle');
+  var pwInput = document.getElementById('password');
+  if (pwToggle && pwInput) {
+    pwToggle.addEventListener('click', function() {
+      var isPassword = pwInput.type === 'password';
+      pwInput.type = isPassword ? 'text' : 'password';
+      var eyeOpen = pwToggle.querySelector('.pw-eye-open');
+      var eyeClosed = pwToggle.querySelector('.pw-eye-closed');
+      if (eyeOpen && eyeClosed) {
+        eyeOpen.style.display = isPassword ? 'none' : '';
+        eyeClosed.style.display = isPassword ? '' : 'none';
+      }
     });
   }
 
