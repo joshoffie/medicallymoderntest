@@ -122,7 +122,7 @@ function startSnakeAnimation() {
   var phase = 0;
   var progress = 0; // 0-1, how far through current draw/undraw
   var drawSpeed = 1.0 / 800; // fraction per ms (800ms to draw full M)
-  var holdDuration = 1200; // ms
+  var holdDuration = 2500; // ms (2.5s with glow pulse)
   var pauseDuration = 300; // ms between undraw and next draw
   var phaseTime = 0;
   var lastTime = 0;
@@ -160,9 +160,9 @@ function startSnakeAnimation() {
         drawSegment(path, tailIdx, headIdx);
         break;
 
-      case 1: // Hold (after L→R draw)
+      case 1: // Hold (after L→R draw) — with glow pulse
       case 5: // Hold (after R→L draw)
-        drawSegment(path, 0, numPts);
+        drawGlowingM(phaseTime);
         if (phaseTime >= holdDuration) {
           phase = (phase === 1) ? 2 : 6;
           phaseTime = 0;
@@ -229,6 +229,36 @@ function startSnakeAnimation() {
     ctx.beginPath();
     ctx.arc(path[endIdx].x, path[endIdx].y, lineW / 2 + 1, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.globalAlpha = 1;
+  }
+
+  function drawGlowingM(t) {
+    ctx.clearRect(0, 0, W, H);
+
+    // Pulse: sin wave cycles over ~800ms for a smooth breathe
+    var pulse = Math.sin(t * Math.PI * 2 / 800);
+    var glowRadius = 8 + pulse * 5; // 3-13px glow
+    var glowAlpha = 0.12 + pulse * 0.08; // 0.04-0.20
+
+    // Draw glow layer (thicker, transparent)
+    ctx.strokeStyle = teal;
+    ctx.lineWidth = lineW + glowRadius;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha = glowAlpha;
+    ctx.beginPath();
+    ctx.moveTo(mPts[0].x, mPts[0].y);
+    for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+    ctx.stroke();
+
+    // Draw solid M on top
+    ctx.lineWidth = lineW;
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.moveTo(mPts[0].x, mPts[0].y);
+    for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+    ctx.stroke();
 
     ctx.globalAlpha = 1;
   }
