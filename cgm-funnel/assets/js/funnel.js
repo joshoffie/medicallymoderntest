@@ -237,7 +237,7 @@
     const insuranceIdInput = document.getElementById('insuranceId');
     if (!insuranceIdQuestion) return;
 
-    var hintText = "We'll run a complimentary benefits check for you — having your ID lets us get you results faster, but it's totally optional.";
+    var hintText = "We'll run a complimentary benefits check for you. Having your ID gets you results faster, but it's totally optional.";
     if (selectedInsuranceType === 'medicare') {
       insuranceIdQuestion.textContent = "Have your Medicare card handy?";
       insuranceIdHint.textContent = hintText;
@@ -646,9 +646,200 @@
     });
   }
 
+  // ---- Snake M Canvas Animation ----
+  var snakeAnim = null;
+
+  function startSnakeAnimation() {
+    var canvas = document.getElementById('snakeCanvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = 128, H = 128;
+    var cx = W / 2, cy = H / 2, r = 40;
+    var teal = '#0e7c6b';
+    var lineW = 6;
+    var snakeLen = 0.75; // fraction of total path visible as "body"
+
+    // M shape points (in canvas coords)
+    var mPts = [
+      { x: 22, y: 98 },
+      { x: 22, y: 30 },
+      { x: 64, y: 68 },
+      { x: 106, y: 30 },
+      { x: 106, y: 98 }
+    ];
+
+    // Get total M path length
+    function mPathLength() {
+      var len = 0;
+      for (var i = 1; i < mPts.length; i++) {
+        var dx = mPts[i].x - mPts[i - 1].x;
+        var dy = mPts[i].y - mPts[i - 1].y;
+        len += Math.sqrt(dx * dx + dy * dy);
+      }
+      return len;
+    }
+
+    // Get point along M path at fraction t (0-1)
+    function mPointAt(t) {
+      var totalLen = mPathLength();
+      var target = t * totalLen;
+      var acc = 0;
+      for (var i = 1; i < mPts.length; i++) {
+        var dx = mPts[i].x - mPts[i - 1].x;
+        var dy = mPts[i].y - mPts[i - 1].y;
+        var segLen = Math.sqrt(dx * dx + dy * dy);
+        if (acc + segLen >= target) {
+          var frac = (target - acc) / segLen;
+          return { x: mPts[i - 1].x + dx * frac, y: mPts[i - 1].y + dy * frac };
+        }
+        acc += segLen;
+      }
+      return mPts[mPts.length - 1];
+    }
+
+    // Get point on circle at angle
+    function circlePoint(angle) {
+      return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+    }
+
+    // Smooth easing
+    function easeInOut(t) {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    }
+
+    // Interpolate between circle point and M point
+    function lerp(a, b, t) {
+      return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    }
+
+    var phase = 0; // 0: spinning circle, 1: circle→M, 2: hold M, 3: M→circle
+    var phaseTime = 0;
+    var phaseDurations = [1200, 800, 1200, 800]; // ms per phase
+    var headAngle = 0;
+    var lastTime = 0;
+    var running = true;
+    var forceM = false;
+
+    function getSnakePoints(numPts) {
+      var pts = [];
+
+      if (phase === 0) {
+        // Spinning circle — snake chases its tail
+        var speed = Math.PI * 2 / 1000; // rads per ms
+        for (var i = 0; i < numPts; i++) {
+          var frac = i / (numPts - 1);
+          var angle = headAngle - frac * snakeLen * Math.PI * 2;
+          pts.push(circlePoint(angle));
+        }
+      } else if (phase === 1) {
+        // Circle → M transition
+        var t = easeInOut(Math.min(phaseTime / phaseDurations[1], 1));
+        for (var i = 0; i < numPts; i++) {
+          var frac = i / (numPts - 1);
+          // Where this point would be on the circle
+          var angle = headAngle - frac * snakeLen * Math.PI * 2;
+          var cp = circlePoint(angle);
+          // Where this point maps to on the M
+          var mFrac = 1 - frac; // head = end of M, tail = start
+          var mp = mPointAt(mFrac);
+          pts.push(lerp(cp, mp, t));
+        }
+      } else if (phase === 2 || forceM) {
+        // Hold M shape
+        for (var i = 0; i < numPts; i++) {
+          var frac = 1 - (i / (numPts - 1));
+          pts.push(mPointAt(frac));
+        }
+      } else if (phase === 3) {
+        // M → circle transition
+        var t = easeInOut(Math.min(phaseTime / phaseDurations[3], 1));
+        for (var i = 0; i < numPts; i++) {
+          var frac = i / (numPts - 1);
+          var mFrac = 1 - frac;
+          var mp = mPointAt(mFrac);
+          var angle = headAngle - frac * snakeLen * Math.PI * 2;
+          var cp = circlePoint(angle);
+          pts.push(lerp(mp, cp, t));
+        }
+      }
+      return pts;
+    }
+
+    function drawSnake(pts) {
+      ctx.clearRect(0, 0, W, H);
+      if (pts.length < 2) return;
+
+      ctx.strokeStyle = teal;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      // Draw with gradient opacity (tail fades)
+      for (var i = 1; i < pts.length; i++) {
+        var alpha = 1 - (i / pts.length) * 0.6;
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
+        ctx.lineTo(pts[i].x, pts[i].y);
+        ctx.stroke();
+      }
+
+      // Head dot
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = teal;
+      ctx.beginPath();
+      ctx.arc(pts[0].x, pts[0].y, lineW / 2 + 1, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function animate(time) {
+      if (!running) return;
+      if (!lastTime) lastTime = time;
+      var dt = time - lastTime;
+      lastTime = time;
+
+      if (forceM) {
+        drawSnake(getSnakePoints(60));
+        snakeAnim = requestAnimationFrame(animate);
+        return;
+      }
+
+      phaseTime += dt;
+
+      // Advance head angle during spinning phases
+      if (phase === 0 || phase === 3) {
+        headAngle += (Math.PI * 2 / 1000) * dt;
+      }
+
+      // Phase transitions
+      if (phaseTime >= phaseDurations[phase]) {
+        phaseTime = 0;
+        phase = (phase + 1) % 4;
+      }
+
+      var pts = getSnakePoints(60);
+      drawSnake(pts);
+
+      snakeAnim = requestAnimationFrame(animate);
+    }
+
+    // Start
+    running = true;
+    forceM = false;
+    snakeAnim = requestAnimationFrame(animate);
+
+    // Return control object
+    return {
+      stop: function() { running = false; if (snakeAnim) cancelAnimationFrame(snakeAnim); },
+      showM: function() { forceM = true; }
+    };
+  }
+
   // ---- Benefits Verification Loading Animation ----
   var verifyInterval = null;
   var verifyTimeout = null;
+
+  var snakeCtrl = null;
 
   function startBenefitsVerification() {
     var progressBar = document.getElementById('verifyProgressBar');
@@ -658,6 +849,10 @@
     var verifyScreen = document.querySelector('.verify-screen');
 
     if (!progressBar || !slidesContainer) return;
+
+    // Start snake M animation
+    if (snakeCtrl) snakeCtrl.stop();
+    snakeCtrl = startSnakeAnimation();
 
     var slides = slidesContainer.querySelectorAll('.verify-slide');
     var dots = dotsContainer ? dotsContainer.querySelectorAll('.verify-dot') : [];
@@ -762,23 +957,15 @@
       }, 600);
     }
 
-    // Stop M morph animation and show solid M
-    var mMorphPath = screen ? screen.querySelector('.m-morph-path') : null;
-    if (mMorphPath) {
-      mMorphPath.style.animation = 'none';
-      mMorphPath.setAttribute('d', 'M15 85 L15 25 L50 60 L85 25 L85 85');
-    }
-    var mContainer = screen ? screen.querySelector('.m-morph-container') : null;
-    if (mContainer) {
-      var ring = mContainer.querySelector('::after');
-      mContainer.style.setProperty('--ring-opacity', '0');
-    }
+    // Lock snake animation into M shape
+    if (snakeCtrl) snakeCtrl.showM();
 
     // Seamless transition to benefits summary after a moment
     setTimeout(function() {
       goToBenefitsSummary();
 
       // Clean up verify screen state for potential re-use
+      if (snakeCtrl) { snakeCtrl.stop(); snakeCtrl = null; }
       if (screen) screen.classList.remove('complete');
       if (statusText) {
         statusText.style.color = '';

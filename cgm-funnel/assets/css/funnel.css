@@ -1984,87 +1984,32 @@ body {
   to { stroke-dashoffset: 0; }
 }
 
-/* ---- ANIMATED M LOGO: Verify Screen — Morphing Loader ---- */
-.m-morph-container {
-  position: relative;
+/* ---- TEXT CENTERING: Hims-style mobile-first ---- */
+.step-question {
+  text-align: center;
+}
+
+.step-subtitle {
+  text-align: center;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.step-content {
+  text-align: center;
+}
+
+.options, .intake-form {
+  text-align: left;
+}
+
+/* ---- SNAKE M LOGO: Verify Screen ---- */
+.snake-canvas {
   width: 64px;
   height: 64px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.m-morph-svg {
-  position: relative;
-  z-index: 2;
-}
-
-.m-morph-path {
-  stroke-dasharray: 300;
-  stroke-dashoffset: 0;
-  transform-origin: 50px 50px;
-  animation: mMorphCycle 3s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-@keyframes mMorphCycle {
-  0% {
-    d: path("M15 85 L15 25 L50 60 L85 25 L85 85");
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-  15% {
-    d: path("M15 55 L15 55 L50 55 L85 55 L85 55");
-    opacity: 1;
-  }
-  30% {
-    d: path("M50 15 L80 50 L65 85 L35 85 L20 50");
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-  35%, 65% {
-    d: path("M50 15 L80 50 L65 85 L35 85 L20 50");
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-  80% {
-    d: path("M15 55 L15 55 L50 55 L85 55 L85 55");
-    opacity: 1;
-  }
-  95%, 100% {
-    d: path("M15 85 L15 25 L50 60 L85 25 L85 85");
-    stroke-dashoffset: 0;
-    opacity: 1;
-  }
-}
-
-/* Spinning ring behind the M morph */
-.m-morph-container::after {
-  content: '';
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  border: 2.5px solid transparent;
-  border-top-color: var(--mm-teal);
-  border-right-color: rgba(14, 124, 107, 0.3);
-  animation: mSpin 1.2s linear infinite;
-  opacity: 0.5;
-}
-
-@keyframes mSpin {
-  to { transform: rotate(360deg); }
-}
-
-/* When verification is complete, show M solidly */
-.verify-screen.complete .m-morph-path {
-  animation: none;
-  d: path("M15 85 L15 25 L50 60 L85 25 L85 85");
-}
-
-.verify-screen.complete .m-morph-container::after {
-  animation: none;
-  opacity: 0;
-  transition: opacity 0.5s ease;
+  display: block;
+  margin: 0 auto;
 }
 
 /* ---- BENEFITS HEADER: Centered Checkmark ---- */
@@ -2080,11 +2025,21 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   background: var(--mm-teal-light);
-  border-radius: 12px;
+  border-radius: 14px;
   margin-bottom: 16px;
+  animation: benefitsRattle 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.3s both;
+}
+
+@keyframes benefitsRattle {
+  0% { transform: scale(0) rotate(0deg); }
+  30% { transform: scale(1.2) rotate(-8deg); }
+  45% { transform: scale(0.95) rotate(6deg); }
+  60% { transform: scale(1.05) rotate(-4deg); }
+  75% { transform: scale(0.98) rotate(2deg); }
+  100% { transform: scale(1) rotate(0deg); }
 }
 
 /* ---- CONFIRMATION: Dropping Checkmark + Trampoline ---- */
@@ -2092,59 +2047,88 @@ body {
   animation: dropBounce 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
 
+/* Check drops from WAY above, lands very close to text, bounces back up */
 @keyframes dropBounce {
   0% {
     opacity: 0;
-    transform: translateY(-200px) scale(0.8);
+    transform: translateY(-300px) scale(0.7);
   }
-  35% {
+  25% {
     opacity: 1;
-    transform: translateY(30px) scale(1.05);
   }
-  50% {
-    transform: translateY(-15px) scale(0.95);
+  /* Impact: check gets RIGHT up to the text (margin-bottom shrinks) */
+  40% {
+    opacity: 1;
+    transform: translateY(18px) scale(1.08);
+    margin-bottom: 8px;
   }
-  65% {
-    transform: translateY(8px) scale(1.02);
+  /* Bounce back up high */
+  55% {
+    transform: translateY(-40px) scale(0.92);
+    margin-bottom: 28px;
   }
-  80% {
-    transform: translateY(-4px) scale(0.99);
+  /* Second smaller impact */
+  68% {
+    transform: translateY(6px) scale(1.03);
+    margin-bottom: 18px;
+  }
+  /* Smaller bounce */
+  78% {
+    transform: translateY(-12px) scale(0.98);
+    margin-bottom: 28px;
+  }
+  /* Settle */
+  88% {
+    transform: translateY(2px) scale(1.01);
+    margin-bottom: 26px;
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+    margin-bottom: 28px;
   }
 }
 
+/* Text bows like a trampoline — squishes vertically, stretches horizontally */
 .trampoline-text {
-  animation: trampolineBow 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  animation: trampolineBow 1.6s ease 0.1s both;
+  transform-origin: center top;
 }
 
 @keyframes trampolineBow {
-  0% {
-    transform: scaleY(1) translateY(0);
+  0%, 25% {
+    transform: scaleY(1) scaleX(1) translateY(0);
   }
-  30% {
-    transform: scaleY(1) translateY(0);
+  /* First impact — deep bow, text squishes down and spreads wide */
+  40% {
+    transform: scaleY(0.72) scaleX(1.14) translateY(10px);
   }
-  38% {
-    transform: scaleY(0.85) scaleX(1.08) translateY(6px);
-  }
+  /* Spring launch — text stretches tall and thin */
   50% {
-    transform: scaleY(1.12) scaleX(0.96) translateY(-4px);
+    transform: scaleY(1.15) scaleX(0.93) translateY(-8px);
   }
-  62% {
-    transform: scaleY(0.95) scaleX(1.03) translateY(2px);
+  /* Second impact — smaller bow */
+  65% {
+    transform: scaleY(0.88) scaleX(1.06) translateY(5px);
   }
-  75% {
-    transform: scaleY(1.03) scaleX(0.99) translateY(-1px);
+  /* Second spring */
+  73% {
+    transform: scaleY(1.06) scaleX(0.97) translateY(-3px);
+  }
+  /* Third tiny impact */
+  82% {
+    transform: scaleY(0.96) scaleX(1.02) translateY(1px);
+  }
+  /* Settle back */
+  90% {
+    transform: scaleY(1.02) scaleX(0.99) translateY(-1px);
   }
   100% {
     transform: scaleY(1) scaleX(1) translateY(0);
   }
 }
 
-/* Override the old badgePop on step 9 since we have the new drop animation */
+/* Override the old badgePop on step 9 */
 #step9 .qualify-badge {
-  animation: dropBounce 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  animation: dropBounce 1.6s ease 0.1s both;
 }
