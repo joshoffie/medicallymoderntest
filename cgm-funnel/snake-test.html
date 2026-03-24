@@ -214,11 +214,10 @@ function startSnakeAnimation() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineW;
+    ctx.strokeStyle = teal;
 
-    // Draw the trail as a single continuous path with gradient
-    // Use multiple sub-segments with varying alpha for smooth gradient
-    var segments = 24; // enough for smooth gradient, not too many for perf
-    var segSize = Math.max(1, Math.floor(len / segments));
+    // More segments = smoother gradient (48 is imperceptible banding)
+    var segments = 48;
 
     for (var s = 0; s < segments; s++) {
       var sStart = startIdx + Math.round(s * len / segments);
@@ -226,16 +225,21 @@ function startSnakeAnimation() {
       sEnd = Math.min(sEnd, endIdx);
       if (sEnd <= sStart) continue;
 
-      // Position in visible segment: 0 = tail, 1 = head
+      // Position in visible segment: 0 = start of visible, 1 = end of visible
       var pos = (s + 0.5) / segments;
+      var alpha;
 
-      // Smooth alpha curve: tail fades gracefully, head is full
-      // Using a curve that's brighter overall — more teal presence
-      var alpha = 0.15 + pos * pos * 0.85; // quadratic: gentle fade at tail, quick ramp to full
+      if (isDrawing) {
+        // DRAW: tail (pos=0) fades, head (pos=1) is bright
+        alpha = 0.12 + pos * pos * 0.88;
+      } else {
+        // UNDRAW: erasing edge (pos=0) softly fades, remaining end (pos=1) stays solid
+        // The erasing front dissolves — soft leading edge
+        alpha = Math.min(pos * 4, 1); // first 25% fades in, rest is solid
+      }
       alpha *= masterAlpha;
 
       ctx.globalAlpha = alpha;
-      ctx.strokeStyle = teal;
       ctx.beginPath();
       ctx.moveTo(path[sStart].x, path[sStart].y);
       for (var i = sStart + 1; i <= sEnd; i++) {
@@ -244,22 +248,23 @@ function startSnakeAnimation() {
       ctx.stroke();
     }
 
-    // Head: soft rounded cap with subtle glow
-    var headPt = isDrawing ? path[endIdx] : path[startIdx];
+    // Head dot — only during DRAW phase
+    if (isDrawing) {
+      var headPt = path[endIdx];
 
-    // Subtle shadow glow on head
-    ctx.globalAlpha = masterAlpha * 0.3;
-    ctx.fillStyle = teal;
-    ctx.beginPath();
-    ctx.arc(headPt.x, headPt.y, lineW * 0.9, 0, Math.PI * 2);
-    ctx.fill();
+      // Soft glow halo
+      ctx.globalAlpha = masterAlpha * 0.25;
+      ctx.fillStyle = teal;
+      ctx.beginPath();
+      ctx.arc(headPt.x, headPt.y, lineW * 0.85, 0, Math.PI * 2);
+      ctx.fill();
 
-    // Solid head dot
-    ctx.globalAlpha = masterAlpha;
-    ctx.fillStyle = teal;
-    ctx.beginPath();
-    ctx.arc(headPt.x, headPt.y, lineW * 0.55, 0, Math.PI * 2);
-    ctx.fill();
+      // Solid head
+      ctx.globalAlpha = masterAlpha;
+      ctx.beginPath();
+      ctx.arc(headPt.x, headPt.y, lineW * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     ctx.globalAlpha = 1;
   }
