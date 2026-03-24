@@ -68,7 +68,7 @@
 
       prevEl.classList.add('active');
       currentStep = prevStep;
-      var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 8.5 };
+      var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 4.5 };
       updateProgress(typeof prevStep === 'number' ? prevStep : (progressMap[prevStep] || 1));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       updateBackButton();
@@ -139,7 +139,7 @@
     stepHistory.push(stepId);
 
     // Map string step IDs to progress values
-    var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 8.5 };
+    var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 4.5 };
     updateProgress(typeof stepId === 'number' ? stepId : (progressMap[stepId] || currentStep));
 
     // Show phone on later steps
@@ -151,8 +151,14 @@
     updateBackButton();
   }
 
-  // ---- Validate Step Router (Medicare/Medicaid → step 5, Commercial → step 5b) ----
+  // ---- Validate Step Router (Insurance ID → Verify → step 5 or 5b) ----
   function goToValidateStep() {
+    // Go to verification loading screen first, then route to benefits summary
+    goToStep('verify');
+    startBenefitsVerification();
+  }
+
+  function goToBenefitsSummary() {
     if (selectedInsuranceType === 'medicare' || selectedInsuranceType === 'medicaid') {
       goToStep(5);
     } else {
@@ -338,9 +344,8 @@
       //   body: JSON.stringify(funnelData)
       // });
 
-      // Advance to verification loading screen (then auto-transitions to confirmation)
-      goToStep('verify');
-      startBenefitsVerification();
+      // Advance to confirmation
+      goToStep(9);
     });
   }
 
@@ -657,10 +662,9 @@
       shieldSvg.setAttribute('stroke-width', '2.5');
     }
 
-    // Seamless transition to confirmation after a moment
+    // Seamless transition to benefits summary after a moment
     setTimeout(function() {
-      // Personalize confirmation (already done in form submit)
-      goToStep(9);
+      goToBenefitsSummary();
 
       // Clean up verify screen state for potential re-use
       if (screen) screen.classList.remove('complete');
