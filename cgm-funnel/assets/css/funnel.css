@@ -1468,8 +1468,8 @@ body {
   left: 0;
   right: 0;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
   padding: 0 20px;
 }
@@ -1482,7 +1482,7 @@ body {
 
 .verify-slide.exiting {
   opacity: 0;
-  transform: translateY(-16px);
+  transform: translateY(-20px);
 }
 
 .slide-icon {
@@ -1636,4 +1636,198 @@ body {
   .qualify-headline {
     font-size: 1.45rem;
   }
+}
+
+/* ============================================
+   NEW STYLES FOR CHANGES
+   ============================================ */
+
+/* ---- WELCOME SCREEN ---- */
+.welcome-screen {
+  text-align: center;
+}
+
+.welcome-badge {
+  margin-bottom: 24px;
+}
+
+.welcome-badge svg {
+  opacity: 0.8;
+}
+
+.welcome-trust {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 24px;
+  margin: 28px 0 36px;
+}
+
+.trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--mm-gray-500);
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .welcome-trust {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+}
+
+/* ---- REVIEW INTERSTITIAL ---- */
+.review-interstitial {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 320px;
+}
+
+.review-card {
+  max-width: 480px;
+  padding: 32px;
+  background: var(--mm-white);
+  border: 1px solid var(--mm-gray-100);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+  animation: reviewFadeIn 0.8s ease forwards;
+}
+
+.review-stars {
+  font-size: 1.5rem;
+  color: #F4B400;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
+}
+
+.review-quote {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--mm-text);
+  font-style: italic;
+  margin: 0 0 20px;
+  font-weight: 400;
+}
+
+.review-author {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.review-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--mm-text);
+}
+
+.review-via {
+  font-size: 0.8rem;
+  color: var(--mm-gray-400);
+}
+
+.review-trust-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 10px 20px;
+  background: var(--mm-teal-light);
+  border-radius: 100px;
+}
+
+.review-rating {
+  font-weight: 700;
+  color: var(--mm-teal);
+  font-size: 0.95rem;
+}
+
+.review-count {
+  font-size: 0.85rem;
+  color: var(--mm-gray-500);
+}
+
+@keyframes reviewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---- BENEFITS BREAKDOWN ---- */
+.benefits-breakdown {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.benefits-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.benefits-header svg {
+  margin-bottom: 12px;
+}
+
+.benefits-table {
+  border: 1px solid var(--mm-gray-100);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.benefit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--mm-gray-100);
+}
+
+.benefit-row:last-child {
+  border-bottom: none;
+}
+
+.benefit-row.highlight {
+  background: var(--mm-teal-light);
+}
+
+.benefit-label {
+  font-size: 0.95rem;
+  color: var(--mm-text);
+  font-weight: 500;
+}
+
+.benefit-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.benefit-value.covered {
+  color: var(--mm-teal);
+}
+
+.benefit-value.price {
+  color: var(--mm-teal);
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.benefits-note {
+  font-size: 0.8rem;
+  color: var(--mm-gray-400);
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.5;
 }

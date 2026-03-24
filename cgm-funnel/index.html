@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/funnel.css?v=11">
+  <link rel="stylesheet" href="assets/css/funnel.css?v=12">
 </head>
 <body>
 
@@ -30,8 +30,29 @@
   <!-- Funnel Container -->
   <main class="funnel-container" id="funnelContainer">
 
+    <!-- ========== STEP 0: WELCOME ========== -->
+    <section class="step active" data-step="welcome" id="stepWelcome">
+      <div class="step-content welcome-screen">
+        <div class="welcome-badge">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h1 class="step-question">Let's check your CGM coverage.</h1>
+        <p class="step-subtitle">Answer a few quick questions and we'll see if your insurance covers a Continuous Glucose Monitor — most patients pay $0 out of pocket.</p>
+        <div class="welcome-trust">
+          <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> HIPAA Compliant</span>
+          <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Takes ~2 minutes</span>
+          <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 10,000+ patients helped</span>
+        </div>
+        <button class="cta-btn" data-next="1">
+          Check my coverage →
+        </button>
+      </div>
+    </section>
+
     <!-- ========== STEP 1: QUALIFY — Diabetes Check ========== -->
-    <section class="step active" data-step="1" id="step1">
+    <section class="step" data-step="1" id="step1">
       <div class="step-content">
         <h1 class="step-question">Have you been diagnosed with diabetes?</h1>
         <p class="step-subtitle">This helps us check if your insurance covers a Continuous Glucose Monitor.</p>
@@ -58,18 +79,36 @@
         <h1 class="step-question">Do you use insulin?</h1>
         <p class="step-subtitle">Insulin-dependent patients typically qualify for full CGM coverage.</p>
         <div class="options">
-          <button class="option-btn" data-next="3" data-value="yes-insulin">
+          <button class="option-btn" data-next="review" data-value="yes-insulin">
             <span class="option-text">Yes, I use insulin</span>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn" data-next="3" data-value="no-insulin">
+          <button class="option-btn" data-next="review" data-value="no-insulin">
             <span class="option-text">No, I don't use insulin</span>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
-          <button class="option-btn" data-next="3" data-value="unsure-insulin">
+          <button class="option-btn" data-next="review" data-value="unsure-insulin">
             <span class="option-text">I'm not sure</span>
             <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
           </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== STEP REVIEW: Interstitial with Customer Review ========== -->
+    <section class="step" data-step="review" id="stepReview">
+      <div class="step-content review-interstitial">
+        <div class="review-card">
+          <div class="review-stars">★★★★★</div>
+          <blockquote class="review-quote">"Corey did everything for me. He secured my glucose monitor system that CVS said wasn't covered. I went from paying $85 a month to $0."</blockquote>
+          <div class="review-author">
+            <span class="review-name">— Verified Patient</span>
+            <span class="review-via">via Google Reviews</span>
+          </div>
+        </div>
+        <div class="review-trust-bar">
+          <span class="review-rating">4.9 ★</span>
+          <span class="review-count">117 Google Reviews</span>
         </div>
       </div>
     </section>
@@ -194,19 +233,31 @@
       </div>
     </section>
 
-    <!-- ========== STEP 4: COLLECT — Insurance ID ========== -->
+    <!-- ========== STEP 4: COLLECT — Insurance Card Handy ========== -->
     <section class="step" data-step="4" id="step4">
       <div class="step-content">
-        <h1 class="step-question" id="insuranceIdQuestion">What's your Medicare ID number?</h1>
-        <p class="step-subtitle" id="insuranceIdHint">Found on your red, white, and blue Medicare card. Format: 1EG4-TE5-MK72</p>
-        <form class="intake-form" id="insuranceIdForm">
+        <h1 class="step-question" id="insuranceIdQuestion">Have your Medicare card handy?</h1>
+        <p class="step-subtitle" id="insuranceIdHint">Having your ID helps us check your coverage faster — but it's not required.</p>
+
+        <div class="options" id="cardHandyOptions">
+          <button class="option-btn" id="cardYesBtn">
+            <span class="option-text">Yes, I have it</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+          <button class="option-btn" id="cardNoBtn">
+            <span class="option-text">No, skip this step</span>
+            <svg class="option-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
+
+        <form class="intake-form" id="insuranceIdForm" style="display:none;">
           <div class="form-group">
+            <label for="insuranceId" id="insuranceIdLabel">Medicare ID</label>
             <input type="text" id="insuranceId" name="insuranceId" placeholder="1EG4-TE5-MK72" autocomplete="off">
           </div>
           <button type="submit" class="cta-btn submit-btn">
-            Continue to complementary benefits check →
+            Continue →
           </button>
-          <a href="#" class="skip-link" id="skipInsuranceIdBtn">Skip for now</a>
         </form>
       </div>
     </section>
@@ -296,7 +347,7 @@
           <div class="verify-slide" data-slide="5">
             <div class="slide-icon">
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
-                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
             </div>
             <h3 class="slide-stat">Better sleep</h3>
@@ -325,31 +376,39 @@
       </div>
     </section>
 
-    <!-- ========== STEP 5: VALIDATE — "You Likely Qualify" ========== -->
+    <!-- ========== STEP 5: VALIDATE — Benefits Breakdown ========== -->
     <section class="step" data-step="5" id="step5">
-      <div class="step-content interstitial">
-        <div class="qualify-badge">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <div class="step-content benefits-breakdown">
+        <div class="benefits-header">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <h1 class="step-question">Your benefits summary</h1>
+          <p class="step-subtitle">Based on your plan, here's what we found for DME / CGM coverage.</p>
         </div>
-        <h1 class="step-question qualify-headline">Great news — your CGM should be covered.</h1>
-        <p class="step-subtitle qualify-subtitle">Based on your answers, your insurance likely covers a Continuous Glucose Monitor at little to no cost.</p>
-        <div class="trust-points">
-          <div class="trust-item">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>We contact your doctor for the prescription</span>
+        <div class="benefits-table">
+          <div class="benefit-row">
+            <span class="benefit-label">CGM Device</span>
+            <span class="benefit-value covered">Covered</span>
           </div>
-          <div class="trust-item">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>We handle all the insurance paperwork</span>
+          <div class="benefit-row">
+            <span class="benefit-label">Monthly Sensors</span>
+            <span class="benefit-value covered">Covered</span>
           </div>
-          <div class="trust-item">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>We ship your CGM directly to your door</span>
+          <div class="benefit-row highlight">
+            <span class="benefit-label">Your Estimated Copay</span>
+            <span class="benefit-value price">$0</span>
+          </div>
+          <div class="benefit-row">
+            <span class="benefit-label">Deductible Remaining</span>
+            <span class="benefit-value price">$0</span>
+          </div>
+          <div class="benefit-row">
+            <span class="benefit-label">Out-of-Pocket Maximum</span>
+            <span class="benefit-value price">$0</span>
           </div>
         </div>
+        <p class="benefits-note">This is an estimate based on typical Medicare CGM coverage. Final amounts confirmed after full verification.</p>
         <button class="cta-btn" data-next="6">
-          Next step, doctor info
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          Next step, doctor info →
         </button>
       </div>
     </section>
@@ -554,12 +613,12 @@
       </div>
     </section>
 
-    <!-- ========== STEP 8: COLLECT — Patient Info ========== -->
+    <!-- ========== STEP 8: COLLECT — Personal Info ========== -->
     <section class="step" data-step="8" id="step8">
       <div class="step-content">
-        <h1 class="step-question">Almost there — create your account.</h1>
-        <p class="step-subtitle">Set up your Medically Modern account so we can check your coverage and get the process started.</p>
-        <form class="intake-form" id="intakeForm">
+        <h1 class="step-question">Tell us about yourself.</h1>
+        <p class="step-subtitle">We need a few details to check your coverage.</p>
+        <form class="intake-form" id="personalInfoForm">
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">First Name</label>
@@ -578,6 +637,19 @@
             <label for="dob">Date of Birth</label>
             <input type="date" id="dob" name="dob" required autocomplete="bday">
           </div>
+          <button type="submit" class="cta-btn submit-btn">
+            Continue →
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ========== STEP 8B: COLLECT — Account Info ========== -->
+    <section class="step" data-step="8b" id="step8b">
+      <div class="step-content">
+        <h1 class="step-question">Create your account.</h1>
+        <p class="step-subtitle">Set up your Medically Modern account so we can get the process started.</p>
+        <form class="intake-form" id="accountForm">
           <div class="form-group">
             <label for="email">Email Address</label>
             <input type="email" id="email" name="email" required placeholder="your@email.com" autocomplete="email">

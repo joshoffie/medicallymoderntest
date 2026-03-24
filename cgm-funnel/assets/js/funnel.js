@@ -19,9 +19,9 @@
 
   // ---- State ----
   const funnelData = {};
-  let currentStep = 1;
+  let currentStep = 'welcome';
   const totalSteps = 9;
-  const stepHistory = [1];
+  const stepHistory = ['welcome'];
   let selectedInsuranceType = null;
 
   // ---- DOM ----
@@ -68,7 +68,7 @@
 
       prevEl.classList.add('active');
       currentStep = prevStep;
-      var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 4.5 };
+      var progressMap = { 'welcome': 0, 'blood-sugar': 1.5, 'review': 2.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, '8b': 8.5, 'verify': 4.5 };
       updateProgress(typeof prevStep === 'number' ? prevStep : (progressMap[prevStep] || 1));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       updateBackButton();
@@ -82,8 +82,8 @@
       existingBack.remove();
     }
 
-    // Add back button to steps 2-8 and string steps like blood-sugar (not on step 1 or confirmation)
-    if ((typeof currentStep === 'number' && currentStep >= 2 && currentStep <= 8) || currentStep === 'blood-sugar' || currentStep === 'insurance-picker' || currentStep === '5b') {
+    // Add back button to steps 2-8 and string steps like blood-sugar (not on welcome or confirmation)
+    if ((typeof currentStep === 'number' && currentStep >= 2 && currentStep <= 8) || currentStep === 'blood-sugar' || currentStep === 'insurance-picker' || currentStep === 'review' || currentStep === '5b' || currentStep === '8b') {
       const activeStep = container.querySelector('.step.active');
       if (activeStep) {
         const stepContent = activeStep.querySelector('.step-content');
@@ -97,10 +97,13 @@
 
   // ---- Element Lookup Helper ----
   const stepIdMap = {
+    'welcome': 'stepWelcome',
     'not-eligible': 'stepNotEligible',
     'blood-sugar': 'stepBloodSugar',
+    'review': 'stepReview',
     'insurance-picker': 'stepInsurancePicker',
     '5b': 'step5b',
+    '8b': 'step8b',
     'verify': 'stepVerify'
   };
 
@@ -139,12 +142,20 @@
     stepHistory.push(stepId);
 
     // Map string step IDs to progress values
-    var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 4.5 };
+    var progressMap = { 'welcome': 0, 'blood-sugar': 1.5, 'review': 2.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, '8b': 8.5, 'verify': 4.5 };
     updateProgress(typeof stepId === 'number' ? stepId : (progressMap[stepId] || currentStep));
 
     // Show phone on later steps
     if ((typeof currentStep === 'number' && currentStep >= 4) || currentStep === 'insurance-picker') {
       headerPhone.style.display = 'flex';
+    }
+
+    // Auto-advance review interstitial
+    if (stepId === 'review') {
+      if (window._reviewTimeout) clearTimeout(window._reviewTimeout);
+      window._reviewTimeout = setTimeout(function() {
+        if (currentStep === 'review') goToStep(3);
+      }, 5000);
     }
 
     // Update back button visibility
@@ -180,29 +191,48 @@
     if (!insuranceIdQuestion) return;
 
     if (selectedInsuranceType === 'medicare') {
-      insuranceIdQuestion.textContent = "What's your Medicare ID number?";
-      insuranceIdHint.textContent = "Found on your red, white, and blue Medicare card. Format: 1EG4-TE5-MK72";
+      insuranceIdQuestion.textContent = "Have your Medicare card handy?";
+      insuranceIdHint.textContent = "Having your ID helps us check your coverage faster — but it's not required.";
       insuranceIdInput.placeholder = "1EG4-TE5-MK72";
     } else if (selectedInsuranceType === 'medicaid') {
-      insuranceIdQuestion.textContent = "What's your Medicaid ID number?";
-      insuranceIdHint.textContent = "Found on your state Medicaid card";
+      insuranceIdQuestion.textContent = "Have your Medicaid card handy?";
+      insuranceIdHint.textContent = "Having your ID helps us check your coverage faster — but it's not required.";
       insuranceIdInput.placeholder = "Your Medicaid ID";
     } else if (selectedInsuranceType === 'private') {
-      insuranceIdQuestion.textContent = "What's your Member ID?";
-      insuranceIdHint.textContent = "Found on your insurance card — front or back";
+      insuranceIdQuestion.textContent = "Have your insurance card handy?";
+      insuranceIdHint.textContent = "Having your ID helps us check your coverage faster — but it's not required.";
       insuranceIdInput.placeholder = "Member ID";
     } else {
-      insuranceIdQuestion.textContent = "What's your insurance ID?";
-      insuranceIdHint.textContent = "Found on your insurance card";
+      insuranceIdQuestion.textContent = "Have your insurance card handy?";
+      insuranceIdHint.textContent = "Having your ID helps us check your coverage faster — but it's not required.";
       insuranceIdInput.placeholder = "Insurance ID";
     }
   }
 
   function setupInsuranceIdStep() {
     const insuranceIdForm = document.getElementById('insuranceIdForm');
-    const skipInsuranceIdBtn = document.getElementById('skipInsuranceIdBtn');
+    const cardYesBtn = document.getElementById('cardYesBtn');
+    const cardNoBtn = document.getElementById('cardNoBtn');
     if (!insuranceIdForm || insuranceIdListenersAdded) return;
     insuranceIdListenersAdded = true;
+
+    // Show form when user has card
+    if (cardYesBtn) {
+      cardYesBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('cardHandyOptions').style.display = 'none';
+        insuranceIdForm.style.display = '';
+        insuranceIdForm.querySelector('input').focus();
+      });
+    }
+
+    // Skip directly to validate when user doesn't have card
+    if (cardNoBtn) {
+      cardNoBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        goToValidateStep();
+      });
+    }
 
     insuranceIdForm.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -210,11 +240,6 @@
       if (insuranceId.trim()) {
         funnelData.insuranceId = insuranceId;
       }
-      goToValidateStep();
-    });
-
-    skipInsuranceIdBtn.addEventListener('click', function(e) {
-      e.preventDefault();
       goToValidateStep();
     });
   }
@@ -293,20 +318,42 @@
 
     const ctaBtn = e.target.closest('.cta-btn[data-next]');
     if (ctaBtn) {
-      const nextStep = parseInt(ctaBtn.dataset.next);
-      goToStep(nextStep);
+      const nextStep = ctaBtn.dataset.next;
+      // Check if it's a number or string step ID
+      if (isNaN(nextStep)) {
+        goToStep(nextStep);
+      } else {
+        goToStep(parseInt(nextStep));
+      }
       return;
     }
   });
 
-  // ---- Form Submission ----
-  const intakeForm = document.getElementById('intakeForm');
-  if (intakeForm) {
-    intakeForm.addEventListener('submit', function(e) {
+  // ---- Form Submission - Personal Info ----
+  const personalInfoForm = document.getElementById('personalInfoForm');
+  if (personalInfoForm) {
+    personalInfoForm.addEventListener('submit', function(e) {
       e.preventDefault();
 
       // Collect form data
-      const formData = new FormData(intakeForm);
+      const formData = new FormData(personalInfoForm);
+      formData.forEach(function(value, key) {
+        funnelData[key] = value;
+      });
+
+      // Advance to step 8b
+      goToStep('8b');
+    });
+  }
+
+  // ---- Form Submission - Account Info ----
+  const accountForm = document.getElementById('accountForm');
+  if (accountForm) {
+    accountForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      // Collect form data
+      const formData = new FormData(accountForm);
       formData.forEach(function(value, key) {
         funnelData[key] = value;
       });
@@ -618,7 +665,7 @@
       // After exit animation, remove exiting class
       setTimeout(function() {
         slides[prevSlide].classList.remove('exiting');
-      }, 600);
+      }, 800);
 
       // Animate in next
       slides[currentSlide].classList.add('active');
@@ -688,7 +735,7 @@
 
   // ---- Init ----
   function init() {
-    updateProgress(1);
+    updateProgress(0);
     updateBackButton();
 
     // Setup event listeners for dynamic steps
