@@ -248,22 +248,22 @@
     const insuranceIdInput = document.getElementById('insuranceId');
     if (!insuranceIdQuestion) return;
 
-    var hintText = "We'll run a complimentary benefits check for you. Having your ID gets you results faster, but it's totally optional.";
+    var hintHtml = 'We\'ll run a <em style="color:var(--mm-teal);font-weight:600;font-style:italic;">complimentary benefits check</em> for you. Having your ID gets you results faster, but it\'s totally optional.';
     if (selectedInsuranceType === 'medicare') {
       insuranceIdQuestion.textContent = "Have your Medicare card handy?";
-      insuranceIdHint.textContent = hintText;
+      insuranceIdHint.innerHTML = hintHtml;
       insuranceIdInput.placeholder = "1EG4-TE5-MK72";
     } else if (selectedInsuranceType === 'medicaid') {
       insuranceIdQuestion.textContent = "Have your Medicaid card handy?";
-      insuranceIdHint.textContent = hintText;
+      insuranceIdHint.innerHTML = hintHtml;
       insuranceIdInput.placeholder = "Your Medicaid ID";
     } else if (selectedInsuranceType === 'private') {
       insuranceIdQuestion.textContent = "Have your insurance card handy?";
-      insuranceIdHint.textContent = hintText;
+      insuranceIdHint.innerHTML = hintHtml;
       insuranceIdInput.placeholder = "Member ID";
     } else {
       insuranceIdQuestion.textContent = "Have your insurance card handy?";
-      insuranceIdHint.textContent = hintText;
+      insuranceIdHint.innerHTML = hintHtml;
       insuranceIdInput.placeholder = "Insurance ID";
     }
   }
