@@ -167,11 +167,12 @@ function startSnakeAnimation() {
   // 1: bridge circle → M start
   // 2: trace M forward (head snakes through, body peels off circle)
   // 3: hold M
-  // 4: bridge M end → circle (head leaves M end, body peels off M)
+  // → after hold, head just starts spinning on circle from M-end angle;
+  //   body (still the M shape) peels off naturally as circle points accumulate
   var phase = 0;
   var phaseTime = 0;
-  var spinDuration = 1500;
-  var holdDuration = 1200;
+  var spinDuration = 1800;
+  var holdDuration = 1400;
   var bridgeDuration = 300;
   var lastTime = 0;
   var running = true;
@@ -184,7 +185,7 @@ function startSnakeAnimation() {
     trail.push(circlePoint(a));
   }
 
-  var phaseNames = ['spinning', 'entering M', 'tracing M', 'hold M', 'leaving M'];
+  var phaseNames = ['spinning (body peels off M)', 'entering M', 'tracing M', 'hold M'];
 
   function animate(time) {
     if (!running) return;
@@ -247,31 +248,14 @@ function startSnakeAnimation() {
         addToTrail = false;
         headPos = null;
         if (phaseTime >= holdDuration) {
-          // Head leaves M end, curves to circle
-          phase = 4;
-          phaseTime = 0;
-          bridgeStart = { x: mPts[mPts.length - 1].x, y: mPts[mPts.length - 1].y };
-          // Re-enter circle at angle closest to M end point (bottom-right)
-          var reentryAngle = Math.atan2(mPts[mPts.length - 1].y - cy, mPts[mPts.length - 1].x - cx);
-          bridgeEnd = circlePoint(reentryAngle);
-          headAngle = reentryAngle;
-        }
-        break;
-
-      case 4: // Bridge: M end → circle — head curves to circle, body peels off M
-        var t = easeInOut(Math.min(phaseTime / bridgeDuration, 1));
-        headPos = {
-          x: bridgeStart.x + (bridgeEnd.x - bridgeStart.x) * t,
-          y: bridgeStart.y + (bridgeEnd.y - bridgeStart.y) * t
-        };
-        if (phaseTime >= bridgeDuration) {
-          // Continue spinning on circle
+          // Go straight to spinning from the angle closest to M end
+          // The trail is still the M shape — it will naturally peel off
+          // as circle points accumulate and old M points drop from the tail
           phase = 0;
           phaseTime = 0;
-          // headAngle is already set
-        } else {
-          // Also slowly advance angle so spinning resumes smoothly
-          headAngle += circleSpeed * dt * t;
+          headAngle = Math.atan2(mPts[mPts.length - 1].y - cy, mPts[mPts.length - 1].x - cx);
+          // Add current position to resume trail updates
+          headPos = circlePoint(headAngle);
         }
         break;
     }
