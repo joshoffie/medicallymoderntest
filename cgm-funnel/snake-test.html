@@ -45,7 +45,7 @@
   <div class="benefits-badge-centered">
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="2" y="2" width="24" height="24" rx="5" stroke="#0e7c6b" stroke-width="2"/>
-      <path d="M8.5 14.5L12 18L19.5 10.5" stroke="#0e7c6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M8.5 16L12 19.5L19.5 12" stroke="#0e7c6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
   </div>
 </div>
@@ -150,7 +150,7 @@ function startSnakeAnimation() {
         // Smooth fade-in for the first 15% of the draw
         blendIn = Math.min(rawProgress / 0.15, 1);
 
-        drawSnakePath(path, 0, headIdx, blendIn, true);
+        drawSnakePath(path, 0, headIdx, blendIn);
 
         if (rawProgress >= 1) {
           phase = (phase === 0) ? 1 : 5;
@@ -179,7 +179,7 @@ function startSnakeAnimation() {
         // Smooth fade-out for the last 15% of the undraw
         blendOut = 1 - Math.max((rawProgress - 0.85) / 0.15, 0);
 
-        drawSnakePath(path, tailIdx, N, blendOut, false);
+        drawSnakePath(path, tailIdx, N, blendOut);
 
         if (rawProgress >= 1) {
           phase = (phase === 2) ? 3 : 7;
@@ -204,67 +204,24 @@ function startSnakeAnimation() {
     snakeAnim = requestAnimationFrame(animate);
   }
 
-  // ---- Premium snake path renderer ----
-  function drawSnakePath(path, startIdx, endIdx, masterAlpha, isDrawing) {
+  // ---- Clean uniform line renderer ----
+  function drawSnakePath(path, startIdx, endIdx, masterAlpha) {
     ctx.clearRect(0, 0, W, H);
     if (endIdx <= startIdx + 1) return;
-
-    var len = endIdx - startIdx;
 
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineW;
     ctx.strokeStyle = teal;
+    ctx.globalAlpha = masterAlpha;
 
-    // More segments = smoother gradient (48 is imperceptible banding)
-    var segments = 48;
-
-    for (var s = 0; s < segments; s++) {
-      var sStart = startIdx + Math.round(s * len / segments);
-      var sEnd = startIdx + Math.round((s + 1) * len / segments);
-      sEnd = Math.min(sEnd, endIdx);
-      if (sEnd <= sStart) continue;
-
-      // Position in visible segment: 0 = start of visible, 1 = end of visible
-      var pos = (s + 0.5) / segments;
-      var alpha;
-
-      if (isDrawing) {
-        // DRAW: tail (pos=0) fades, head (pos=1) is bright
-        alpha = 0.12 + pos * pos * 0.88;
-      } else {
-        // UNDRAW: erasing edge (pos=0) softly fades, remaining end (pos=1) stays solid
-        // The erasing front dissolves — soft leading edge
-        alpha = Math.min(pos * 4, 1); // first 25% fades in, rest is solid
-      }
-      alpha *= masterAlpha;
-
-      ctx.globalAlpha = alpha;
-      ctx.beginPath();
-      ctx.moveTo(path[sStart].x, path[sStart].y);
-      for (var i = sStart + 1; i <= sEnd; i++) {
-        ctx.lineTo(path[i].x, path[i].y);
-      }
-      ctx.stroke();
+    // Single uniform-weight path — no gradient, no taper
+    ctx.beginPath();
+    ctx.moveTo(path[startIdx].x, path[startIdx].y);
+    for (var i = startIdx + 1; i <= endIdx; i++) {
+      ctx.lineTo(path[i].x, path[i].y);
     }
-
-    // Head dot — only during DRAW phase
-    if (isDrawing) {
-      var headPt = path[endIdx];
-
-      // Soft glow halo
-      ctx.globalAlpha = masterAlpha * 0.25;
-      ctx.fillStyle = teal;
-      ctx.beginPath();
-      ctx.arc(headPt.x, headPt.y, lineW * 0.85, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Solid head
-      ctx.globalAlpha = masterAlpha;
-      ctx.beginPath();
-      ctx.arc(headPt.x, headPt.y, lineW * 0.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.stroke();
 
     ctx.globalAlpha = 1;
   }

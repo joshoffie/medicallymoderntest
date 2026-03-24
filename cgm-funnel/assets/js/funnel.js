@@ -274,11 +274,11 @@
       });
     }
 
-    // Skip directly to validate when user doesn't have card
+    // Skip benefits check entirely when user doesn't have card — go straight to doctor info
     if (cardNoBtn) {
       cardNoBtn.addEventListener('click', function(e) {
         e.preventDefault();
-        goToValidateStep();
+        goToStep(6);
       });
     }
 
@@ -724,7 +724,7 @@
           var eased = easeInOutCubic(rawProgress);
           var headIdx = Math.round(eased * N);
           blendIn = Math.min(rawProgress / 0.15, 1);
-          drawSnakePath(path, 0, headIdx, blendIn, true);
+          drawSnakePath(path, 0, headIdx, blendIn);
           if (rawProgress >= 1) { phase = (phase === 0) ? 1 : 5; phaseTime = 0; rawProgress = 0; }
           break;
         case 1: case 5:
@@ -737,7 +737,7 @@
           var eased = easeInOutCubic(rawProgress);
           var tailIdx = Math.round(eased * N);
           blendOut = 1 - Math.max((rawProgress - 0.85) / 0.15, 0);
-          drawSnakePath(path, tailIdx, N, blendOut, false);
+          drawSnakePath(path, tailIdx, N, blendOut);
           if (rawProgress >= 1) { phase = (phase === 2) ? 3 : 7; phaseTime = 0; rawProgress = 0; }
           break;
         case 3: case 7:
@@ -749,46 +749,18 @@
       snakeAnim = requestAnimationFrame(animate);
     }
 
-    function drawSnakePath(path, startIdx, endIdx, masterAlpha, isDrawing) {
+    function drawSnakePath(path, startIdx, endIdx, masterAlpha) {
       ctx.clearRect(0, 0, W, H);
       if (endIdx <= startIdx + 1) return;
-      var len = endIdx - startIdx;
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
       ctx.lineWidth = lineW;
       ctx.strokeStyle = teal;
-      var segments = 48;
-      for (var s = 0; s < segments; s++) {
-        var sStart = startIdx + Math.round(s * len / segments);
-        var sEnd = startIdx + Math.round((s + 1) * len / segments);
-        sEnd = Math.min(sEnd, endIdx);
-        if (sEnd <= sStart) continue;
-        var pos = (s + 0.5) / segments;
-        var alpha;
-        if (isDrawing) {
-          alpha = 0.12 + pos * pos * 0.88;
-        } else {
-          alpha = Math.min(pos * 4, 1);
-        }
-        alpha *= masterAlpha;
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.moveTo(path[sStart].x, path[sStart].y);
-        for (var i = sStart + 1; i <= sEnd; i++) ctx.lineTo(path[i].x, path[i].y);
-        ctx.stroke();
-      }
-      if (isDrawing) {
-        var headPt = path[endIdx];
-        ctx.globalAlpha = masterAlpha * 0.25;
-        ctx.fillStyle = teal;
-        ctx.beginPath();
-        ctx.arc(headPt.x, headPt.y, lineW * 0.85, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = masterAlpha;
-        ctx.beginPath();
-        ctx.arc(headPt.x, headPt.y, lineW * 0.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      ctx.globalAlpha = masterAlpha;
+      ctx.beginPath();
+      ctx.moveTo(path[startIdx].x, path[startIdx].y);
+      for (var i = startIdx + 1; i <= endIdx; i++) ctx.lineTo(path[i].x, path[i].y);
+      ctx.stroke();
       ctx.globalAlpha = 1;
     }
 
