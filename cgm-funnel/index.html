@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/funnel.css?v=9">
+  <link rel="stylesheet" href="assets/css/funnel.css?v=10">
 </head>
 <body>
 
@@ -486,6 +486,120 @@
       </div>
     </section>
 
+    <!-- ========== STEP VERIFY: Benefits Verification Loading + Info Slides ========== -->
+    <section class="step" data-step="verify" id="stepVerify">
+      <div class="step-content verify-screen">
+
+        <!-- Top: Verification Status -->
+        <div class="verify-status">
+          <div class="verify-icon-wrap">
+            <svg class="verify-shield" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <div class="verify-pulse-ring"></div>
+          </div>
+          <h2 class="verify-heading">Checking your benefits...</h2>
+          <p class="verify-status-text" id="verifyStatusText">Connecting to your insurer</p>
+          <div class="verify-progress-track">
+            <div class="verify-progress-bar" id="verifyProgressBar"></div>
+          </div>
+        </div>
+
+        <!-- Middle: Rotating Info Slides -->
+        <div class="verify-slides" id="verifySlides">
+
+          <div class="verify-slide" data-slide="0">
+            <div class="slide-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <h3 class="slide-stat">72% fewer</h3>
+            <p class="slide-label">low blood sugar episodes</p>
+            <p class="slide-body">CGM users experience 72% fewer hypoglycemic events, giving you peace of mind day and night.</p>
+            <p class="slide-source">HypoDE Clinical Study</p>
+          </div>
+
+          <div class="verify-slide" data-slide="1">
+            <div class="slide-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3 class="slide-stat">+2 hours/day</h3>
+            <p class="slide-label">in healthy glucose range</p>
+            <p class="slide-body">Patients using CGM spend an extra 2 hours every day within their target blood sugar range — that adds up to over 700 hours a year.</p>
+            <p class="slide-source">FLASH-UK Randomized Clinical Trial, NEJM 2022</p>
+          </div>
+
+          <div class="verify-slide" data-slide="2">
+            <div class="slide-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+            </div>
+            <h3 class="slide-stat">Zero finger pricks</h3>
+            <p class="slide-label">no more daily needle sticks</p>
+            <p class="slide-body">A CGM replaces 6–10 daily finger pricks with a painless sensor — that's over 3,000 fewer needle sticks per year.</p>
+            <p class="slide-source">Clinical Practice Analysis, 2023</p>
+          </div>
+
+          <div class="verify-slide" data-slide="3">
+            <div class="slide-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h3 class="slide-stat">1 in 3 adults</h3>
+            <p class="slide-label">with diabetes now use a CGM</p>
+            <p class="slide-body">You're joining millions of people who've already made the switch. CGM adoption has tripled in the last 5 years — you're not alone in this.</p>
+            <p class="slide-source">T1D Exchange Registry, 2024</p>
+          </div>
+
+          <div class="verify-slide" data-slide="4">
+            <div class="slide-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <h3 class="slide-stat">$424/month saved</h3>
+            <p class="slide-label">in reduced healthcare costs</p>
+            <p class="slide-body">CGM users see an average of $424 lower monthly healthcare costs through fewer ER visits and hospitalizations.</p>
+            <p class="slide-source">Real-World Analysis, Journal of Managed Care, 2024</p>
+          </div>
+
+          <div class="verify-slide" data-slide="5">
+            <div class="slide-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </div>
+            <h3 class="slide-stat">Better sleep</h3>
+            <p class="slide-label">for you and your family</p>
+            <p class="slide-body">Nighttime alerts mean no more waking up worried. Parents and caregivers report significantly less overnight anxiety with CGM.</p>
+            <p class="slide-source">Caregiver Studies, 2022–2024</p>
+          </div>
+
+        </div>
+
+        <!-- Bottom: Slide Dots -->
+        <div class="verify-dots" id="verifyDots">
+          <span class="verify-dot active" data-dot="0"></span>
+          <span class="verify-dot" data-dot="1"></span>
+          <span class="verify-dot" data-dot="2"></span>
+          <span class="verify-dot" data-dot="3"></span>
+          <span class="verify-dot" data-dot="4"></span>
+          <span class="verify-dot" data-dot="5"></span>
+        </div>
+
+        <p class="verify-secure">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          256-bit encrypted &nbsp;•&nbsp; HIPAA compliant
+        </p>
+
+      </div>
+    </section>
+
     <!-- ========== STEP 9: CONNECT — Confirmation + Instant Engagement ========== -->
     <section class="step" data-step="9" id="step9">
       <div class="step-content interstitial confirmation">
@@ -709,6 +823,6 @@
 
   </main>
 
-  <script src="assets/js/funnel.js?v=9"></script>
+  <script src="assets/js/funnel.js?v=10"></script>
 </body>
 </html>

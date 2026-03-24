@@ -68,7 +68,7 @@
 
       prevEl.classList.add('active');
       currentStep = prevStep;
-      var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5 };
+      var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 8.5 };
       updateProgress(typeof prevStep === 'number' ? prevStep : (progressMap[prevStep] || 1));
       window.scrollTo({ top: 0, behavior: 'smooth' });
       updateBackButton();
@@ -100,7 +100,8 @@
     'not-eligible': 'stepNotEligible',
     'blood-sugar': 'stepBloodSugar',
     'insurance-picker': 'stepInsurancePicker',
-    '5b': 'step5b'
+    '5b': 'step5b',
+    'verify': 'stepVerify'
   };
 
   function getStepElement(stepId) {
@@ -138,7 +139,7 @@
     stepHistory.push(stepId);
 
     // Map string step IDs to progress values
-    var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5 };
+    var progressMap = { 'blood-sugar': 1.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, 'verify': 8.5 };
     updateProgress(typeof stepId === 'number' ? stepId : (progressMap[stepId] || currentStep));
 
     // Show phone on later steps
@@ -337,8 +338,9 @@
       //   body: JSON.stringify(funnelData)
       // });
 
-      // Advance to confirmation
-      goToStep(9);
+      // Advance to verification loading screen (then auto-transitions to confirmation)
+      goToStep('verify');
+      startBenefitsVerification();
     });
   }
 
@@ -532,6 +534,152 @@
         eyeClosed.style.display = isPassword ? '' : 'none';
       }
     });
+  }
+
+  // ---- Benefits Verification Loading Animation ----
+  var verifyInterval = null;
+  var verifyTimeout = null;
+
+  function startBenefitsVerification() {
+    var progressBar = document.getElementById('verifyProgressBar');
+    var statusText = document.getElementById('verifyStatusText');
+    var slidesContainer = document.getElementById('verifySlides');
+    var dotsContainer = document.getElementById('verifyDots');
+    var verifyScreen = document.querySelector('.verify-screen');
+
+    if (!progressBar || !slidesContainer) return;
+
+    var slides = slidesContainer.querySelectorAll('.verify-slide');
+    var dots = dotsContainer ? dotsContainer.querySelectorAll('.verify-dot') : [];
+    var totalSlides = slides.length;
+    var currentSlide = 0;
+    var progress = 0;
+
+    // Status messages that rotate with the progress bar
+    var statusMessages = [
+      { at: 0, text: 'Connecting to your insurer' },
+      { at: 15, text: 'Verifying member information' },
+      { at: 35, text: 'Checking CGM eligibility' },
+      { at: 55, text: 'Reviewing coverage details' },
+      { at: 75, text: 'Confirming your benefits' },
+      { at: 92, text: 'Almost there...' }
+    ];
+
+    // Total duration: ~25 seconds (enough for 5 slide rotations at ~5s each)
+    var totalDuration = 25000;
+    var slideInterval = 4500;
+    var progressStep = 100 / (totalDuration / 100);
+
+    // Activate first slide
+    slides[0].classList.add('active');
+    if (dots.length > 0) dots[0].classList.add('active');
+
+    // Progress bar animation
+    var progressInterval = setInterval(function() {
+      progress += progressStep;
+      if (progress >= 100) progress = 100;
+
+      progressBar.style.width = progress + '%';
+
+      // Update status text
+      for (var i = statusMessages.length - 1; i >= 0; i--) {
+        if (progress >= statusMessages[i].at) {
+          if (statusText.textContent !== statusMessages[i].text) {
+            statusText.style.opacity = '0';
+            setTimeout(function(msg) {
+              statusText.textContent = msg;
+              statusText.style.opacity = '1';
+            }.bind(null, statusMessages[i].text), 200);
+          }
+          break;
+        }
+      }
+
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+        completeBenefitsVerification(verifyScreen, statusText, progressBar);
+      }
+    }, 100);
+
+    // Slide rotation
+    verifyInterval = setInterval(function() {
+      var prevSlide = currentSlide;
+      currentSlide = (currentSlide + 1) % totalSlides;
+
+      // Animate out current
+      slides[prevSlide].classList.add('exiting');
+      slides[prevSlide].classList.remove('active');
+
+      // After exit animation, remove exiting class
+      setTimeout(function() {
+        slides[prevSlide].classList.remove('exiting');
+      }, 600);
+
+      // Animate in next
+      slides[currentSlide].classList.add('active');
+
+      // Update dots
+      for (var d = 0; d < dots.length; d++) {
+        dots[d].classList.toggle('active', d === currentSlide);
+      }
+    }, slideInterval);
+
+    // Safety cleanup after max duration
+    verifyTimeout = setTimeout(function() {
+      clearInterval(verifyInterval);
+    }, totalDuration + 2000);
+  }
+
+  function completeBenefitsVerification(screen, statusText, progressBar) {
+    // Stop slide rotation
+    if (verifyInterval) clearInterval(verifyInterval);
+
+    // Update UI to completion state
+    if (screen) screen.classList.add('complete');
+
+    var heading = screen ? screen.querySelector('.verify-heading') : null;
+    if (heading) heading.textContent = 'Benefits verified!';
+
+    if (statusText) {
+      statusText.style.opacity = '0';
+      setTimeout(function() {
+        statusText.textContent = 'Great news — you\'re covered.';
+        statusText.style.opacity = '1';
+        statusText.style.color = 'var(--mm-teal)';
+        statusText.style.fontWeight = '600';
+      }, 200);
+    }
+
+    // Replace shield with checkmark
+    var shieldSvg = screen ? screen.querySelector('.verify-shield') : null;
+    if (shieldSvg) {
+      shieldSvg.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>';
+      shieldSvg.setAttribute('stroke-width', '2.5');
+    }
+
+    // Seamless transition to confirmation after a moment
+    setTimeout(function() {
+      // Personalize confirmation (already done in form submit)
+      goToStep(9);
+
+      // Clean up verify screen state for potential re-use
+      if (screen) screen.classList.remove('complete');
+      if (statusText) {
+        statusText.style.color = '';
+        statusText.style.fontWeight = '';
+      }
+      if (progressBar) progressBar.style.width = '0%';
+
+      // Reset slides
+      var slides = document.querySelectorAll('.verify-slide');
+      slides.forEach(function(s) {
+        s.classList.remove('active', 'exiting');
+      });
+      var dots = document.querySelectorAll('.verify-dot');
+      dots.forEach(function(d, i) {
+        d.classList.toggle('active', i === 0);
+      });
+    }, 2500);
   }
 
   // ---- Init ----

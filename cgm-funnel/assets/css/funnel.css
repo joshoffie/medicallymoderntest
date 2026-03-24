@@ -1352,6 +1352,261 @@ body {
   color: var(--mm-teal);
 }
 
+/* ============================================
+   BENEFITS VERIFICATION LOADING SCREEN
+   ============================================ */
+
+.verify-screen {
+  text-align: center;
+  padding-top: 40px;
+}
+
+/* ---- Status Area ---- */
+.verify-status {
+  margin-bottom: 48px;
+}
+
+.verify-icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.verify-shield {
+  position: relative;
+  z-index: 2;
+  animation: verifyFloat 3s ease-in-out infinite;
+}
+
+.verify-pulse-ring {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: 2px solid var(--mm-teal);
+  opacity: 0;
+  animation: verifyPulse 2s ease-out infinite;
+}
+
+@keyframes verifyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes verifyPulse {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+.verify-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--mm-text);
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+
+.verify-status-text {
+  font-size: 0.95rem;
+  color: var(--mm-gray-500);
+  margin: 0 0 24px;
+  transition: opacity 0.4s ease;
+}
+
+/* ---- Progress Track ---- */
+.verify-progress-track {
+  width: 100%;
+  max-width: 360px;
+  height: 6px;
+  background: var(--mm-gray-100);
+  border-radius: 3px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.verify-progress-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--mm-teal), #12a890);
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.verify-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: verifyShimmer 1.5s infinite;
+}
+
+@keyframes verifyShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ---- Info Slides ---- */
+.verify-slides {
+  position: relative;
+  min-height: 240px;
+  margin-bottom: 24px;
+}
+
+.verify-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  pointer-events: none;
+  padding: 0 16px;
+}
+
+.verify-slide.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.verify-slide.exiting {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+.slide-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  background: var(--mm-teal-light);
+  border-radius: 20px;
+  margin-bottom: 20px;
+}
+
+.slide-stat {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--mm-teal);
+  margin: 0 0 4px;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.slide-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mm-text);
+  margin: 0 0 12px;
+  text-transform: lowercase;
+}
+
+.slide-body {
+  font-size: 0.95rem;
+  color: var(--mm-gray-500);
+  line-height: 1.6;
+  max-width: 420px;
+  margin: 0 auto 8px;
+}
+
+.slide-source {
+  font-size: 0.75rem;
+  color: var(--mm-gray-400);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ---- Dots ---- */
+.verify-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.verify-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mm-gray-200);
+  transition: all 0.4s ease;
+}
+
+.verify-dot.active {
+  background: var(--mm-teal);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* ---- Security Badge ---- */
+.verify-secure {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--mm-gray-400);
+  margin: 0;
+}
+
+.verify-secure svg {
+  flex-shrink: 0;
+}
+
+/* ---- Completion Transition ---- */
+.verify-screen.complete .verify-heading {
+  color: var(--mm-teal);
+}
+
+.verify-screen.complete .verify-shield {
+  animation: none;
+  color: var(--mm-teal);
+}
+
+.verify-screen.complete .verify-pulse-ring {
+  animation: none;
+  opacity: 0;
+}
+
+.verify-screen.complete .verify-progress-bar {
+  background: var(--mm-teal);
+}
+
+.verify-screen.complete .verify-progress-bar::after {
+  animation: none;
+  opacity: 0;
+}
+
+/* ---- Mobile adjustments ---- */
+@media (max-width: 600px) {
+  .verify-screen {
+    padding-top: 24px;
+  }
+
+  .verify-slides {
+    min-height: 280px;
+  }
+
+  .slide-stat {
+    font-size: 1.7rem;
+  }
+
+  .slide-body {
+    font-size: 0.9rem;
+  }
+
+  .verify-heading {
+    font-size: 1.3rem;
+  }
+}
+
 @media (max-width: 380px) {
   .step-question {
     font-size: 1.3rem;
