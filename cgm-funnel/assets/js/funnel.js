@@ -150,6 +150,22 @@
       headerPhone.style.display = 'flex';
     }
 
+    // Re-trigger animations for doctor subtitle (step 6)
+    if (stepId === 6) {
+      var drEl = nextEl.querySelector('.doctor-reveal');
+      var dhEl = nextEl.querySelector('.doctor-highlight');
+      if (drEl) { drEl.style.animation = 'none'; drEl.offsetHeight; drEl.style.animation = ''; }
+      if (dhEl) { dhEl.style.animation = 'none'; dhEl.offsetHeight; dhEl.style.animation = ''; }
+    }
+
+    // Re-trigger animations for confirmation screen (step 9)
+    if (stepId === 9) {
+      var dropBadge = nextEl.querySelector('.drop-check');
+      var trampolineText = nextEl.querySelector('.trampoline-text');
+      if (dropBadge) { dropBadge.style.animation = 'none'; dropBadge.offsetHeight; dropBadge.style.animation = ''; }
+      if (trampolineText) { trampolineText.style.animation = 'none'; trampolineText.offsetHeight; trampolineText.style.animation = ''; }
+    }
+
     // Auto-advance review interstitial
     if (stepId === 'review') {
       if (window._reviewTimeout) clearTimeout(window._reviewTimeout);
@@ -746,11 +762,16 @@
       }, 600);
     }
 
-    // Replace shield with checkmark
-    var shieldSvg = screen ? screen.querySelector('.verify-shield') : null;
-    if (shieldSvg) {
-      shieldSvg.innerHTML = '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>';
-      shieldSvg.setAttribute('stroke-width', '2.5');
+    // Stop M morph animation and show solid M
+    var mMorphPath = screen ? screen.querySelector('.m-morph-path') : null;
+    if (mMorphPath) {
+      mMorphPath.style.animation = 'none';
+      mMorphPath.setAttribute('d', 'M15 85 L15 25 L50 60 L85 25 L85 85');
+    }
+    var mContainer = screen ? screen.querySelector('.m-morph-container') : null;
+    if (mContainer) {
+      var ring = mContainer.querySelector('::after');
+      mContainer.style.setProperty('--ring-opacity', '0');
     }
 
     // Seamless transition to benefits summary after a moment

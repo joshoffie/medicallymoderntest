@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/funnel.css?v=16">
+  <link rel="stylesheet" href="assets/css/funnel.css?v=17">
 </head>
 <body>
 
@@ -34,20 +34,20 @@
     <section class="step active" data-step="welcome" id="stepWelcome">
       <div class="step-content welcome-screen">
         <div class="welcome-badge">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <svg class="mm-m-logo welcome-m" width="48" height="48" viewBox="0 0 100 100" fill="none">
+            <path class="m-path" d="M15 85 L15 25 L50 60 L85 25 L85 85" stroke="var(--mm-teal)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
           </svg>
         </div>
         <h1 class="step-question welcome-headline">
           <span class="reveal-line" style="animation-delay: 0s">Your CGM, delivered.</span>
           <span class="reveal-line" style="animation-delay: 0.4s">No hassle.</span>
-          <span class="reveal-line reveal-hero" style="animation-delay: 0.9s">No cost.</span>
+          <span class="reveal-line reveal-hero" style="animation-delay: 0.9s">Low cost.</span>
         </h1>
-        <p class="step-subtitle reveal-fade" style="animation-delay: 1.5s">Answer a few quick questions and our team takes it from there. Most patients qualify for a $0 out-of-pocket CGM with white-glove service from start to finish.</p>
+        <p class="step-subtitle reveal-fade" style="animation-delay: 1.5s">Answer a few quick questions and our team takes it from there. Answer a few quick questions and our team takes it from there — most patients pay little to nothing with our white-glove service.</p>
         <div class="welcome-trust reveal-fade" style="animation-delay: 1.8s">
           <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> HIPAA Compliant</span>
           <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Takes ~2 minutes</span>
-          <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 10,000+ patients helped</span>
+          <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 1,000's of patients helped</span>
         </div>
         <button class="cta-btn reveal-fade" data-next="1" style="animation-delay: 2.1s">
           Get started →
@@ -114,7 +114,7 @@
           <span class="review-rating">4.9 ★</span>
           <span class="review-count">117 Google Reviews</span>
         </div>
-        <button class="review-skip-btn" id="reviewSkipBtn">Continue →</button>
+        <button class="review-skip-btn" id="reviewSkipBtn"><span class="skip-text">Continue →</span><span class="skip-shine"></span></button>
       </div>
     </section>
 
@@ -274,10 +274,11 @@
         <!-- Top: Verification Status -->
         <div class="verify-status">
           <div class="verify-icon-wrap">
-            <svg class="verify-shield" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="1.5">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            <div class="verify-pulse-ring"></div>
+            <div class="m-morph-container" id="mMorphContainer">
+              <svg class="m-morph-svg" width="64" height="64" viewBox="0 0 100 100" fill="none">
+                <path class="m-morph-path" id="mMorphPath" d="M15 85 L15 25 L50 60 L85 25 L85 85" stroke="var(--mm-teal)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              </svg>
+            </div>
           </div>
           <h2 class="verify-heading">Checking your benefits...</h2>
           <p class="verify-status-text" id="verifyStatusText">Connecting to your insurer</p>
@@ -421,14 +422,12 @@
     <!-- ========== STEP 5B: VALIDATE — Commercial Benefits Verification ========== -->
     <section class="step" data-step="5b" id="step5b">
       <div class="step-content">
-        <div class="benefits-header">
-          <div class="benefits-badge">
+        <div class="benefits-header benefits-header-centered">
+          <div class="benefits-badge-centered">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2"><path d="M9 12l2 2 4-4"/><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
           </div>
-          <div>
-            <h1 class="step-question" style="margin-bottom:4px;">Your benefits summary</h1>
-            <p class="step-subtitle" style="margin-bottom:0;">Based on your plan, here's what we found for DME / CGM coverage.</p>
-          </div>
+          <h1 class="step-question" style="margin-bottom:4px;">Your benefits summary</h1>
+          <p class="step-subtitle" style="margin-bottom:0;">Based on your plan, here's what we found for DME / CGM coverage.</p>
         </div>
 
         <div class="benefits-card">
@@ -527,7 +526,7 @@
     <section class="step" data-step="6" id="step6">
       <div class="step-content">
         <h1 class="step-question">Do you have your doctor's info handy?</h1>
-        <p class="step-subtitle">If we have your doctor's details, we can get started right away — no phone call needed.</p>
+        <p class="step-subtitle doctor-subtitle"><span class="doctor-reveal">If we have your doctor's details, we can get started right away —</span> <em class="doctor-highlight">no phone call needed.</em></p>
         <form class="intake-form" id="doctorForm">
           <div class="form-group">
             <label for="doctorName">Doctor's Full Name</label>
@@ -680,10 +679,10 @@
     <!-- ========== STEP 9: CONNECT — Confirmation + Instant Engagement ========== -->
     <section class="step" data-step="9" id="step9">
       <div class="step-content interstitial confirmation">
-        <div class="qualify-badge">
+        <div class="qualify-badge drop-check" id="dropCheckBadge">
           <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#0e7c6b" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <h1 class="step-question qualify-headline" id="confirmationHeadline">Congrats, <span id="patientFirstName">friend</span>!</h1>
+        <h1 class="step-question qualify-headline trampoline-text" id="confirmationHeadline">Congrats, <span id="patientFirstName">friend</span>!</h1>
         <p class="step-subtitle qualify-subtitle" id="confirmationSubtitle">Here's what happens next:</p>
 
         <div class="next-steps">
@@ -900,6 +899,6 @@
 
   </main>
 
-  <script src="assets/js/funnel.js?v=16"></script>
+  <script src="assets/js/funnel.js?v=17"></script>
 </body>
 </html>

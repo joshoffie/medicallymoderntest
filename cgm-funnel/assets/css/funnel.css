@@ -1793,26 +1793,7 @@ body {
   color: var(--mm-gray-500);
 }
 
-.review-skip-btn {
-  display: inline-block;
-  margin-top: 28px;
-  padding: 12px 36px;
-  background: transparent;
-  border: 1.5px solid var(--mm-gray-200);
-  border-radius: 100px;
-  color: var(--mm-gray-500);
-  font-size: 0.9rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  opacity: 0;
-  animation: reviewSkipFadeIn 0.8s ease 0.3s forwards;
-}
-.review-skip-btn:hover {
-  border-color: var(--mm-teal);
-  color: var(--mm-teal);
-  background: var(--mm-teal-light);
-}
+/* review-skip-btn styles moved to V17 section below */
 
 @keyframes reviewSkipFadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -1896,4 +1877,274 @@ body {
   text-align: center;
   margin-bottom: 24px;
   line-height: 1.5;
+}
+
+/* ============================================
+   V17 — NEW ANIMATIONS & POLISH
+   ============================================ */
+
+/* ---- REVIEW SKIP BUTTON: Shiny Green Highlight ---- */
+.review-skip-btn {
+  display: inline-block;
+  margin-top: 28px;
+  padding: 12px 36px;
+  background: var(--mm-teal);
+  border: none;
+  border-radius: 100px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+  animation: reviewSkipFadeIn 0.8s ease 0.3s forwards;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: -0.01em;
+}
+
+.skip-text {
+  position: relative;
+  z-index: 2;
+}
+
+.skip-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.35) 40%,
+    rgba(255,255,255,0.55) 50%,
+    rgba(255,255,255,0.35) 60%,
+    transparent 100%
+  );
+  animation: skipShine 2.5s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+
+@keyframes skipShine {
+  0% { left: -100%; }
+  60% { left: 100%; }
+  100% { left: 100%; }
+}
+
+.review-skip-btn:hover {
+  background: var(--mm-teal-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(14, 124, 107, 0.3);
+}
+
+/* ---- DOCTOR SUBTITLE: Animated + Italicized ---- */
+.doctor-subtitle {
+  overflow: hidden;
+}
+
+.doctor-reveal {
+  display: inline;
+  opacity: 0;
+  animation: doctorReveal 0.8s ease 0.3s forwards;
+}
+
+.doctor-highlight {
+  display: inline;
+  opacity: 0;
+  font-style: italic;
+  color: var(--mm-teal);
+  font-weight: 600;
+  animation: doctorHighlight 0.8s ease 0.9s forwards;
+}
+
+@keyframes doctorReveal {
+  from { opacity: 0; filter: blur(4px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+@keyframes doctorHighlight {
+  0% { opacity: 0; transform: translateY(6px); }
+  60% { opacity: 1; transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- ANIMATED M LOGO: Welcome Screen ---- */
+.mm-m-logo {
+  opacity: 0.8;
+}
+
+.welcome-m .m-path {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: drawM 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
+}
+
+@keyframes drawM {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ---- ANIMATED M LOGO: Verify Screen — Morphing Loader ---- */
+.m-morph-container {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.m-morph-svg {
+  position: relative;
+  z-index: 2;
+}
+
+.m-morph-path {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 0;
+  transform-origin: 50px 50px;
+  animation: mMorphCycle 3s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+@keyframes mMorphCycle {
+  0% {
+    d: path("M15 85 L15 25 L50 60 L85 25 L85 85");
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  15% {
+    d: path("M15 55 L15 55 L50 55 L85 55 L85 55");
+    opacity: 1;
+  }
+  30% {
+    d: path("M50 15 L80 50 L65 85 L35 85 L20 50");
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  35%, 65% {
+    d: path("M50 15 L80 50 L65 85 L35 85 L20 50");
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  80% {
+    d: path("M15 55 L15 55 L50 55 L85 55 L85 55");
+    opacity: 1;
+  }
+  95%, 100% {
+    d: path("M15 85 L15 25 L50 60 L85 25 L85 85");
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+/* Spinning ring behind the M morph */
+.m-morph-container::after {
+  content: '';
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2.5px solid transparent;
+  border-top-color: var(--mm-teal);
+  border-right-color: rgba(14, 124, 107, 0.3);
+  animation: mSpin 1.2s linear infinite;
+  opacity: 0.5;
+}
+
+@keyframes mSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* When verification is complete, show M solidly */
+.verify-screen.complete .m-morph-path {
+  animation: none;
+  d: path("M15 85 L15 25 L50 60 L85 25 L85 85");
+}
+
+.verify-screen.complete .m-morph-container::after {
+  animation: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* ---- BENEFITS HEADER: Centered Checkmark ---- */
+.benefits-header-centered {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.benefits-badge-centered {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--mm-teal-light);
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+/* ---- CONFIRMATION: Dropping Checkmark + Trampoline ---- */
+.drop-check {
+  animation: dropBounce 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+@keyframes dropBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(-200px) scale(0.8);
+  }
+  35% {
+    opacity: 1;
+    transform: translateY(30px) scale(1.05);
+  }
+  50% {
+    transform: translateY(-15px) scale(0.95);
+  }
+  65% {
+    transform: translateY(8px) scale(1.02);
+  }
+  80% {
+    transform: translateY(-4px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.trampoline-text {
+  animation: trampolineBow 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+@keyframes trampolineBow {
+  0% {
+    transform: scaleY(1) translateY(0);
+  }
+  30% {
+    transform: scaleY(1) translateY(0);
+  }
+  38% {
+    transform: scaleY(0.85) scaleX(1.08) translateY(6px);
+  }
+  50% {
+    transform: scaleY(1.12) scaleX(0.96) translateY(-4px);
+  }
+  62% {
+    transform: scaleY(0.95) scaleX(1.03) translateY(2px);
+  }
+  75% {
+    transform: scaleY(1.03) scaleX(0.99) translateY(-1px);
+  }
+  100% {
+    transform: scaleY(1) scaleX(1) translateY(0);
+  }
+}
+
+/* Override the old badgePop on step 9 since we have the new drop animation */
+#step9 .qualify-badge {
+  animation: dropBounce 1.2s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
 }
