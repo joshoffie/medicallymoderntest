@@ -268,6 +268,11 @@
 
       // Slight delay for visual feedback, then advance
       setTimeout(function() {
+        // Clear the inline selection styles before navigating away
+        // so they won't persist if the user comes back
+        optionBtn.style.borderColor = '';
+        optionBtn.style.background = '';
+
         // If it's a known string step ID, route as string; otherwise parse as number
         if (stepIdMap[nextStep]) {
           goToStep(nextStep);
