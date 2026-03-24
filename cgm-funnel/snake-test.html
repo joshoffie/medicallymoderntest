@@ -119,7 +119,7 @@ function startSnakeAnimation() {
     return Math.sqrt(dx * dx + dy * dy);
   }
 
-  // Compute total M path length
+  // Compute total M path length & segment lengths
   var mSegLens = [];
   var totalMLen = 0;
   for (var i = 1; i < mPts.length; i++) {
@@ -149,7 +149,7 @@ function startSnakeAnimation() {
     return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
   }
 
-  // Smooth easing for bridge
+  // Smooth easing
   function easeInOut(t) {
     return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   }
@@ -157,23 +157,22 @@ function startSnakeAnimation() {
   // ---- State ----
   var trailLen = 80;
   var trail = [];
-  var headAngle = -Math.PI / 2; // start at top
-  var circleSpeed = Math.PI * 1.8 / 1000; // rad/ms — one full loop ~3.5s
-  var mSpeed = totalMLen / 700; // px/ms — trace M in ~700ms
+  var headAngle = -Math.PI / 2; // start at top of circle
+  var circleSpeed = Math.PI * 1.6 / 1000; // rad/ms
+  var mSpeed = totalMLen / 800; // px/ms — trace M in ~800ms
   var mDist = 0;
 
-  var phase = 0;
+  // Phases:
   // 0: spin circle
-  // 1: bridge circle → M start (head curves to M start)
-  // 2: trace M (head snakes along M, body peels off circle/bridge)
-  // 3: hold M (trail settles into M shape)
-  // 4: trace M reverse (head leaves M end, snakes back toward circle)
-  // 5: bridge M end → circle
-
+  // 1: bridge circle → M start
+  // 2: trace M forward (head snakes through, body peels off circle)
+  // 3: hold M
+  // 4: bridge M end → circle (head leaves M end, body peels off M)
+  var phase = 0;
   var phaseTime = 0;
   var spinDuration = 1500;
   var holdDuration = 1200;
-  var bridgeDuration = 250;
+  var bridgeDuration = 300;
   var lastTime = 0;
   var running = true;
   var forceM = false;
@@ -185,7 +184,7 @@ function startSnakeAnimation() {
     trail.push(circlePoint(a));
   }
 
-  var phaseNames = ['spinning', 'bridge→M', 'tracing M', 'hold M', 'leaving M', 'bridge→circle'];
+  var phaseNames = ['spinning', 'entering M', 'tracing M', 'hold M', 'leaving M'];
 
   function animate(time) {
     if (!running) return;
@@ -228,15 +227,15 @@ function startSnakeAnimation() {
         }
         break;
 
-      case 2: // Tracing M path — head snakes through M shape
+      case 2: // Tracing M path — head snakes through M shape, body follows
         mDist += mSpeed * dt;
         if (mDist >= totalMLen) {
           mDist = totalMLen;
           headPos = mPointAtDist(totalMLen);
+          // Transition to hold
           phase = 3;
           phaseTime = 0;
-          // Settle trail: replace with evenly-spaced M points
-          // so the hold looks like a clean M
+          // Settle trail into clean M shape
           settleTrailToM();
           addToTrail = false;
         } else {
@@ -244,44 +243,35 @@ function startSnakeAnimation() {
         }
         break;
 
-      case 3: // Hold M — don't modify trail
+      case 3: // Hold M — frozen trail
         addToTrail = false;
         headPos = null;
         if (phaseTime >= holdDuration) {
+          // Head leaves M end, curves to circle
           phase = 4;
           phaseTime = 0;
-          mDist = totalMLen; // start from end of M
-        }
-        break;
-
-      case 4: // Leaving M — head retraces M in reverse back toward start, then bridges to circle
-        // Head moves backward along M from end toward start
-        mDist -= mSpeed * dt;
-        if (mDist <= 0) {
-          mDist = 0;
-          headPos = mPointAtDist(0);
-          // Now bridge from M start back to circle
-          phase = 5;
-          phaseTime = 0;
-          bridgeStart = { x: mPts[0].x, y: mPts[0].y };
-          // Re-enter circle at the angle closest to M start
-          var reentryAngle = Math.atan2(mPts[0].y - cy, mPts[0].x - cx);
+          bridgeStart = { x: mPts[mPts.length - 1].x, y: mPts[mPts.length - 1].y };
+          // Re-enter circle at angle closest to M end point (bottom-right)
+          var reentryAngle = Math.atan2(mPts[mPts.length - 1].y - cy, mPts[mPts.length - 1].x - cx);
           bridgeEnd = circlePoint(reentryAngle);
           headAngle = reentryAngle;
-        } else {
-          headPos = mPointAtDist(mDist);
         }
         break;
 
-      case 5: // Bridge: M start → circle
+      case 4: // Bridge: M end → circle — head curves to circle, body peels off M
         var t = easeInOut(Math.min(phaseTime / bridgeDuration, 1));
         headPos = {
           x: bridgeStart.x + (bridgeEnd.x - bridgeStart.x) * t,
           y: bridgeStart.y + (bridgeEnd.y - bridgeStart.y) * t
         };
         if (phaseTime >= bridgeDuration) {
+          // Continue spinning on circle
           phase = 0;
           phaseTime = 0;
+          // headAngle is already set
+        } else {
+          // Also slowly advance angle so spinning resumes smoothly
+          headAngle += circleSpeed * dt * t;
         }
         break;
     }
@@ -308,7 +298,7 @@ function startSnakeAnimation() {
     trail = [];
     for (var i = 0; i < trailLen; i++) {
       var frac = i / (trailLen - 1);
-      var d = totalMLen * (1 - frac); // head at end, tail at start
+      var d = totalMLen * (1 - frac);
       trail.push(mPointAtDist(d));
     }
   }
@@ -321,7 +311,7 @@ function startSnakeAnimation() {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // Draw segments with fading opacity
+    // Draw segments with fading opacity (head = full, tail = faded)
     for (var i = 1; i < pts.length; i++) {
       var alpha = 1 - (i / pts.length) * 0.6;
       ctx.globalAlpha = alpha;
