@@ -654,181 +654,162 @@
     if (!canvas) return;
     var ctx = canvas.getContext('2d');
     var W = 128, H = 128;
-    var cx = W / 2, cy = H / 2, r = 40;
     var teal = '#0e7c6b';
-    var lineW = 6;
-    var snakeLen = 0.75; // fraction of total path visible as "body"
+    var lineW = 7;
 
-    // M shape points (in canvas coords)
+    // M shape waypoints
     var mPts = [
-      { x: 22, y: 98 },
-      { x: 22, y: 30 },
-      { x: 64, y: 68 },
-      { x: 106, y: 30 },
-      { x: 106, y: 98 }
+      {x: 20, y: 100},
+      {x: 20, y: 28},
+      {x: 64, y: 72},
+      {x: 108, y: 28},
+      {x: 108, y: 100}
     ];
 
-    // Get total M path length
-    function mPathLength() {
-      var len = 0;
-      for (var i = 1; i < mPts.length; i++) {
-        var dx = mPts[i].x - mPts[i - 1].x;
-        var dy = mPts[i].y - mPts[i - 1].y;
-        len += Math.sqrt(dx * dx + dy * dy);
-      }
-      return len;
+    function dist(a, b) { return Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y)); }
+
+    var mSegLens = [], totalMLen = 0;
+    for (var i = 1; i < mPts.length; i++) {
+      var d = dist(mPts[i-1], mPts[i]);
+      mSegLens.push(d);
+      totalMLen += d;
     }
 
-    // Get point along M path at fraction t (0-1)
-    function mPointAt(t) {
-      var totalLen = mPathLength();
-      var target = t * totalLen;
+    function mPointAtDist(d) {
+      d = Math.max(0, Math.min(d, totalMLen));
       var acc = 0;
-      for (var i = 1; i < mPts.length; i++) {
-        var dx = mPts[i].x - mPts[i - 1].x;
-        var dy = mPts[i].y - mPts[i - 1].y;
-        var segLen = Math.sqrt(dx * dx + dy * dy);
-        if (acc + segLen >= target) {
-          var frac = (target - acc) / segLen;
-          return { x: mPts[i - 1].x + dx * frac, y: mPts[i - 1].y + dy * frac };
+      for (var i = 0; i < mSegLens.length; i++) {
+        if (acc + mSegLens[i] >= d) {
+          var f = (d - acc) / mSegLens[i];
+          return {x: mPts[i].x+(mPts[i+1].x-mPts[i].x)*f, y: mPts[i].y+(mPts[i+1].y-mPts[i].y)*f};
         }
-        acc += segLen;
+        acc += mSegLens[i];
       }
-      return mPts[mPts.length - 1];
+      return {x: mPts[4].x, y: mPts[4].y};
     }
 
-    // Get point on circle at angle
-    function circlePoint(angle) {
-      return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+    var numPts = 120;
+    var pathLR = [];
+    for (var i = 0; i <= numPts; i++) {
+      pathLR.push(mPointAtDist((i / numPts) * totalMLen));
     }
+    var pathRL = pathLR.slice().reverse();
 
-    // Smooth easing
-    function easeInOut(t) {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    }
-
-    // Interpolate between circle point and M point
-    function lerp(a, b, t) {
-      return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
-    }
-
-    var phase = 0; // 0: spinning circle, 1: circle→M, 2: hold M, 3: M→circle
+    // 8-phase teeter-totter: draw L→R, hold, undraw L→R, pause, draw R→L, hold, undraw R→L, pause
+    var phase = 0;
+    var progress = 0;
+    var drawSpeed = 1.0 / 800;
+    var holdDuration = 2500;
+    var pauseDuration = 300;
     var phaseTime = 0;
-    var phaseDurations = [1200, 800, 1200, 800]; // ms per phase
-    var headAngle = 0;
     var lastTime = 0;
-    var running = true;
-    var forceM = false;
-
-    function getSnakePoints(numPts) {
-      var pts = [];
-
-      if (phase === 0) {
-        // Spinning circle — snake chases its tail
-        var speed = Math.PI * 2 / 1000; // rads per ms
-        for (var i = 0; i < numPts; i++) {
-          var frac = i / (numPts - 1);
-          var angle = headAngle - frac * snakeLen * Math.PI * 2;
-          pts.push(circlePoint(angle));
-        }
-      } else if (phase === 1) {
-        // Circle → M transition
-        var t = easeInOut(Math.min(phaseTime / phaseDurations[1], 1));
-        for (var i = 0; i < numPts; i++) {
-          var frac = i / (numPts - 1);
-          // Where this point would be on the circle
-          var angle = headAngle - frac * snakeLen * Math.PI * 2;
-          var cp = circlePoint(angle);
-          // Where this point maps to on the M
-          var mFrac = 1 - frac; // head = end of M, tail = start
-          var mp = mPointAt(mFrac);
-          pts.push(lerp(cp, mp, t));
-        }
-      } else if (phase === 2 || forceM) {
-        // Hold M shape
-        for (var i = 0; i < numPts; i++) {
-          var frac = 1 - (i / (numPts - 1));
-          pts.push(mPointAt(frac));
-        }
-      } else if (phase === 3) {
-        // M → circle transition
-        var t = easeInOut(Math.min(phaseTime / phaseDurations[3], 1));
-        for (var i = 0; i < numPts; i++) {
-          var frac = i / (numPts - 1);
-          var mFrac = 1 - frac;
-          var mp = mPointAt(mFrac);
-          var angle = headAngle - frac * snakeLen * Math.PI * 2;
-          var cp = circlePoint(angle);
-          pts.push(lerp(mp, cp, t));
-        }
-      }
-      return pts;
-    }
-
-    function drawSnake(pts) {
-      ctx.clearRect(0, 0, W, H);
-      if (pts.length < 2) return;
-
-      ctx.strokeStyle = teal;
-      ctx.lineWidth = lineW;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      // Draw with gradient opacity (tail fades)
-      for (var i = 1; i < pts.length; i++) {
-        var alpha = 1 - (i / pts.length) * 0.6;
-        ctx.globalAlpha = alpha;
-        ctx.beginPath();
-        ctx.moveTo(pts[i - 1].x, pts[i - 1].y);
-        ctx.lineTo(pts[i].x, pts[i].y);
-        ctx.stroke();
-      }
-
-      // Head dot
-      ctx.globalAlpha = 1;
-      ctx.fillStyle = teal;
-      ctx.beginPath();
-      ctx.arc(pts[0].x, pts[0].y, lineW / 2 + 1, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    var running = true, forceM = false;
 
     function animate(time) {
       if (!running) return;
       if (!lastTime) lastTime = time;
-      var dt = time - lastTime;
+      var dt = Math.min(time - lastTime, 50);
       lastTime = time;
 
-      if (forceM) {
-        drawSnake(getSnakePoints(60));
-        snakeAnim = requestAnimationFrame(animate);
-        return;
-      }
+      if (forceM) { drawFullM(); snakeAnim = requestAnimationFrame(animate); return; }
 
       phaseTime += dt;
+      var path = (phase < 4) ? pathLR : pathRL;
+      var headIdx, tailIdx;
 
-      // Advance head angle during spinning phases
-      if (phase === 0 || phase === 3) {
-        headAngle += (Math.PI * 2 / 1000) * dt;
+      switch (phase) {
+        case 0: case 4:
+          progress += drawSpeed * dt;
+          if (progress >= 1) { progress = 1; phase = (phase === 0) ? 1 : 5; phaseTime = 0; }
+          headIdx = Math.round(progress * numPts);
+          tailIdx = 0;
+          drawSegment(path, tailIdx, headIdx);
+          break;
+        case 1: case 5:
+          drawGlowingM(phaseTime);
+          if (phaseTime >= holdDuration) { phase = (phase === 1) ? 2 : 6; phaseTime = 0; progress = 0; }
+          break;
+        case 2: case 6:
+          progress += drawSpeed * dt;
+          if (progress >= 1) { progress = 1; phase = (phase === 2) ? 3 : 7; phaseTime = 0; }
+          tailIdx = Math.round(progress * numPts);
+          headIdx = numPts;
+          drawSegment(path, tailIdx, headIdx);
+          break;
+        case 3: case 7:
+          ctx.clearRect(0, 0, W, H);
+          if (phaseTime >= pauseDuration) { phase = (phase === 3) ? 4 : 0; phaseTime = 0; progress = 0; }
+          break;
       }
-
-      // Phase transitions
-      if (phaseTime >= phaseDurations[phase]) {
-        phaseTime = 0;
-        phase = (phase + 1) % 4;
-      }
-
-      var pts = getSnakePoints(60);
-      drawSnake(pts);
 
       snakeAnim = requestAnimationFrame(animate);
     }
 
-    // Start
+    function drawSegment(path, startIdx, endIdx) {
+      ctx.clearRect(0, 0, W, H);
+      if (endIdx <= startIdx) return;
+      var len = endIdx - startIdx;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (var i = startIdx + 1; i <= endIdx; i++) {
+        var posInSegment = (i - startIdx) / len;
+        var alpha = 0.3 + posInSegment * 0.7;
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = teal;
+        ctx.beginPath();
+        ctx.moveTo(path[i-1].x, path[i-1].y);
+        ctx.lineTo(path[i].x, path[i].y);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = teal;
+      ctx.beginPath();
+      ctx.arc(path[endIdx].x, path[endIdx].y, lineW / 2 + 1, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+
+    function drawGlowingM(t) {
+      ctx.clearRect(0, 0, W, H);
+      var pulse = Math.sin(t * Math.PI * 2 / 800);
+      var glowRadius = 8 + pulse * 5;
+      var glowAlpha = 0.12 + pulse * 0.08;
+      ctx.strokeStyle = teal;
+      ctx.lineWidth = lineW + glowRadius;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalAlpha = glowAlpha;
+      ctx.beginPath();
+      ctx.moveTo(mPts[0].x, mPts[0].y);
+      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+      ctx.stroke();
+      ctx.lineWidth = lineW;
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.moveTo(mPts[0].x, mPts[0].y);
+      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    function drawFullM() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.strokeStyle = teal;
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.moveTo(mPts[0].x, mPts[0].y);
+      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+      ctx.stroke();
+    }
+
     running = true;
     forceM = false;
     snakeAnim = requestAnimationFrame(animate);
 
-    // Return control object
     return {
       stop: function() { running = false; if (snakeAnim) cancelAnimationFrame(snakeAnim); },
       showM: function() { forceM = true; }
