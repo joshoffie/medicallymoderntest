@@ -210,15 +210,23 @@ body {
   pointer-events: none;
 }
 
-.option-btn:hover {
-  background: var(--mm-teal-light);
-  border-color: transparent;
-  transform: translateY(-1px);
-  box-shadow: var(--mm-shadow);
-}
+/* Hover effects only on true hover devices (mouse/trackpad) — prevents sticky hover on mobile */
+@media (hover: hover) {
+  .option-btn:hover {
+    background: var(--mm-teal-light);
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: var(--mm-shadow);
+  }
 
-.option-btn:hover::after {
-  opacity: 1;
+  .option-btn:hover::after {
+    opacity: 1;
+  }
+
+  .option-btn:hover .option-arrow {
+    opacity: 1;
+    transform: translateX(3px);
+  }
 }
 
 .option-btn:active {
@@ -231,11 +239,6 @@ body {
   transition: all 0.25s var(--mm-ease);
   flex-shrink: 0;
   color: var(--mm-teal);
-}
-
-.option-btn:hover .option-arrow {
-  opacity: 1;
-  transform: translateX(3px);
 }
 
 /* Product option variant */
@@ -953,11 +956,13 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.ins-item:hover {
-  border-color: var(--mm-teal);
-  background: var(--mm-teal-light);
-  transform: translateY(-1px);
-  box-shadow: var(--mm-shadow-sm);
+@media (hover: hover) {
+  .ins-item:hover {
+    border-color: var(--mm-teal);
+    background: var(--mm-teal-light);
+    transform: translateY(-1px);
+    box-shadow: var(--mm-shadow-sm);
+  }
 }
 
 .ins-item.selected {

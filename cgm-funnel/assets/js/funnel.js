@@ -154,8 +154,19 @@
     if (stepId === 6) {
       var drEl = nextEl.querySelector('.doctor-reveal');
       var dhEl = nextEl.querySelector('.doctor-highlight');
-      if (drEl) { drEl.style.animation = 'none'; drEl.offsetHeight; drEl.style.animation = ''; }
-      if (dhEl) { dhEl.style.animation = 'none'; dhEl.offsetHeight; dhEl.style.animation = ''; }
+      if (drEl) {
+        drEl.style.animation = 'none';
+        drEl.style.opacity = '0';
+      }
+      if (dhEl) {
+        dhEl.style.animation = 'none';
+        dhEl.style.opacity = '0';
+      }
+      // Wait for the step transition to finish, then start doctor animations
+      setTimeout(function() {
+        if (drEl) { drEl.style.opacity = ''; drEl.style.animation = ''; }
+        if (dhEl) { dhEl.style.opacity = ''; dhEl.style.animation = ''; }
+      }, 80);
     }
 
     // Re-trigger animations for confirmation screen (step 9)
