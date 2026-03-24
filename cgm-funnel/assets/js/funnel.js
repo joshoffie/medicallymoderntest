@@ -170,8 +170,46 @@
   }
 
   function goToBenefitsSummary() {
-    // All insurance types use the same benefits summary table
-    goToStep(5);
+    // All insurance types use the same commercial-style benefits table (step 5b)
+    var providerEl = document.getElementById('benefitsProviderName');
+    var amounts = document.querySelectorAll('#step5b .bt-amount');
+    var metSpans = document.querySelectorAll('#step5b .bt-met');
+
+    if (selectedInsuranceType === 'medicare') {
+      if (providerEl) providerEl.textContent = 'Medicare';
+      // Zero out deductible and OOP for Medicare
+      if (amounts[0]) amounts[0].textContent = '$0';      // Annual Deductible
+      if (metSpans[0]) metSpans[0].textContent = '$0 met'; // met amount
+      if (amounts[1]) amounts[1].textContent = '$0';       // Remaining Deductible
+      if (amounts[2]) amounts[2].textContent = '$0';       // OOP Max
+      if (metSpans[1]) metSpans[1].textContent = '$0 met'; // OOP met
+      if (amounts[3]) amounts[3].textContent = '0%';       // Coinsurance
+      if (amounts[4]) amounts[4].textContent = '$0';       // Copay
+      // Update estimate range
+      var estLow = document.querySelector('#step5b .estimate-low');
+      var estHigh = document.querySelector('#step5b .estimate-high');
+      if (estLow) estLow.textContent = '$0';
+      if (estHigh) estHigh.textContent = '$0';
+    } else if (selectedInsuranceType === 'medicaid') {
+      if (providerEl) providerEl.textContent = 'Medicaid';
+      if (amounts[0]) amounts[0].textContent = '$0';
+      if (metSpans[0]) metSpans[0].textContent = '$0 met';
+      if (amounts[1]) amounts[1].textContent = '$0';
+      if (amounts[2]) amounts[2].textContent = '$0';
+      if (metSpans[1]) metSpans[1].textContent = '$0 met';
+      if (amounts[3]) amounts[3].textContent = '0%';
+      if (amounts[4]) amounts[4].textContent = '$0';
+      var estLow2 = document.querySelector('#step5b .estimate-low');
+      var estHigh2 = document.querySelector('#step5b .estimate-high');
+      if (estLow2) estLow2.textContent = '$0';
+      if (estHigh2) estHigh2.textContent = '$0';
+    } else {
+      // Commercial — use default demo values
+      var providerName = funnelData.insuranceProvider || 'Your Insurance';
+      if (providerEl) providerEl.textContent = providerName;
+    }
+
+    goToStep('5b');
   }
 
   // ---- Insurance ID Setup ----
@@ -637,15 +675,15 @@
 
       progressBar.style.width = progress + '%';
 
-      // Update status text
+      // Update status text with clean fade
       for (var i = statusMessages.length - 1; i >= 0; i--) {
         if (progress >= statusMessages[i].at) {
-          if (statusText.textContent !== statusMessages[i].text) {
-            statusText.style.opacity = '0';
+          if (statusText.textContent !== statusMessages[i].text && !statusText.classList.contains('fading')) {
+            statusText.classList.add('fading');
             setTimeout(function(msg) {
               statusText.textContent = msg;
-              statusText.style.opacity = '1';
-            }.bind(null, statusMessages[i].text), 200);
+              statusText.classList.remove('fading');
+            }.bind(null, statusMessages[i].text), 600);
           }
           break;
         }
@@ -699,13 +737,13 @@
     if (heading) heading.textContent = 'Benefits verified!';
 
     if (statusText) {
-      statusText.style.opacity = '0';
+      statusText.classList.add('fading');
       setTimeout(function() {
         statusText.textContent = 'Great news — you\'re covered.';
-        statusText.style.opacity = '1';
         statusText.style.color = 'var(--mm-teal)';
         statusText.style.fontWeight = '600';
-      }, 200);
+        statusText.classList.remove('fading');
+      }, 600);
     }
 
     // Replace shield with checkmark

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/funnel.css?v=14">
+  <link rel="stylesheet" href="assets/css/funnel.css?v=16">
 </head>
 <body>
 
@@ -38,14 +38,18 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <h1 class="step-question">Your CGM, delivered — no hassle, no cost.</h1>
-        <p class="step-subtitle">Answer a few quick questions and our team takes it from there. Most patients qualify for a $0 out-of-pocket CGM with white-glove service from start to finish.</p>
-        <div class="welcome-trust">
+        <h1 class="step-question welcome-headline">
+          <span class="reveal-line" style="animation-delay: 0s">Your CGM, delivered.</span>
+          <span class="reveal-line" style="animation-delay: 0.4s">No hassle.</span>
+          <span class="reveal-line reveal-hero" style="animation-delay: 0.9s">No cost.</span>
+        </h1>
+        <p class="step-subtitle reveal-fade" style="animation-delay: 1.5s">Answer a few quick questions and our team takes it from there. Most patients qualify for a $0 out-of-pocket CGM with white-glove service from start to finish.</p>
+        <div class="welcome-trust reveal-fade" style="animation-delay: 1.8s">
           <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> HIPAA Compliant</span>
           <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Takes ~2 minutes</span>
           <span class="trust-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mm-teal)" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> 10,000+ patients helped</span>
         </div>
-        <button class="cta-btn" data-next="1">
+        <button class="cta-btn reveal-fade" data-next="1" style="animation-delay: 2.1s">
           Get started →
         </button>
       </div>
@@ -896,6 +900,6 @@
 
   </main>
 
-  <script src="assets/js/funnel.js?v=15"></script>
+  <script src="assets/js/funnel.js?v=16"></script>
 </body>
 </html>
