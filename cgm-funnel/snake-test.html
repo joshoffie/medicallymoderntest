@@ -274,6 +274,25 @@
     return {x: pts[pts.length-1].x, y: pts[pts.length-1].y};
   }
 
+  // Erase the front M's stroke from the back canvas so the back M
+  // has transparent gaps where the front M crosses over it.
+  // This matches the original logo where the lighter M is NOT solid
+  // through the overlap zones — you can see white background through it.
+  function eraseFrontOverlap(ctx) {
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineCap = 'butt';
+    ctx.lineJoin = 'miter';
+    ctx.miterLimit = 20;
+    ctx.lineWidth = lineW;
+    ctx.strokeStyle = 'rgba(0,0,0,1)';
+    ctx.beginPath();
+    ctx.moveTo(frontM[0].x, frontM[0].y);
+    for (var i = 1; i < frontM.length; i++) ctx.lineTo(frontM[i].x, frontM[i].y);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   // Draw M with subtle glow (hold phase)
   function drawGlowM(ctx, pts, color, t, blendIn) {
     ctx.clearRect(0, 0, W, H);
@@ -351,6 +370,7 @@
 
     if (forceFinal) {
       drawStaticM(backCtx, backM, backColor);
+      eraseFrontOverlap(backCtx);
       drawStaticM(frontCtx, frontM, frontColor);
       animId = requestAnimationFrame(animate);
       return;
@@ -372,18 +392,21 @@
         } else {
           drawPartialM(backCtx, backPathData, 1 - eased, 1, backColor, 1);
         }
+        eraseFrontOverlap(backCtx);
         frontCtx.clearRect(0, 0, W, H);
         break;
 
       // GAP (back fully drawn, front about to start)
       case 1: case 9:
         drawStaticM(backCtx, backM, backColor);
+        eraseFrontOverlap(backCtx);
         frontCtx.clearRect(0, 0, W, H);
         break;
 
       // DRAW FRONT
       case 2: case 10:
         drawStaticM(backCtx, backM, backColor);
+        eraseFrontOverlap(backCtx);
         if (!isReverse) {
           drawPartialM(frontCtx, frontPathData, 0, eased, frontColor, 1);
         } else {
@@ -395,12 +418,14 @@
       case 3: case 11:
         var glowBlend = Math.min(phaseTime / 250, 1);
         drawGlowM(backCtx, backM, backColor, phaseTime, glowBlend);
+        eraseFrontOverlap(backCtx);
         drawGlowM(frontCtx, frontM, frontColor, phaseTime, glowBlend);
         break;
 
       // UNDRAW FRONT
       case 4: case 12:
         drawStaticM(backCtx, backM, backColor);
+        eraseFrontOverlap(backCtx);
         if (!isReverse) {
           drawPartialM(frontCtx, frontPathData, eased, 1, frontColor, 1);
         } else {
@@ -411,6 +436,7 @@
       // GAP (front gone, back about to undraw)
       case 5: case 13:
         drawStaticM(backCtx, backM, backColor);
+        eraseFrontOverlap(backCtx);
         frontCtx.clearRect(0, 0, W, H);
         break;
 
@@ -421,6 +447,7 @@
         } else {
           drawPartialM(backCtx, backPathData, 0, 1 - eased, backColor, 1);
         }
+        eraseFrontOverlap(backCtx);
         frontCtx.clearRect(0, 0, W, H);
         break;
 
@@ -445,6 +472,7 @@
     var sb = document.getElementById('staticBack').getContext('2d');
     var sf = document.getElementById('staticFront').getContext('2d');
     drawStaticM(sb, backM, backColor);
+    eraseFrontOverlap(sb);
     drawStaticM(sf, frontM, frontColor);
   }
 
