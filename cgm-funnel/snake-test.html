@@ -278,17 +278,23 @@
   // has transparent gaps where the front M crosses over it.
   // This matches the original logo where the lighter M is NOT solid
   // through the overlap zones — you can see white background through it.
+  // Erasure uses a wider stroke and shifted-down path to cut bigger
+  // gaps in the back M, matching the logo where the gap extends further
+  // and lower than the front M's visible stroke.
+  var eraseW = lineW + 10;   // wider than the actual front stroke
+  var eraseShiftY = 4;       // shift erasure path down a few px
+
   function eraseFrontOverlap(ctx) {
     ctx.save();
     ctx.globalCompositeOperation = 'destination-out';
     ctx.lineCap = 'butt';
     ctx.lineJoin = 'miter';
     ctx.miterLimit = 20;
-    ctx.lineWidth = lineW;
+    ctx.lineWidth = eraseW;
     ctx.strokeStyle = 'rgba(0,0,0,1)';
     ctx.beginPath();
-    ctx.moveTo(frontM[0].x, frontM[0].y);
-    for (var i = 1; i < frontM.length; i++) ctx.lineTo(frontM[i].x, frontM[i].y);
+    ctx.moveTo(frontM[0].x, frontM[0].y + eraseShiftY);
+    for (var i = 1; i < frontM.length; i++) ctx.lineTo(frontM[i].x, frontM[i].y + eraseShiftY);
     ctx.stroke();
     ctx.restore();
   }
@@ -331,8 +337,9 @@
   // ============================================================
   // ANIMATION ENGINE — 16-phase sequential cycle
   // ============================================================
-  // L→R cycle: back draw → gap → front draw → hold → front undraw → gap → back undraw → pause
+  // L→R cycle: FRONT draw → gap → BACK draw → hold → BACK undraw → gap → FRONT undraw → pause
   // R→L cycle: same but reversed direction
+  // Dark (front) M draws FIRST, then light (back) M draws on top.
   // Total: 16 phases
 
   var backCanvas  = document.getElementById('backCanvas');
@@ -349,10 +356,10 @@
   var running = true, forceFinal = false, animId;
 
   var phaseNames = [
-    'back draw L\u2192R','gap','front draw L\u2192R','hold (glow)',
-    'front undraw L\u2192R','gap','back undraw L\u2192R','pause',
-    'back draw R\u2192L','gap','front draw R\u2192L','hold (glow)',
-    'front undraw R\u2192L','gap','back undraw R\u2192L','pause'
+    'front draw L\u2192R','gap','back draw L\u2192R','hold (glow)',
+    'back undraw L\u2192R','gap','front undraw L\u2192R','pause',
+    'front draw R\u2192L','gap','back draw R\u2192L','hold (glow)',
+    'back undraw R\u2192L','gap','front undraw R\u2192L','pause'
   ];
 
   function phaseDuration(p) {
@@ -385,33 +392,31 @@
     var isReverse = phase >= 8;
 
     switch (phase) {
-      // DRAW BACK
+      // DRAW FRONT (dark M first)
       case 0: case 8:
+        backCtx.clearRect(0, 0, W, H);
+        if (!isReverse) {
+          drawPartialM(frontCtx, frontPathData, 0, eased, frontColor, 1);
+        } else {
+          drawPartialM(frontCtx, frontPathData, 1 - eased, 1, frontColor, 1);
+        }
+        break;
+
+      // GAP (front fully drawn, back about to start)
+      case 1: case 9:
+        backCtx.clearRect(0, 0, W, H);
+        drawStaticM(frontCtx, frontM, frontColor);
+        break;
+
+      // DRAW BACK (light M second)
+      case 2: case 10:
+        drawStaticM(frontCtx, frontM, frontColor);
         if (!isReverse) {
           drawPartialM(backCtx, backPathData, 0, eased, backColor, 1);
         } else {
           drawPartialM(backCtx, backPathData, 1 - eased, 1, backColor, 1);
         }
         eraseFrontOverlap(backCtx);
-        frontCtx.clearRect(0, 0, W, H);
-        break;
-
-      // GAP (back fully drawn, front about to start)
-      case 1: case 9:
-        drawStaticM(backCtx, backM, backColor);
-        eraseFrontOverlap(backCtx);
-        frontCtx.clearRect(0, 0, W, H);
-        break;
-
-      // DRAW FRONT
-      case 2: case 10:
-        drawStaticM(backCtx, backM, backColor);
-        eraseFrontOverlap(backCtx);
-        if (!isReverse) {
-          drawPartialM(frontCtx, frontPathData, 0, eased, frontColor, 1);
-        } else {
-          drawPartialM(frontCtx, frontPathData, 1 - eased, 1, frontColor, 1);
-        }
         break;
 
       // HOLD WITH GLOW
@@ -422,33 +427,31 @@
         drawGlowM(frontCtx, frontM, frontColor, phaseTime, glowBlend);
         break;
 
-      // UNDRAW FRONT
+      // UNDRAW BACK (light M undraws first)
       case 4: case 12:
-        drawStaticM(backCtx, backM, backColor);
-        eraseFrontOverlap(backCtx);
-        if (!isReverse) {
-          drawPartialM(frontCtx, frontPathData, eased, 1, frontColor, 1);
-        } else {
-          drawPartialM(frontCtx, frontPathData, 0, 1 - eased, frontColor, 1);
-        }
-        break;
-
-      // GAP (front gone, back about to undraw)
-      case 5: case 13:
-        drawStaticM(backCtx, backM, backColor);
-        eraseFrontOverlap(backCtx);
-        frontCtx.clearRect(0, 0, W, H);
-        break;
-
-      // UNDRAW BACK
-      case 6: case 14:
+        drawStaticM(frontCtx, frontM, frontColor);
         if (!isReverse) {
           drawPartialM(backCtx, backPathData, eased, 1, backColor, 1);
         } else {
           drawPartialM(backCtx, backPathData, 0, 1 - eased, backColor, 1);
         }
         eraseFrontOverlap(backCtx);
-        frontCtx.clearRect(0, 0, W, H);
+        break;
+
+      // GAP (back gone, front about to undraw)
+      case 5: case 13:
+        backCtx.clearRect(0, 0, W, H);
+        drawStaticM(frontCtx, frontM, frontColor);
+        break;
+
+      // UNDRAW FRONT (dark M undraws last)
+      case 6: case 14:
+        backCtx.clearRect(0, 0, W, H);
+        if (!isReverse) {
+          drawPartialM(frontCtx, frontPathData, eased, 1, frontColor, 1);
+        } else {
+          drawPartialM(frontCtx, frontPathData, 0, 1 - eased, frontColor, 1);
+        }
         break;
 
       // PAUSE
