@@ -93,26 +93,30 @@
   //
   // Mapping to 256x256 canvas (M centered, taking ~85% of space):
 
-  // Front M (darker teal, drawn ON TOP)
-  var frontM = [
-    {x: 42,  y: 228},  // bottom-left
-    {x: 42,  y: 30},   // top-left
-    {x: 138, y: 159},  // center-V  (65% down: 30 + 0.65*(228-30) = 159)
-    {x: 234, y: 30},   // top-right
-    {x: 234, y: 228}   // bottom-right
-  ];
-  // Width: 234-42 = 192.  Height: 228-30 = 198.  Ratio: 192/198 = 0.97 (nearly square, slightly taller)
-  // V depth: (159-30)/198 = 65.2%
+  // CRITICAL: The two M's are DIFFERENT SIZES.
+  // The front (darker) M is WIDER than the back (lighter) M.
+  // The back M is narrower and positioned further left.
+  // The front M is the dominant, wider shape.
 
-  // Back M (lighter teal, offset LEFT and UP, drawn BEHIND)
-  // Offset: -20px x, -14px y  (roughly 1 stroke-width left, 0.6 stroke up)
-  var backM = [
-    {x: 22,  y: 214},  // bottom-left
-    {x: 22,  y: 16},   // top-left
-    {x: 118, y: 145},  // center-V
-    {x: 214, y: 16},   // top-right
-    {x: 214, y: 214}   // bottom-right
+  // Front M (darker teal, WIDER, drawn ON TOP)
+  var frontM = [
+    {x: 34,  y: 228},  // bottom-left
+    {x: 34,  y: 30},   // top-left
+    {x: 138, y: 153},  // center-V  (~62% down)
+    {x: 242, y: 30},   // top-right
+    {x: 242, y: 228}   // bottom-right
   ];
+  // Width: 242-34 = 208.  Height: 228-30 = 198.
+
+  // Back M (lighter teal, NARROWER, shifted LEFT, drawn BEHIND)
+  var backM = [
+    {x: 6,   y: 222},  // bottom-left
+    {x: 6,   y: 24},   // top-left
+    {x: 100, y: 147},  // center-V
+    {x: 194, y: 24},   // top-right
+    {x: 194, y: 222}   // bottom-right
+  ];
+  // Width: 194-6 = 188 (narrower than front M's 208)
 
   // --- COLORS ---
   // Sampled from zoomed logo analysis:
@@ -123,7 +127,7 @@
 
   // --- STROKE ---
   // The logo strokes are about 9% of M width.  192 * 0.09 = ~17
-  var lineW = 18;
+  var lineW = 20;
 
   // ---- Path utilities ----
   function dist(a, b) {
