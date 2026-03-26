@@ -95,36 +95,34 @@
   var W = 256, H = 256;
 
   // --- M waypoints (in 256x256 space) ---
-  // Proportions carefully matched to the logo:
-  //   - Vertical legs from bottom to top
-  //   - Inner diagonals meet at center V
-  //   - V depth at about 58% from top
-  //   - Legs slightly inset from edges
-  //   - Overall shape ~90% width, ~80% height of canvas
+  // Matched to the Medically Modern logo:
+  //   - Shallow V notch (~40% down from top)
+  //   - Tall vertical legs
+  //   - Back M (lighter) is offset LEFT and UP from front M
+  //   - Overall shape fills ~80% of canvas
 
-  // BACK M (lighter, offset slightly left and up)
-  var backM = [
-    {x: 38,  y: 210},  // bottom-left
-    {x: 38,  y: 46},   // top-left
-    {x: 128, y: 148},  // center-V
-    {x: 218, y: 46},   // top-right
-    {x: 218, y: 210}   // bottom-right
+  // FRONT M (darker teal, main shape — positioned center)
+  var frontM = [
+    {x: 48,  y: 220},  // bottom-left
+    {x: 48,  y: 36},   // top-left
+    {x: 128, y: 116},  // center-V (shallow — only 40% down)
+    {x: 208, y: 36},   // top-right
+    {x: 208, y: 220}   // bottom-right
   ];
 
-  // FRONT M (darker, offset slightly right and down)
-  // Shifted ~12px right, ~12px down from back M
-  var frontM = [
-    {x: 50,  y: 222},  // bottom-left
-    {x: 50,  y: 58},   // top-left
-    {x: 140, y: 160},  // center-V
-    {x: 230, y: 58},   // top-right
-    {x: 230, y: 222}   // bottom-right
+  // BACK M (lighter teal, offset left and up behind the front M)
+  var backM = [
+    {x: 32,  y: 206},  // bottom-left
+    {x: 32,  y: 22},   // top-left
+    {x: 112, y: 102},  // center-V
+    {x: 192, y: 22},   // top-right
+    {x: 192, y: 206}   // bottom-right
   ];
 
   // Colors
-  var backColor  = '#6db5a8';  // lighter teal (back M)
+  var backColor  = '#8ec5b9';  // lighter teal (back M — closer to logo)
   var frontColor = '#0e7c6b';  // darker teal (front M)
-  var lineW = 14;  // stroke width to approximate the filled look
+  var lineW = 16;  // stroke width to approximate the filled logo look
 
   // ---- Path utilities ----
   function dist(a, b) { return Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y)); }
