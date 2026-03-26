@@ -1974,19 +1974,24 @@ body {
   100% { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- ANIMATED M LOGO: Welcome Screen ---- */
-.mm-m-logo {
-  opacity: 0.8;
+/* ---- DUAL-M LOGO: Shared canvas wrapper ---- */
+.dual-m-wrap {
+  position: relative;
+  display: inline-block;
+}
+.dual-m-wrap canvas {
+  position: absolute;
+  top: 0; left: 0;
 }
 
-.welcome-m .m-path {
-  stroke-dasharray: 300;
-  stroke-dashoffset: 300;
-  animation: drawM 1.2s cubic-bezier(0.65, 0, 0.35, 1) 0.2s forwards;
+/* Welcome screen: 48x48 displayed */
+.welcome-dual-m {
+  width: 48px;
+  height: 48px;
 }
-
-@keyframes drawM {
-  to { stroke-dashoffset: 0; }
+.welcome-dual-m canvas {
+  width: 48px;
+  height: 48px;
 }
 
 /* ---- TEXT CENTERING: Hims-style mobile-first ---- */
@@ -2009,12 +2014,15 @@ body {
   text-align: left;
 }
 
-/* ---- SNAKE M LOGO: Verify Screen ---- */
-.snake-canvas {
+/* ---- DUAL-M LOGO: Verify/Loading Screen ---- */
+.verify-dual-m {
   width: 64px;
   height: 64px;
-  display: block;
   margin: 0 auto;
+}
+.verify-dual-m canvas {
+  width: 64px;
+  height: 64px;
 }
 
 /* ---- BENEFITS HEADER: Centered Checkmark ---- */

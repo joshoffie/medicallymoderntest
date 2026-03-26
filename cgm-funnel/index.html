@@ -34,9 +34,10 @@
     <section class="step active" data-step="welcome" id="stepWelcome">
       <div class="step-content welcome-screen">
         <div class="welcome-badge">
-          <svg class="mm-m-logo welcome-m" width="48" height="48" viewBox="0 0 100 100" fill="none">
-            <path class="m-path" d="M15 85 L15 25 L50 60 L85 25 L85 85" stroke="var(--mm-teal)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-          </svg>
+          <div class="dual-m-wrap welcome-dual-m">
+            <canvas id="welcomeBackCanvas" width="256" height="256"></canvas>
+            <canvas id="welcomeFrontCanvas" width="256" height="256"></canvas>
+          </div>
         </div>
         <h1 class="step-question welcome-headline">
           <span class="reveal-line" style="animation-delay: 0s">Your CGM, delivered.</span>
@@ -274,7 +275,10 @@
         <!-- Top: Verification Status -->
         <div class="verify-status">
           <div class="verify-icon-wrap">
-            <canvas id="snakeCanvas" class="snake-canvas" width="128" height="128"></canvas>
+            <div class="dual-m-wrap verify-dual-m">
+              <canvas id="verifyBackCanvas" width="256" height="256"></canvas>
+              <canvas id="verifyFrontCanvas" width="256" height="256"></canvas>
+            </div>
           </div>
           <h2 class="verify-heading">Checking your benefits...</h2>
           <p class="verify-status-text" id="verifyStatusText">Connecting to your insurer</p>

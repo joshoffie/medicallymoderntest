@@ -657,66 +657,158 @@
     });
   }
 
-  // ---- Snake M Canvas Animation ----
+  // ---- Dual-M Logo Rendering (shared geometry + functions) ----
+  var dualM = (function() {
+    var W = 256, H = 256;
+
+    // Back M (lighter teal, NARROWER + TALLER)
+    var backM = [
+      {x: 44,  y: 222}, {x: 44,  y: 24},
+      {x: 128, y: 118}, {x: 212, y: 24}, {x: 212, y: 222}
+    ];
+    // Front M (darker teal, WIDER + SHORTER)
+    var frontM = [
+      {x: 12,  y: 222}, {x: 12,  y: 80},
+      {x: 128, y: 176}, {x: 244, y: 80}, {x: 244, y: 222}
+    ];
+
+    var frontColor = '#80adaa';
+    var backColor  = '#a9d1d0';
+    var lineW = 20;
+    var eraseW = lineW + 20;
+    var eraseShiftY = 1;
+
+    function dist(a, b) { var dx=b.x-a.x, dy=b.y-a.y; return Math.sqrt(dx*dx+dy*dy); }
+
+    function buildPath(pts) {
+      var segLens = [], totalLen = 0;
+      for (var i = 1; i < pts.length; i++) { var d = dist(pts[i-1], pts[i]); segLens.push(d); totalLen += d; }
+      var waypointDists = [0]; var acc = 0;
+      for (var i = 0; i < segLens.length; i++) { acc += segLens[i]; waypointDists.push(acc); }
+      return { pts: pts, totalLen: totalLen, waypointDists: waypointDists };
+    }
+
+    var backPathData  = buildPath(backM);
+    var frontPathData = buildPath(frontM);
+
+    function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+    function configureCtx(ctx) {
+      ctx.lineCap = 'butt'; ctx.lineJoin = 'miter'; ctx.miterLimit = 20; ctx.lineWidth = lineW;
+    }
+
+    function interpPoint(pts, wpDists, d) {
+      for (var i = 0; i < wpDists.length - 1; i++) {
+        if (d >= wpDists[i] && d <= wpDists[i+1]) {
+          var segLen = wpDists[i+1] - wpDists[i];
+          var f = segLen > 0 ? (d - wpDists[i]) / segLen : 0;
+          return { x: pts[i].x + (pts[i+1].x - pts[i].x) * f, y: pts[i].y + (pts[i+1].y - pts[i].y) * f };
+        }
+      }
+      return { x: pts[pts.length-1].x, y: pts[pts.length-1].y };
+    }
+
+    function drawStaticM(ctx, pts, color) {
+      ctx.clearRect(0, 0, W, H); configureCtx(ctx);
+      ctx.strokeStyle = color; ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+    }
+
+    function drawPartialM(ctx, pathData, startFrac, endFrac, color) {
+      ctx.clearRect(0, 0, W, H);
+      if (endFrac <= startFrac + 0.005) return;
+      configureCtx(ctx); ctx.strokeStyle = color; ctx.globalAlpha = 1;
+      var totalLen = pathData.totalLen;
+      var startDist = startFrac * totalLen, endDist = endFrac * totalLen;
+      var pts = pathData.pts, wpDists = pathData.waypointDists;
+      var subPoints = [interpPoint(pts, wpDists, startDist)];
+      for (var i = 1; i < pts.length - 1; i++) {
+        if (wpDists[i] > startDist && wpDists[i] < endDist) subPoints.push({x: pts[i].x, y: pts[i].y});
+      }
+      subPoints.push(interpPoint(pts, wpDists, endDist));
+      if (subPoints.length >= 2) {
+        ctx.beginPath(); ctx.moveTo(subPoints[0].x, subPoints[0].y);
+        for (var i = 1; i < subPoints.length; i++) ctx.lineTo(subPoints[i].x, subPoints[i].y);
+        ctx.stroke();
+      }
+    }
+
+    function eraseFrontOverlap(ctx) {
+      ctx.save(); ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineCap = 'butt'; ctx.lineJoin = 'miter'; ctx.miterLimit = 20;
+      ctx.lineWidth = eraseW; ctx.strokeStyle = 'rgba(0,0,0,1)';
+      ctx.beginPath(); ctx.moveTo(frontM[0].x, frontM[0].y + eraseShiftY);
+      for (var i = 1; i < frontM.length; i++) ctx.lineTo(frontM[i].x, frontM[i].y + eraseShiftY);
+      ctx.stroke(); ctx.restore();
+    }
+
+    function drawGlowM(ctx, pts, color, t, blendIn) {
+      ctx.clearRect(0, 0, W, H);
+      var breathe = (Math.sin(t * Math.PI * 2 / 1200 - Math.PI/2) + 1) / 2;
+      ctx.save(); configureCtx(ctx); ctx.strokeStyle = color;
+      var glowIntensity = 0.06 + breathe * 0.10;
+      var glowSize = 4 + breathe * 6;
+      ctx.shadowColor = color; ctx.shadowBlur = glowSize * blendIn;
+      ctx.globalAlpha = glowIntensity * blendIn;
+      ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+      ctx.shadowBlur = glowSize * 2 * blendIn; ctx.globalAlpha = glowIntensity * 0.5 * blendIn;
+      ctx.stroke(); ctx.restore();
+      configureCtx(ctx); ctx.strokeStyle = color; ctx.globalAlpha = 1;
+      ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+      for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.stroke();
+    }
+
+    // Draw the static dual-M (for welcome screen)
+    function drawStatic(backCtx, frontCtx) {
+      drawStaticM(backCtx, backM, backColor);
+      eraseFrontOverlap(backCtx);
+      drawStaticM(frontCtx, frontM, frontColor);
+    }
+
+    return {
+      W: W, H: H, backM: backM, frontM: frontM,
+      backPathData: backPathData, frontPathData: frontPathData,
+      frontColor: frontColor, backColor: backColor,
+      drawStaticM: drawStaticM, drawPartialM: drawPartialM,
+      eraseFrontOverlap: eraseFrontOverlap, drawGlowM: drawGlowM,
+      drawStatic: drawStatic, easeInOutCubic: easeInOutCubic
+    };
+  })();
+
+  // ---- Welcome Screen: Static Dual-M ----
+  (function() {
+    var bc = document.getElementById('welcomeBackCanvas');
+    var fc = document.getElementById('welcomeFrontCanvas');
+    if (!bc || !fc) return;
+    dualM.drawStatic(bc.getContext('2d'), fc.getContext('2d'));
+  })();
+
+  // ---- Verify Screen: Animated Dual-M Snake ----
   var snakeAnim = null;
 
   function startSnakeAnimation() {
-    var canvas = document.getElementById('snakeCanvas');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
-    var W = 128, H = 128;
-    var teal = '#0e7c6b';
-    var lineW = 6;
+    var backCanvas  = document.getElementById('verifyBackCanvas');
+    var frontCanvas = document.getElementById('verifyFrontCanvas');
+    if (!backCanvas || !frontCanvas) return;
+    var backCtx  = backCanvas.getContext('2d');
+    var frontCtx = frontCanvas.getContext('2d');
+    var W = dualM.W, H = dualM.H;
 
-    // M shape waypoints — refined proportions
-    var mPts = [
-      {x: 18, y: 100},
-      {x: 18, y: 26},
-      {x: 64, y: 68},
-      {x: 110, y: 26},
-      {x: 110, y: 100}
-    ];
-
-    function dist(a, b) { return Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y)); }
-
-    var segLens = [], totalLen = 0;
-    for (var i = 1; i < mPts.length; i++) {
-      var d = dist(mPts[i-1], mPts[i]);
-      segLens.push(d);
-      totalLen += d;
-    }
-
-    function pointAtDist(d) {
-      d = Math.max(0, Math.min(d, totalLen));
-      var acc = 0;
-      for (var i = 0; i < segLens.length; i++) {
-        if (acc + segLens[i] >= d) {
-          var f = (d - acc) / segLens[i];
-          return {x: mPts[i].x+(mPts[i+1].x-mPts[i].x)*f, y: mPts[i].y+(mPts[i+1].y-mPts[i].y)*f};
-        }
-        acc += segLens[i];
-      }
-      return {x: mPts[mPts.length-1].x, y: mPts[mPts.length-1].y};
-    }
-
-    var N = 200;
-    var pathLR = [];
-    for (var i = 0; i <= N; i++) pathLR.push(pointAtDist((i / N) * totalLen));
-    var pathRL = pathLR.slice().reverse();
-
-    function easeInOutCubic(t) {
-      return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
-    }
-
-    var phase = 0;
-    var rawProgress = 0;
-    var drawDuration = 900;
-    var holdDuration = 2000;
-    var pauseDuration = 200;
-    var phaseTime = 0;
-    var lastTime = 0;
+    var drawDur = 900, holdDur = 2000, gapDur = 100, pauseDur = 300;
+    var phase = 0, phaseTime = 0, lastTime = 0;
     var running = true, forceM = false;
-    var blendIn = 0, blendOut = 1;
+
+    function phaseDuration(p) {
+      if (p === 3 || p === 11) return holdDur;
+      if (p === 1 || p === 5 || p === 9 || p === 13) return gapDur;
+      if (p === 7 || p === 15) return pauseDur;
+      return drawDur;
+    }
 
     function animate(time) {
       if (!running) return;
@@ -724,118 +816,65 @@
       var dt = Math.min(time - lastTime, 50);
       lastTime = time;
 
-      if (forceM) { drawStaticM(); snakeAnim = requestAnimationFrame(animate); return; }
+      if (forceM) {
+        dualM.drawStatic(backCtx, frontCtx);
+        snakeAnim = requestAnimationFrame(animate);
+        return;
+      }
 
       phaseTime += dt;
-      var path = (phase < 4) ? pathLR : pathRL;
+      var dur = phaseDuration(phase);
+      var progress = Math.min(phaseTime / dur, 1);
+      var eased = dualM.easeInOutCubic(progress);
+      var isReverse = phase >= 8;
 
       switch (phase) {
-        case 0: case 4:
-          rawProgress = Math.min(phaseTime / drawDuration, 1);
-          var eased = easeInOutCubic(rawProgress);
-          var headIdx = Math.round(eased * N);
-          blendIn = Math.min(rawProgress / 0.15, 1);
-          drawSnakePath(path, 0, headIdx, blendIn);
-          if (rawProgress >= 1) { phase = (phase === 0) ? 1 : 5; phaseTime = 0; rawProgress = 0; }
+        case 0: case 8: // DRAW FRONT (dark M first)
+          backCtx.clearRect(0, 0, W, H);
+          if (!isReverse) dualM.drawPartialM(frontCtx, dualM.frontPathData, 0, eased, dualM.frontColor);
+          else dualM.drawPartialM(frontCtx, dualM.frontPathData, 1 - eased, 1, dualM.frontColor);
           break;
-        case 1: case 5:
+        case 1: case 9: // GAP
+          backCtx.clearRect(0, 0, W, H);
+          dualM.drawStaticM(frontCtx, dualM.frontM, dualM.frontColor);
+          break;
+        case 2: case 10: // DRAW BACK (light M second)
+          dualM.drawStaticM(frontCtx, dualM.frontM, dualM.frontColor);
+          if (!isReverse) dualM.drawPartialM(backCtx, dualM.backPathData, 0, eased, dualM.backColor);
+          else dualM.drawPartialM(backCtx, dualM.backPathData, 1 - eased, 1, dualM.backColor);
+          dualM.eraseFrontOverlap(backCtx);
+          break;
+        case 3: case 11: // HOLD WITH GLOW
           var glowBlend = Math.min(phaseTime / 250, 1);
-          drawGlowingM(phaseTime, glowBlend);
-          if (phaseTime >= holdDuration) { phase = (phase === 1) ? 2 : 6; phaseTime = 0; rawProgress = 0; }
+          dualM.drawGlowM(backCtx, dualM.backM, dualM.backColor, phaseTime, glowBlend);
+          dualM.eraseFrontOverlap(backCtx);
+          dualM.drawGlowM(frontCtx, dualM.frontM, dualM.frontColor, phaseTime, glowBlend);
           break;
-        case 2: case 6:
-          rawProgress = Math.min(phaseTime / drawDuration, 1);
-          var eased = easeInOutCubic(rawProgress);
-          var tailIdx = Math.round(eased * N);
-          blendOut = 1 - Math.max((rawProgress - 0.85) / 0.15, 0);
-          drawSnakePath(path, tailIdx, N, blendOut);
-          if (rawProgress >= 1) { phase = (phase === 2) ? 3 : 7; phaseTime = 0; rawProgress = 0; }
+        case 4: case 12: // UNDRAW BACK
+          dualM.drawStaticM(frontCtx, dualM.frontM, dualM.frontColor);
+          if (!isReverse) dualM.drawPartialM(backCtx, dualM.backPathData, eased, 1, dualM.backColor);
+          else dualM.drawPartialM(backCtx, dualM.backPathData, 0, 1 - eased, dualM.backColor);
+          dualM.eraseFrontOverlap(backCtx);
           break;
-        case 3: case 7:
-          ctx.clearRect(0, 0, W, H);
-          if (phaseTime >= pauseDuration) { phase = (phase === 3) ? 4 : 0; phaseTime = 0; rawProgress = 0; }
+        case 5: case 13: // GAP
+          backCtx.clearRect(0, 0, W, H);
+          dualM.drawStaticM(frontCtx, dualM.frontM, dualM.frontColor);
+          break;
+        case 6: case 14: // UNDRAW FRONT
+          backCtx.clearRect(0, 0, W, H);
+          if (!isReverse) dualM.drawPartialM(frontCtx, dualM.frontPathData, eased, 1, dualM.frontColor);
+          else dualM.drawPartialM(frontCtx, dualM.frontPathData, 0, 1 - eased, dualM.frontColor);
+          break;
+        case 7: case 15: // PAUSE
+          backCtx.clearRect(0, 0, W, H); frontCtx.clearRect(0, 0, W, H);
           break;
       }
 
+      if (progress >= 1) { phase = (phase + 1) % 16; phaseTime = 0; }
       snakeAnim = requestAnimationFrame(animate);
     }
 
-    function drawSnakePath(path, startIdx, endIdx, masterAlpha) {
-      ctx.clearRect(0, 0, W, H);
-      if (endIdx <= startIdx + 1) return;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.lineWidth = lineW;
-      ctx.strokeStyle = teal;
-      ctx.globalAlpha = masterAlpha;
-      ctx.beginPath();
-      ctx.moveTo(path[startIdx].x, path[startIdx].y);
-      for (var i = startIdx + 1; i <= endIdx; i++) ctx.lineTo(path[i].x, path[i].y);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-
-    function drawGlowingM(t, blendIn) {
-      ctx.clearRect(0, 0, W, H);
-      var breathe = (Math.sin(t * Math.PI * 2 / 1200 - Math.PI/2) + 1) / 2;
-      ctx.save();
-      ctx.strokeStyle = teal;
-      ctx.lineWidth = lineW;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      var glowIntensity = 0.08 + breathe * 0.12;
-      var glowSize = 6 + breathe * 8;
-      ctx.shadowColor = teal;
-      ctx.shadowBlur = glowSize * blendIn;
-      ctx.globalAlpha = glowIntensity * blendIn;
-      ctx.beginPath();
-      ctx.moveTo(mPts[0].x, mPts[0].y);
-      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
-      ctx.stroke();
-      ctx.shadowBlur = glowSize * 2 * blendIn;
-      ctx.globalAlpha = glowIntensity * 0.5 * blendIn;
-      ctx.stroke();
-      ctx.restore();
-      ctx.strokeStyle = teal;
-      ctx.lineWidth = lineW;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.globalAlpha = 1;
-      ctx.beginPath();
-      ctx.moveTo(mPts[0].x, mPts[0].y);
-      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
-      ctx.stroke();
-      ctx.globalAlpha = 1;
-    }
-
-    function drawStaticM() {
-      ctx.clearRect(0, 0, W, H);
-      ctx.save();
-      ctx.strokeStyle = teal;
-      ctx.lineWidth = lineW;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.shadowColor = teal;
-      ctx.shadowBlur = 8;
-      ctx.globalAlpha = 0.15;
-      ctx.beginPath();
-      ctx.moveTo(mPts[0].x, mPts[0].y);
-      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
-      ctx.stroke();
-      ctx.restore();
-      ctx.strokeStyle = teal;
-      ctx.lineWidth = lineW;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      ctx.globalAlpha = 1;
-      ctx.beginPath();
-      ctx.moveTo(mPts[0].x, mPts[0].y);
-      for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
-      ctx.stroke();
-    }
-
-    running = true;
-    forceM = false;
+    running = true; forceM = false;
     snakeAnim = requestAnimationFrame(animate);
 
     return {
