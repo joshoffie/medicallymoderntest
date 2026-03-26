@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>M Trace Analysis</title>
+<style>
+body { margin: 20px; font-family: monospace; background: #fff; }
+canvas { border: 1px solid #ccc; display: block; margin: 10px 0; image-rendering: pixelated; }
+#info { position: fixed; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: #0f0; padding: 10px; font-size: 14px; z-index: 999; }
+</style>
+</head>
+<body>
+<h3>Logo M Trace — hover to sample pixels</h3>
+<div id="info">Move mouse over canvas</div>
+<canvas id="c"></canvas>
+<div id="measurements"></div>
+
+<script>
+var img = new Image();
+img.crossOrigin = 'anonymous';
+img.onload = function() {
+  // The M is in the left portion of the logo
+  // Natural size: 1024x333
+  // We'll crop just the M area and display at 4x
+  var c = document.getElementById('c');
+  var ctx = c.getContext('2d');
+
+  // First, draw full image to find M bounds
+  var tempC = document.createElement('canvas');
+  tempC.width = img.naturalWidth;
+  tempC.height = img.naturalHeight;
+  var tempCtx = tempC.getContext('2d');
+  tempCtx.drawImage(img, 0, 0);
+
+  // Scan for the M region - find leftmost and rightmost non-white pixels in left half
+  var data = tempCtx.getImageData(0, 0, img.naturalWidth, img.naturalHeight);
+  var px = data.data;
+  var w = img.naturalWidth, h = img.naturalHeight;
+
+  var minX = w, maxX = 0, minY = h, maxY = 0;
+  // Only scan left 35% of image for the M
+  var scanW = Math.floor(w * 0.35);
+  for (var y = 0; y < h; y++) {
+    for (var x = 0; x < scanW; x++) {
+      var i = (y * w + x) * 4;
+      var r = px[i], g = px[i+1], b = px[i+2], a = px[i+3];
+      // Non-white/non-transparent pixel
+      if (a > 50 && (r < 240 || g < 240 || b < 240)) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+      }
+    }
+  }
+
+  // Add some padding
+  var pad = 10;
+  var cropX = Math.max(0, minX - pad);
+  var cropY = Math.max(0, minY - pad);
+  var cropW = (maxX - minX) + pad * 2;
+  var cropH = (maxY - minY) + pad * 2;
+
+  document.getElementById('measurements').innerHTML =
+    '<p>M bounding box in original 1024x333: x=' + minX + '-' + maxX +
+    ' y=' + minY + '-' + maxY +
+    ' w=' + (maxX-minX) + ' h=' + (maxY-minY) + '</p>' +
+    '<p>Aspect ratio (w/h): ' + ((maxX-minX)/(maxY-minY)).toFixed(3) + '</p>';
+
+  // Draw cropped M at 4x zoom
+  var scale = 4;
+  c.width = cropW * scale;
+  c.height = cropH * scale;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW * scale, cropH * scale);
+
+  // Draw grid every 10 original pixels
+  ctx.strokeStyle = 'rgba(255,0,0,0.15)';
+  ctx.lineWidth = 1;
+  for (var gx = 0; gx < cropW; gx += 10) {
+    ctx.beginPath();
+    ctx.moveTo(gx * scale, 0);
+    ctx.lineTo(gx * scale, cropH * scale);
+    ctx.stroke();
+  }
+  for (var gy = 0; gy < cropH; gy += 10) {
+    ctx.beginPath();
+    ctx.moveTo(0, gy * scale);
+    ctx.lineTo(cropW * scale, gy * scale);
+    ctx.stroke();
+  }
+
+  // Mouse tracking
+  var info = document.getElementById('info');
+  c.addEventListener('mousemove', function(e) {
+    var rect = c.getBoundingClientRect();
+    var mx = e.clientX - rect.left;
+    var my = e.clientY - rect.top;
+    // Convert to original image coords
+    var origX = Math.floor(mx / scale) + cropX;
+    var origY = Math.floor(my / scale) + cropY;
+    // Sample pixel color from original
+    if (origX >= 0 && origX < w && origY >= 0 && origY < h) {
+      var pi = (origY * w + origX) * 4;
+      var r = px[pi], g = px[pi+1], b = px[pi+2], a = px[pi+3];
+      var hex = '#' + ((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+      info.innerHTML = 'Orig: (' + origX + ', ' + origY + ')<br>' +
+        'Crop-local: (' + (origX - cropX) + ', ' + (origY - cropY) + ')<br>' +
+        'RGBA: ' + r + ',' + g + ',' + b + ',' + a + '<br>' +
+        'Hex: ' + hex + '<br>' +
+        '<span style="display:inline-block;width:20px;height:20px;background:' + hex + ';border:1px solid #fff;vertical-align:middle;"></span>';
+    }
+  });
+
+  // Now let's auto-detect key geometric points
+  // Find the centerline colors to distinguish front M vs back M
+  // The front M is darker teal, back M is lighter
+  // Let's scan horizontal slices to find stroke edges
+
+  var analysis = '<h4>Color Analysis</h4>';
+
+  // Sample some specific points to identify the two M colors
+  var samples = [];
+  var centerX = Math.floor((minX + maxX) / 2);
+  for (var sy = minY; sy <= maxY; sy += 5) {
+    for (var sx = minX; sx <= maxX; sx += 2) {
+      var si = (sy * w + sx) * 4;
+      var sr = px[si], sg = px[si+1], sb = px[si+2], sa = px[si+3];
+      if (sa > 128 && sr < 200) { // teal-ish pixel
+        samples.push({x: sx, y: sy, r: sr, g: sg, b: sb, a: sa});
+      }
+    }
+  }
+
+  // Cluster colors
+  var dark = samples.filter(function(s) { return s.r < 50 && s.g < 160; });
+  var light = samples.filter(function(s) { return s.r > 100 && s.g > 170; });
+
+  if (dark.length > 0) {
+    var avgDark = {r: 0, g: 0, b: 0};
+    dark.forEach(function(s) { avgDark.r += s.r; avgDark.g += s.g; avgDark.b += s.b; });
+    avgDark.r = Math.round(avgDark.r / dark.length);
+    avgDark.g = Math.round(avgDark.g / dark.length);
+    avgDark.b = Math.round(avgDark.b / dark.length);
+    analysis += '<p>Dark teal (front M): rgb(' + avgDark.r + ',' + avgDark.g + ',' + avgDark.b + ') — ' + dark.length + ' samples</p>';
+  }
+  if (light.length > 0) {
+    var avgLight = {r: 0, g: 0, b: 0};
+    light.forEach(function(s) { avgLight.r += s.r; avgLight.g += s.g; avgLight.b += s.b; });
+    avgLight.r = Math.round(avgLight.r / light.length);
+    avgLight.g = Math.round(avgLight.g / light.length);
+    avgLight.b = Math.round(avgLight.b / light.length);
+    analysis += '<p>Light teal (back M): rgb(' + avgLight.r + ',' + avgLight.g + ',' + avgLight.b + ') — ' + light.length + ' samples</p>';
+  }
+
+  // Find stroke edges by scanning horizontal lines at key Y positions
+  // Top of M, middle V, bottom of M
+  var keyYs = [minY + 5, Math.floor((minY + maxY) * 0.3), Math.floor((minY + maxY) * 0.5), Math.floor((minY + maxY) * 0.7), maxY - 5];
+
+  analysis += '<h4>Horizontal scans (stroke edges)</h4>';
+  keyYs.forEach(function(scanY) {
+    var edges = [];
+    var inStroke = false;
+    for (var sx2 = minX - 5; sx2 <= maxX + 5; sx2++) {
+      var si2 = (scanY * w + sx2) * 4;
+      var sa2 = px[si2 + 3];
+      var isOn = sa2 > 100 && px[si2] < 220;
+      if (isOn && !inStroke) {
+        edges.push({type: 'start', x: sx2});
+        inStroke = true;
+      } else if (!isOn && inStroke) {
+        edges.push({type: 'end', x: sx2 - 1});
+        inStroke = false;
+      }
+    }
+    analysis += '<p>Y=' + scanY + ': ' + edges.map(function(e) { return e.type + '=' + e.x; }).join(', ') + '</p>';
+  });
+
+  document.getElementById('measurements').innerHTML += analysis;
+};
+
+img.onerror = function() {
+  document.getElementById('measurements').innerHTML = '<p style="color:red;">CORS blocked — cannot load logo image for pixel analysis. Will need to trace from visual inspection.</p>';
+};
+
+img.src = 'https://medicallymodern.com/wp-content/uploads/2025/08/logo-1-1024x333.png';
+</script>
+</body>
+</html>
