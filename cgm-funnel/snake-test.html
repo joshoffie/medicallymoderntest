@@ -93,36 +93,37 @@
   //
   // Mapping to 256x256 canvas (M centered, taking ~85% of space):
 
-  // CRITICAL: The two M's are DIFFERENT SIZES.
-  // The front (darker) M is WIDER than the back (lighter) M.
-  // The back M is narrower and positioned further left.
-  // The front M is the dominant, wider shape.
+  // ============================================================
+  // CENTERED AT x=128 (canvas center). No clipping.
+  //
+  // BACK M (lighter): narrower, taller  — the inner M
+  // FRONT M (darker): MUCH wider, shorter — the outer M
+  //   - Front legs OUTSIDE back legs on both sides
+  //   - Front V directly below back V (same x=128)
+  //   - Front is visibly shorter than back
+  // ============================================================
+
+  // Back M (lighter teal, NARROWER + TALLER, drawn BEHIND)
+  // Width 188, height 198, centered at x=128
+  var backM = [
+    {x: 34,  y: 222},  // bottom-left
+    {x: 34,  y: 24},   // top-left
+    {x: 128, y: 147},  // center-V
+    {x: 222, y: 24},   // top-right
+    {x: 222, y: 222}   // bottom-right
+  ];
 
   // Front M (darker teal, WIDER + SHORTER, drawn ON TOP)
-  // Centered at x=100 (same as back M!) — V directly below back M's V
-  // Legs extend OUTSIDE back M on both sides
-  // Shorter height than back M
+  // Width 232, height 142, centered at x=128
+  // Legs extend 22px beyond back M on each side
+  // 56px shorter (32 top + 24 bottom)
   var frontM = [
-    {x: -4,  y: 210},  // bottom-left  (outside back M's x=6)
-    {x: -4,  y: 42},   // top-left     (shorter: starts 18px lower than back M's 24)
-    {x: 100, y: 152},  // center-V     (directly below back M's V at (100,147))
-    {x: 204, y: 42},   // top-right    (outside back M's x=194)
-    {x: 204, y: 210}   // bottom-right (shorter: ends 12px higher than back M's 222)
+    {x: 12,  y: 198},  // bottom-left  (22px outside back M's x=34)
+    {x: 12,  y: 56},   // top-left     (32px lower than back M's 24)
+    {x: 128, y: 152},  // center-V     (same x as back V, 5px below)
+    {x: 244, y: 56},   // top-right    (22px outside back M's x=222)
+    {x: 244, y: 198}   // bottom-right (24px higher than back M's 222)
   ];
-  // Width: 204-(-4) = 208.  Height: 210-42 = 168.
-  // Back M width: 188. Front extends 10px beyond on each side.
-  // Back M height: 198. Front is 30px shorter.
-  // Both V centers at x=100. Front V 5px below back V.
-
-  // Back M (lighter teal, NARROWER, shifted LEFT, drawn BEHIND)
-  var backM = [
-    {x: 6,   y: 222},  // bottom-left
-    {x: 6,   y: 24},   // top-left
-    {x: 100, y: 147},  // center-V
-    {x: 194, y: 24},   // top-right
-    {x: 194, y: 222}   // bottom-right
-  ];
-  // Width: 194-6 = 188 (narrower than front M's 208)
 
   // --- COLORS ---
   // Sampled from zoomed logo analysis:
