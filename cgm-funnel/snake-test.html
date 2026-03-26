@@ -98,15 +98,21 @@
   // The back M is narrower and positioned further left.
   // The front M is the dominant, wider shape.
 
-  // Front M (darker teal, WIDER, drawn ON TOP)
+  // Front M (darker teal, WIDER + SHORTER, drawn ON TOP)
+  // Centered at x=100 (same as back M!) — V directly below back M's V
+  // Legs extend OUTSIDE back M on both sides
+  // Shorter height than back M
   var frontM = [
-    {x: 34,  y: 228},  // bottom-left
-    {x: 34,  y: 30},   // top-left
-    {x: 138, y: 153},  // center-V  (~62% down)
-    {x: 242, y: 30},   // top-right
-    {x: 242, y: 228}   // bottom-right
+    {x: -4,  y: 210},  // bottom-left  (outside back M's x=6)
+    {x: -4,  y: 42},   // top-left     (shorter: starts 18px lower than back M's 24)
+    {x: 100, y: 152},  // center-V     (directly below back M's V at (100,147))
+    {x: 204, y: 42},   // top-right    (outside back M's x=194)
+    {x: 204, y: 210}   // bottom-right (shorter: ends 12px higher than back M's 222)
   ];
-  // Width: 242-34 = 208.  Height: 228-30 = 198.
+  // Width: 204-(-4) = 208.  Height: 210-42 = 168.
+  // Back M width: 188. Front extends 10px beyond on each side.
+  // Back M height: 198. Front is 30px shorter.
+  // Both V centers at x=100. Front V 5px below back V.
 
   // Back M (lighter teal, NARROWER, shifted LEFT, drawn BEHIND)
   var backM = [
