@@ -2,14 +2,24 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>Snake M Animation Test — v6 Premium</title>
+<title>Dual-M Snake Animation — Logo Match</title>
 <style>
   body {
     display: flex; flex-direction: column; align-items: center;
     justify-content: center; min-height: 100vh; margin: 0;
     background: #f5f5f5; font-family: Inter, -apple-system, sans-serif;
   }
-  canvas { width: 64px; height: 64px; display: block; }
+  .canvas-wrap {
+    position: relative;
+    width: 128px;
+    height: 128px;
+  }
+  .canvas-wrap canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 128px;
+    height: 128px;
+  }
   .controls { margin-top: 24px; display: flex; gap: 10px; }
   button {
     padding: 8px 20px; border: none; border-radius: 8px;
@@ -17,305 +27,406 @@
   }
   button:hover { opacity: 0.9; }
   .label { color: #666; font-size: 13px; margin-top: 8px; }
-  .badge-test {
-    margin-top: 40px; padding: 30px; background: white;
-    border-radius: 16px; text-align: center;
+
+  /* Reference logo for comparison */
+  .reference {
+    margin-top: 40px; text-align: center;
   }
-  .benefits-badge-centered {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 52px; height: 52px; background: #eef8f6; border-radius: 14px;
+  .reference img {
+    height: 80px; image-rendering: auto;
+  }
+  .side-by-side {
+    display: flex; align-items: center; gap: 40px; margin-top: 30px;
+  }
+  .compare-box {
+    text-align: center;
   }
 </style>
 </head>
 <body>
 
-<h3 style="color:#0f2b3c; margin-bottom:4px;">Snake M — Premium v6</h3>
-<p class="label">Eased draw, shadow glow, smooth transitions</p>
+<h3 style="color:#0f2b3c; margin-bottom:4px;">Dual-M Snake Animation</h3>
+<p class="label">Two M's sequenced — matching the Medically Modern logo</p>
 
-<canvas id="snakeCanvas" width="128" height="128"></canvas>
+<div class="canvas-wrap" id="canvasWrap">
+  <canvas id="backCanvas" width="256" height="256"></canvas>
+  <canvas id="frontCanvas" width="256" height="256"></canvas>
+</div>
 <p class="label" id="phaseLabel">Phase: —</p>
 
 <div class="controls">
   <button onclick="restart()">Restart</button>
-  <button onclick="ctrl.showM()">Force M</button>
+  <button onclick="showFinal()">Show Final</button>
 </div>
 
-<div class="badge-test">
-  <p class="label" style="margin-bottom:12px">Benefits Badge:</p>
-  <div class="benefits-badge-centered">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="2" width="24" height="24" rx="5" stroke="#0e7c6b" stroke-width="2"/>
-      <path d="M8.5 16L12 19.5L19.5 12" stroke="#0e7c6b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+<div class="side-by-side">
+  <div class="compare-box">
+    <p class="label" style="margin-bottom:8px">Animation (final state)</p>
+    <div class="canvas-wrap" id="staticWrap" style="width:128px;height:128px;">
+      <canvas id="staticBack" width="256" height="256" style="position:absolute;top:0;left:0;width:128px;height:128px;"></canvas>
+      <canvas id="staticFront" width="256" height="256" style="position:absolute;top:0;left:0;width:128px;height:128px;"></canvas>
+    </div>
+  </div>
+  <div class="compare-box">
+    <p class="label" style="margin-bottom:8px">Header logo (reference)</p>
+    <img src="https://medicallymodern.com/wp-content/uploads/2025/08/logo-1-1024x333.png" style="height:80px;" alt="Logo reference">
   </div>
 </div>
 
 <script>
-var ctrl, snakeAnim;
+(function() {
+  'use strict';
 
-function startSnakeAnimation() {
-  var canvas = document.getElementById('snakeCanvas');
-  if (!canvas) return;
-  var ctx = canvas.getContext('2d');
-  var W = 128, H = 128;
-  var teal = '#0e7c6b';
-  var lineW = 6;
+  // ============================================================
+  // LOGO M SHAPE — matched to the Medically Modern header logo
+  // ============================================================
+  // The logo M is a geometric filled shape. For stroke animation,
+  // we trace the CENTER LINE of each M's filled form.
+  // From the logo analysis:
+  //   - Two M's layered: back (lighter teal, offset left+up) and front (darker teal)
+  //   - Each M has vertical legs and angled inner strokes meeting at a V
+  //   - The V notch sits at ~55-60% of the height
+  //   - Legs are straight vertical
+  //   - The overall M is slightly taller than wide
+  //
+  // Canvas: 256x256 internal, displayed at 128x128
+  // M shape occupies roughly 80% of the canvas
 
-  // M shape waypoints — refined proportions
-  // Slightly wider stance, shallower V for a more modern/balanced feel
-  var mPts = [
-    {x: 18, y: 100},   // bottom-left
-    {x: 18, y: 26},    // top-left
-    {x: 64, y: 68},    // center-V (shallower = more elegant)
-    {x: 110, y: 26},   // top-right
-    {x: 110, y: 100}   // bottom-right
+  var W = 256, H = 256;
+
+  // --- M waypoints (in 256x256 space) ---
+  // Proportions carefully matched to the logo:
+  //   - Vertical legs from bottom to top
+  //   - Inner diagonals meet at center V
+  //   - V depth at about 58% from top
+  //   - Legs slightly inset from edges
+  //   - Overall shape ~90% width, ~80% height of canvas
+
+  // BACK M (lighter, offset slightly left and up)
+  var backM = [
+    {x: 38,  y: 210},  // bottom-left
+    {x: 38,  y: 46},   // top-left
+    {x: 128, y: 148},  // center-V
+    {x: 218, y: 46},   // top-right
+    {x: 218, y: 210}   // bottom-right
   ];
 
-  // Pre-compute path geometry
+  // FRONT M (darker, offset slightly right and down)
+  // Shifted ~12px right, ~12px down from back M
+  var frontM = [
+    {x: 50,  y: 222},  // bottom-left
+    {x: 50,  y: 58},   // top-left
+    {x: 140, y: 160},  // center-V
+    {x: 230, y: 58},   // top-right
+    {x: 230, y: 222}   // bottom-right
+  ];
+
+  // Colors
+  var backColor  = '#6db5a8';  // lighter teal (back M)
+  var frontColor = '#0e7c6b';  // darker teal (front M)
+  var lineW = 14;  // stroke width to approximate the filled look
+
+  // ---- Path utilities ----
   function dist(a, b) { return Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y)); }
 
-  var segLens = [], totalLen = 0;
-  for (var i = 1; i < mPts.length; i++) {
-    var d = dist(mPts[i-1], mPts[i]);
-    segLens.push(d);
-    totalLen += d;
-  }
-
-  function pointAtDist(d) {
-    d = Math.max(0, Math.min(d, totalLen));
-    var acc = 0;
-    for (var i = 0; i < segLens.length; i++) {
-      if (acc + segLens[i] >= d) {
-        var f = (d - acc) / segLens[i];
-        return {x: mPts[i].x+(mPts[i+1].x-mPts[i].x)*f, y: mPts[i].y+(mPts[i+1].y-mPts[i].y)*f};
-      }
-      acc += segLens[i];
+  function buildPath(pts) {
+    var segLens = [], totalLen = 0;
+    for (var i = 1; i < pts.length; i++) {
+      var d = dist(pts[i-1], pts[i]);
+      segLens.push(d);
+      totalLen += d;
     }
-    return {x: mPts[mPts.length-1].x, y: mPts[mPts.length-1].y};
+    function pointAt(d) {
+      d = Math.max(0, Math.min(d, totalLen));
+      var acc = 0;
+      for (var i = 0; i < segLens.length; i++) {
+        if (acc + segLens[i] >= d) {
+          var f = (d - acc) / segLens[i];
+          return {x: pts[i].x+(pts[i+1].x-pts[i].x)*f, y: pts[i].y+(pts[i+1].y-pts[i].y)*f};
+        }
+        acc += segLens[i];
+      }
+      return {x: pts[pts.length-1].x, y: pts[pts.length-1].y};
+    }
+    var N = 200;
+    var path = [];
+    for (var i = 0; i <= N; i++) path.push(pointAt((i / N) * totalLen));
+    return { path: path, pts: pts, N: N };
   }
 
-  // Build high-res path arrays
-  var N = 200; // more points = smoother curves
-  var pathLR = [];
-  for (var i = 0; i <= N; i++) pathLR.push(pointAtDist((i / N) * totalLen));
-  var pathRL = pathLR.slice().reverse();
+  var backPath  = buildPath(backM);
+  var frontPath = buildPath(frontM);
 
-  // ---- Easing functions ----
+  // ---- Easing ----
   function easeInOutCubic(t) {
     return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
   }
-  // Smoother ease with slight overshoot feel
-  function easeOutQuart(t) {
-    return 1 - Math.pow(1 - t, 4);
-  }
 
-  // ---- Animation state ----
-  // 8 phases: draw, hold, undraw, pause × 2 directions
+  // ============================================================
+  // ANIMATION ENGINE
+  // ============================================================
+  // Sequence:
+  //   1. Back M draws L→R (900ms)
+  //   2. Brief pause (100ms)
+  //   3. Front M draws L→R (900ms)
+  //   4. Both hold with glow (2000ms)
+  //   5. Front M undraws L→R (900ms)
+  //   6. Brief pause (100ms)
+  //   7. Back M undraws L→R (900ms)
+  //   8. Pause (300ms)
+  //   9. Back M draws R→L (900ms)
+  //  10. Brief pause (100ms)
+  //  11. Front M draws R→L (900ms)
+  //  12. Both hold with glow (2000ms)
+  //  13. Front M undraws R→L (900ms)
+  //  14. Brief pause (100ms)
+  //  15. Back M undraws R→L (900ms)
+  //  16. Pause (300ms) → loop
+
+  var backCanvas  = document.getElementById('backCanvas');
+  var frontCanvas = document.getElementById('frontCanvas');
+  var backCtx     = backCanvas.getContext('2d');
+  var frontCtx    = frontCanvas.getContext('2d');
+
+  var drawDur   = 900;
+  var holdDur   = 2000;
+  var gapDur    = 100;
+  var pauseDur  = 300;
+
   var phase = 0;
-  var rawProgress = 0;  // linear 0–1
-  var drawDuration = 900;   // ms — slightly slower for elegance
-  var holdDuration = 2000;  // ms
-  var pauseDuration = 200;  // ms — shorter, smoother
   var phaseTime = 0;
   var lastTime = 0;
-  var running = true, forceM = false;
+  var running = true;
+  var forceFinal = false;
+  var animId;
 
-  // Blend factor for smooth transitions between phases
-  var blendIn = 0;    // 0–1, ramps up at start of draw
-  var blendOut = 1;   // 1–0, ramps down at end of undraw
-
+  // 16 phases per full cycle
   var phaseNames = [
-    'draw L→R', 'hold', 'undraw L→R', 'pause',
-    'draw R→L', 'hold', 'undraw R→L', 'pause'
+    'back draw L→R',    // 0
+    'gap',              // 1
+    'front draw L→R',   // 2
+    'hold (glow)',      // 3
+    'front undraw L→R', // 4
+    'gap',              // 5
+    'back undraw L→R',  // 6
+    'pause',            // 7
+    'back draw R→L',    // 8
+    'gap',              // 9
+    'front draw R→L',   // 10
+    'hold (glow)',      // 11
+    'front undraw R→L', // 12
+    'gap',              // 13
+    'back undraw R→L',  // 14
+    'pause'             // 15
   ];
 
-  function animate(time) {
-    if (!running) return;
-    if (!lastTime) lastTime = time;
-    var dt = Math.min(time - lastTime, 50);
-    lastTime = time;
-
-    if (forceM) { drawStaticM(); snakeAnim = requestAnimationFrame(animate); return; }
-
-    phaseTime += dt;
-
-    var path = (phase < 4) ? pathLR : pathRL;
-
-    switch (phase) {
-      case 0: case 4: // DRAW
-        rawProgress = Math.min(phaseTime / drawDuration, 1);
-        var eased = easeInOutCubic(rawProgress);
-        var headIdx = Math.round(eased * N);
-
-        // Smooth fade-in for the first 15% of the draw
-        blendIn = Math.min(rawProgress / 0.15, 1);
-
-        drawSnakePath(path, 0, headIdx, blendIn);
-
-        if (rawProgress >= 1) {
-          phase = (phase === 0) ? 1 : 5;
-          phaseTime = 0;
-          rawProgress = 0;
-        }
-        break;
-
-      case 1: case 5: // HOLD with glow
-        // Smooth transition into glow (first 250ms)
-        var glowBlend = Math.min(phaseTime / 250, 1);
-        drawGlowingM(phaseTime, glowBlend);
-
-        if (phaseTime >= holdDuration) {
-          phase = (phase === 1) ? 2 : 6;
-          phaseTime = 0;
-          rawProgress = 0;
-        }
-        break;
-
-      case 2: case 6: // UNDRAW
-        rawProgress = Math.min(phaseTime / drawDuration, 1);
-        var eased = easeInOutCubic(rawProgress);
-        var tailIdx = Math.round(eased * N);
-
-        // Smooth fade-out for the last 15% of the undraw
-        blendOut = 1 - Math.max((rawProgress - 0.85) / 0.15, 0);
-
-        drawSnakePath(path, tailIdx, N, blendOut);
-
-        if (rawProgress >= 1) {
-          phase = (phase === 2) ? 3 : 7;
-          phaseTime = 0;
-          rawProgress = 0;
-        }
-        break;
-
-      case 3: case 7: // PAUSE
-        ctx.clearRect(0, 0, W, H);
-        if (phaseTime >= pauseDuration) {
-          phase = (phase === 3) ? 4 : 0;
-          phaseTime = 0;
-          rawProgress = 0;
-        }
-        break;
+  function phaseDuration(p) {
+    switch (p) {
+      case 0: case 2: case 4: case 6:
+      case 8: case 10: case 12: case 14:
+        return drawDur;
+      case 3: case 11:
+        return holdDur;
+      case 1: case 5: case 9: case 13:
+        return gapDur;
+      case 7: case 15:
+        return pauseDur;
     }
-
-    var label = document.getElementById('phaseLabel');
-    if (label) label.textContent = 'Phase: ' + phaseNames[phase];
-
-    snakeAnim = requestAnimationFrame(animate);
   }
 
-  // ---- Clean uniform line renderer ----
-  function drawSnakePath(path, startIdx, endIdx, masterAlpha) {
+  // ---- Drawing helpers ----
+  function drawStrokePath(ctx, path, startIdx, endIdx, color, alpha) {
     ctx.clearRect(0, 0, W, H);
     if (endIdx <= startIdx + 1) return;
-
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineW;
-    ctx.strokeStyle = teal;
-    ctx.globalAlpha = masterAlpha;
-
-    // Single uniform-weight path — no gradient, no taper
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = alpha;
     ctx.beginPath();
     ctx.moveTo(path[startIdx].x, path[startIdx].y);
     for (var i = startIdx + 1; i <= endIdx; i++) {
       ctx.lineTo(path[i].x, path[i].y);
     }
     ctx.stroke();
-
     ctx.globalAlpha = 1;
   }
 
-  // ---- Premium glow renderer ----
-  function drawGlowingM(t, blendIn) {
+  function drawStaticM(ctx, pts, color) {
     ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = lineW;
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.stroke();
+  }
 
-    // Breathing pulse: smooth sin wave, ~1.2s cycle
-    var breathe = (Math.sin(t * Math.PI * 2 / 1200 - Math.PI/2) + 1) / 2; // 0–1
+  function drawGlowM(ctx, pts, color, t, blendIn) {
+    ctx.clearRect(0, 0, W, H);
+    var breathe = (Math.sin(t * Math.PI * 2 / 1200 - Math.PI/2) + 1) / 2;
 
-    // Shadow-based glow (much more natural than thick stroke)
     ctx.save();
-    ctx.strokeStyle = teal;
+    ctx.strokeStyle = color;
     ctx.lineWidth = lineW;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    // Outer glow layer using shadow
-    var glowIntensity = 0.08 + breathe * 0.12; // 0.08–0.20
-    var glowSize = 6 + breathe * 8; // 6–14px blur
+    var glowIntensity = 0.06 + breathe * 0.10;
+    var glowSize = 4 + breathe * 6;
 
-    ctx.shadowColor = teal;
+    ctx.shadowColor = color;
     ctx.shadowBlur = glowSize * blendIn;
     ctx.globalAlpha = glowIntensity * blendIn;
-
     ctx.beginPath();
-    ctx.moveTo(mPts[0].x, mPts[0].y);
-    for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
     ctx.stroke();
 
-    // Second glow pass for richer bloom
     ctx.shadowBlur = glowSize * 2 * blendIn;
     ctx.globalAlpha = glowIntensity * 0.5 * blendIn;
     ctx.stroke();
-
     ctx.restore();
 
-    // Solid M on top (no shadow)
-    ctx.strokeStyle = teal;
+    // Solid on top
+    ctx.strokeStyle = color;
     ctx.lineWidth = lineW;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     ctx.globalAlpha = 1;
     ctx.beginPath();
-    ctx.moveTo(mPts[0].x, mPts[0].y);
-    for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
-    ctx.stroke();
-
-    ctx.globalAlpha = 1;
-  }
-
-  // ---- Static M for final state ----
-  function drawStaticM() {
-    ctx.clearRect(0, 0, W, H);
-
-    // Subtle permanent glow
-    ctx.save();
-    ctx.strokeStyle = teal;
-    ctx.lineWidth = lineW;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.shadowColor = teal;
-    ctx.shadowBlur = 8;
-    ctx.globalAlpha = 0.15;
-    ctx.beginPath();
-    ctx.moveTo(mPts[0].x, mPts[0].y);
-    for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.strokeStyle = teal;
-    ctx.lineWidth = lineW;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.globalAlpha = 1;
-    ctx.beginPath();
-    ctx.moveTo(mPts[0].x, mPts[0].y);
-    for (var i = 1; i < mPts.length; i++) ctx.lineTo(mPts[i].x, mPts[i].y);
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
     ctx.stroke();
   }
 
-  running = true;
-  forceM = false;
-  snakeAnim = requestAnimationFrame(animate);
+  // ---- Main animation loop ----
+  function animate(time) {
+    if (!running) return;
+    if (!lastTime) lastTime = time;
+    var dt = Math.min(time - lastTime, 50);
+    lastTime = time;
 
-  return {
-    stop: function() { running = false; if (snakeAnim) cancelAnimationFrame(snakeAnim); },
-    showM: function() { forceM = true; }
+    if (forceFinal) {
+      drawStaticM(backCtx, backM, backColor);
+      drawStaticM(frontCtx, frontM, frontColor);
+      animId = requestAnimationFrame(animate);
+      return;
+    }
+
+    phaseTime += dt;
+    var progress = Math.min(phaseTime / phaseDuration(phase), 1);
+    var eased = easeInOutCubic(progress);
+    var N = 200;
+
+    // Determine direction: phases 0-7 = L→R, phases 8-15 = R→L
+    var isReverse = phase >= 8;
+    var bPath = isReverse ? backPath.path.slice().reverse() : backPath.path;
+    var fPath = isReverse ? frontPath.path.slice().reverse() : frontPath.path;
+
+    switch (phase) {
+      // ---- DRAW BACK ----
+      case 0: case 8:
+        var headIdx = Math.round(eased * N);
+        var alpha = Math.min(progress / 0.15, 1);
+        drawStrokePath(backCtx, bPath, 0, headIdx, backColor, alpha);
+        break;
+
+      // ---- GAP (back drawn, front about to start) ----
+      case 1: case 9:
+        drawStaticM(backCtx, backM, backColor);
+        frontCtx.clearRect(0, 0, W, H);
+        break;
+
+      // ---- DRAW FRONT ----
+      case 2: case 10:
+        drawStaticM(backCtx, backM, backColor);
+        var headIdx = Math.round(eased * N);
+        var alpha = Math.min(progress / 0.15, 1);
+        drawStrokePath(frontCtx, fPath, 0, headIdx, frontColor, alpha);
+        break;
+
+      // ---- HOLD WITH GLOW ----
+      case 3: case 11:
+        var glowBlend = Math.min(phaseTime / 250, 1);
+        drawGlowM(backCtx, backM, backColor, phaseTime, glowBlend);
+        drawGlowM(frontCtx, frontM, frontColor, phaseTime, glowBlend);
+        break;
+
+      // ---- UNDRAW FRONT ----
+      case 4: case 12:
+        drawStaticM(backCtx, backM, backColor);
+        var tailIdx = Math.round(eased * N);
+        var alpha = 1 - Math.max((progress - 0.85) / 0.15, 0);
+        drawStrokePath(frontCtx, fPath, tailIdx, N, frontColor, alpha);
+        break;
+
+      // ---- GAP (front gone, back about to undraw) ----
+      case 5: case 13:
+        drawStaticM(backCtx, backM, backColor);
+        frontCtx.clearRect(0, 0, W, H);
+        break;
+
+      // ---- UNDRAW BACK ----
+      case 6: case 14:
+        var tailIdx = Math.round(eased * N);
+        var alpha = 1 - Math.max((progress - 0.85) / 0.15, 0);
+        drawStrokePath(backCtx, bPath, tailIdx, N, backColor, alpha);
+        frontCtx.clearRect(0, 0, W, H);
+        break;
+
+      // ---- PAUSE ----
+      case 7: case 15:
+        backCtx.clearRect(0, 0, W, H);
+        frontCtx.clearRect(0, 0, W, H);
+        break;
+    }
+
+    // Advance phase
+    if (progress >= 1) {
+      phase = (phase + 1) % 16;
+      phaseTime = 0;
+    }
+
+    var label = document.getElementById('phaseLabel');
+    if (label) label.textContent = 'Phase: ' + phaseNames[phase];
+
+    animId = requestAnimationFrame(animate);
+  }
+
+  // ---- Static comparison render ----
+  function renderStatic() {
+    var sb = document.getElementById('staticBack').getContext('2d');
+    var sf = document.getElementById('staticFront').getContext('2d');
+    drawStaticM(sb, backM, backColor);
+    drawStaticM(sf, frontM, frontColor);
+  }
+
+  // ---- Controls ----
+  window.restart = function() {
+    if (animId) cancelAnimationFrame(animId);
+    running = true;
+    forceFinal = false;
+    phase = 0;
+    phaseTime = 0;
+    lastTime = 0;
+    backCtx.clearRect(0, 0, W, H);
+    frontCtx.clearRect(0, 0, W, H);
+    animId = requestAnimationFrame(animate);
   };
-}
 
-function restart() { if (ctrl) ctrl.stop(); ctrl = startSnakeAnimation(); }
-ctrl = startSnakeAnimation();
+  window.showFinal = function() {
+    forceFinal = true;
+  };
+
+  // Boot
+  renderStatic();
+  animId = requestAnimationFrame(animate);
+
+})();
 </script>
 </body>
 </html>
