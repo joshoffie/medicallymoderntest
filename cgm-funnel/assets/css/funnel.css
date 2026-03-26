@@ -2038,6 +2038,10 @@ body {
   animation: benefitsRattle 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) 0.3s both;
 }
 
+.benefits-badge-centered svg {
+  margin: 0 !important;
+}
+
 @keyframes benefitsRattle {
   0% { transform: scale(0) rotate(0deg); }
   30% { transform: scale(1.2) rotate(-8deg); }
