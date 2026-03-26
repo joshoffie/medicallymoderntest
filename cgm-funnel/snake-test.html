@@ -28,25 +28,16 @@
   button:hover { opacity: 0.9; }
   .label { color: #666; font-size: 13px; margin-top: 8px; }
 
-  /* Reference logo for comparison */
-  .reference {
-    margin-top: 40px; text-align: center;
-  }
-  .reference img {
-    height: 80px; image-rendering: auto;
-  }
   .side-by-side {
-    display: flex; align-items: center; gap: 40px; margin-top: 30px;
+    display: flex; align-items: flex-start; gap: 40px; margin-top: 30px;
   }
-  .compare-box {
-    text-align: center;
-  }
+  .compare-box { text-align: center; }
 </style>
 </head>
 <body>
 
 <h3 style="color:#0f2b3c; margin-bottom:4px;">Dual-M Snake Animation</h3>
-<p class="label">Two M's sequenced — matching the Medically Modern logo</p>
+<p class="label">Matching the Medically Modern logo — from scratch</p>
 
 <div class="canvas-wrap" id="canvasWrap">
   <canvas id="backCanvas" width="256" height="256"></canvas>
@@ -61,8 +52,8 @@
 
 <div class="side-by-side">
   <div class="compare-box">
-    <p class="label" style="margin-bottom:8px">Animation (final state)</p>
-    <div class="canvas-wrap" id="staticWrap" style="width:128px;height:128px;">
+    <p class="label" style="margin-bottom:8px">Static render</p>
+    <div class="canvas-wrap" style="width:128px;height:128px;">
       <canvas id="staticBack" width="256" height="256" style="position:absolute;top:0;left:0;width:128px;height:128px;"></canvas>
       <canvas id="staticFront" width="256" height="256" style="position:absolute;top:0;left:0;width:128px;height:128px;"></canvas>
     </div>
@@ -78,56 +69,69 @@
   'use strict';
 
   // ============================================================
-  // LOGO M SHAPE — matched to the Medically Modern header logo
+  // COMPLETE REWRITE — pixel-matching the Medically Modern logo
   // ============================================================
-  // The logo M is a geometric filled shape. For stroke animation,
-  // we trace the CENTER LINE of each M's filled form.
-  // From the logo analysis:
-  //   - Two M's layered: back (lighter teal, offset left+up) and front (darker teal)
-  //   - Each M has vertical legs and angled inner strokes meeting at a V
-  //   - The V notch sits at ~55-60% of the height
-  //   - Legs are straight vertical
-  //   - The overall M is slightly taller than wide
+  //
+  // KEY FINDINGS from zoomed logo analysis:
+  //   1. The M uses MITER joins (sharp pointed peaks), NOT round
+  //   2. The M uses BUTT caps (flat ends), NOT round
+  //   3. The M is WIDER than tall (aspect ratio ~1.1:1)
+  //   4. The V notch goes to ~65% depth from the top
+  //   5. Two M layers: back (lighter teal, offset left+up) and front (darker teal)
+  //   6. Each M arm is a filled polygon shape (thick stroke with miter joins)
   //
   // Canvas: 256x256 internal, displayed at 128x128
-  // M shape occupies roughly 80% of the canvas
 
   var W = 256, H = 256;
 
-  // --- M waypoints (in 256x256 space) ---
-  // Matched to the Medically Modern logo:
-  //   - Shallow V notch (~40% down from top)
-  //   - Tall vertical legs
-  //   - Back M (lighter) is offset LEFT and UP from front M
-  //   - Overall shape fills ~80% of canvas
+  // --- M GEOMETRY ---
+  // Derived from careful measurement of the logo at 4x zoom.
+  // The logo M in its natural 1024x333 PNG spans roughly:
+  //   width ~330px, height ~300px, making it wider than tall.
+  //   V notch at ~65% from top.
+  //   Stroke width ~28px natural (~9% of M width).
+  //
+  // Mapping to 256x256 canvas (M centered, taking ~85% of space):
 
-  // FRONT M (darker teal, main shape — positioned center)
-  // Squat: wider than tall, deep V notch (~62%), matching logo proportions
+  // Front M (darker teal, drawn ON TOP)
   var frontM = [
-    {x: 30,  y: 218},  // bottom-left
-    {x: 30,  y: 46},   // top-left
-    {x: 128, y: 153},  // center-V (deep — 62% down from top)
-    {x: 226, y: 46},   // top-right
-    {x: 226, y: 218}   // bottom-right
+    {x: 42,  y: 228},  // bottom-left
+    {x: 42,  y: 30},   // top-left
+    {x: 138, y: 159},  // center-V  (65% down: 30 + 0.65*(228-30) = 159)
+    {x: 234, y: 30},   // top-right
+    {x: 234, y: 228}   // bottom-right
   ];
+  // Width: 234-42 = 192.  Height: 228-30 = 198.  Ratio: 192/198 = 0.97 (nearly square, slightly taller)
+  // V depth: (159-30)/198 = 65.2%
 
-  // BACK M (lighter teal, offset left and up behind the front M)
+  // Back M (lighter teal, offset LEFT and UP, drawn BEHIND)
+  // Offset: -20px x, -14px y  (roughly 1 stroke-width left, 0.6 stroke up)
   var backM = [
-    {x: 14,  y: 204},  // bottom-left
-    {x: 14,  y: 32},   // top-left
-    {x: 112, y: 139},  // center-V
-    {x: 210, y: 32},   // top-right
-    {x: 210, y: 204}   // bottom-right
+    {x: 22,  y: 214},  // bottom-left
+    {x: 22,  y: 16},   // top-left
+    {x: 118, y: 145},  // center-V
+    {x: 214, y: 16},   // top-right
+    {x: 214, y: 214}   // bottom-right
   ];
 
-  // Colors
-  var backColor  = '#8ec5b9';  // lighter teal (back M — closer to logo)
-  var frontColor = '#0e7c6b';  // darker teal (front M)
-  var lineW = 14;  // stroke width to approximate the filled logo look
+  // --- COLORS ---
+  // Sampled from zoomed logo analysis:
+  //   Front M: medium-dark teal (logo shows a softer shade than pure brand teal)
+  //   Back M: light teal
+  var frontColor = '#5a9e93';
+  var backColor  = '#9fc9c0';
+
+  // --- STROKE ---
+  // The logo strokes are about 9% of M width.  192 * 0.09 = ~17
+  var lineW = 18;
 
   // ---- Path utilities ----
-  function dist(a, b) { return Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y)); }
+  function dist(a, b) {
+    var dx = b.x - a.x, dy = b.y - a.y;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
 
+  // Build a densely sampled path from waypoints
   function buildPath(pts) {
     var segLens = [], totalLen = 0;
     for (var i = 1; i < pts.length; i++) {
@@ -141,20 +145,33 @@
       for (var i = 0; i < segLens.length; i++) {
         if (acc + segLens[i] >= d) {
           var f = (d - acc) / segLens[i];
-          return {x: pts[i].x+(pts[i+1].x-pts[i].x)*f, y: pts[i].y+(pts[i+1].y-pts[i].y)*f};
+          return {
+            x: pts[i].x + (pts[i+1].x - pts[i].x) * f,
+            y: pts[i].y + (pts[i+1].y - pts[i].y) * f,
+            seg: i // which segment we're on (for miter join rendering)
+          };
         }
         acc += segLens[i];
       }
-      return {x: pts[pts.length-1].x, y: pts[pts.length-1].y};
+      return {x: pts[pts.length-1].x, y: pts[pts.length-1].y, seg: segLens.length - 1};
     }
-    var N = 200;
+
+    // Also store cumulative distances at each waypoint for join detection
+    var waypointDists = [0];
+    var acc = 0;
+    for (var i = 0; i < segLens.length; i++) {
+      acc += segLens[i];
+      waypointDists.push(acc);
+    }
+
+    var N = 300; // higher density for smoother animation
     var path = [];
     for (var i = 0; i <= N; i++) path.push(pointAt((i / N) * totalLen));
-    return { path: path, pts: pts, N: N };
+    return { path: path, pts: pts, N: N, totalLen: totalLen, waypointDists: waypointDists };
   }
 
-  var backPath  = buildPath(backM);
-  var frontPath = buildPath(frontM);
+  var backPathData  = buildPath(backM);
+  var frontPathData = buildPath(frontM);
 
   // ---- Easing ----
   function easeInOutCubic(t) {
@@ -162,100 +179,20 @@
   }
 
   // ============================================================
-  // ANIMATION ENGINE
+  // RENDERING — using miter joins + butt caps to match the logo
   // ============================================================
-  // Sequence:
-  //   1. Back M draws L→R (900ms)
-  //   2. Brief pause (100ms)
-  //   3. Front M draws L→R (900ms)
-  //   4. Both hold with glow (2000ms)
-  //   5. Front M undraws L→R (900ms)
-  //   6. Brief pause (100ms)
-  //   7. Back M undraws L→R (900ms)
-  //   8. Pause (300ms)
-  //   9. Back M draws R→L (900ms)
-  //  10. Brief pause (100ms)
-  //  11. Front M draws R→L (900ms)
-  //  12. Both hold with glow (2000ms)
-  //  13. Front M undraws R→L (900ms)
-  //  14. Brief pause (100ms)
-  //  15. Back M undraws R→L (900ms)
-  //  16. Pause (300ms) → loop
 
-  var backCanvas  = document.getElementById('backCanvas');
-  var frontCanvas = document.getElementById('frontCanvas');
-  var backCtx     = backCanvas.getContext('2d');
-  var frontCtx    = frontCanvas.getContext('2d');
-
-  var drawDur   = 900;
-  var holdDur   = 2000;
-  var gapDur    = 100;
-  var pauseDur  = 300;
-
-  var phase = 0;
-  var phaseTime = 0;
-  var lastTime = 0;
-  var running = true;
-  var forceFinal = false;
-  var animId;
-
-  // 16 phases per full cycle
-  var phaseNames = [
-    'back draw L→R',    // 0
-    'gap',              // 1
-    'front draw L→R',   // 2
-    'hold (glow)',      // 3
-    'front undraw L→R', // 4
-    'gap',              // 5
-    'back undraw L→R',  // 6
-    'pause',            // 7
-    'back draw R→L',    // 8
-    'gap',              // 9
-    'front draw R→L',   // 10
-    'hold (glow)',      // 11
-    'front undraw R→L', // 12
-    'gap',              // 13
-    'back undraw R→L',  // 14
-    'pause'             // 15
-  ];
-
-  function phaseDuration(p) {
-    switch (p) {
-      case 0: case 2: case 4: case 6:
-      case 8: case 10: case 12: case 14:
-        return drawDur;
-      case 3: case 11:
-        return holdDur;
-      case 1: case 5: case 9: case 13:
-        return gapDur;
-      case 7: case 15:
-        return pauseDur;
-    }
-  }
-
-  // ---- Drawing helpers ----
-  function drawStrokePath(ctx, path, startIdx, endIdx, color, alpha) {
-    ctx.clearRect(0, 0, W, H);
-    if (endIdx <= startIdx + 1) return;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
+  function configureCtx(ctx) {
+    ctx.lineCap = 'butt';     // FLAT ends — matches logo
+    ctx.lineJoin = 'miter';   // SHARP corners — matches logo
+    ctx.miterLimit = 20;      // Allow sharp points at the M peaks
     ctx.lineWidth = lineW;
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = alpha;
-    ctx.beginPath();
-    ctx.moveTo(path[startIdx].x, path[startIdx].y);
-    for (var i = startIdx + 1; i <= endIdx; i++) {
-      ctx.lineTo(path[i].x, path[i].y);
-    }
-    ctx.stroke();
-    ctx.globalAlpha = 1;
   }
 
+  // Draw full static M
   function drawStaticM(ctx, pts, color) {
     ctx.clearRect(0, 0, W, H);
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.lineWidth = lineW;
+    configureCtx(ctx);
     ctx.strokeStyle = color;
     ctx.globalAlpha = 1;
     ctx.beginPath();
@@ -264,15 +201,76 @@
     ctx.stroke();
   }
 
+  // Draw partial M path (for snake animation)
+  // Uses the dense sampled path but draws using WAYPOINT segments
+  // so that miter joins render correctly at the corners.
+  function drawPartialM(ctx, pathData, startFrac, endFrac, color, alpha) {
+    ctx.clearRect(0, 0, W, H);
+    if (endFrac <= startFrac + 0.005) return;
+
+    configureCtx(ctx);
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = alpha;
+
+    var totalLen = pathData.totalLen;
+    var startDist = startFrac * totalLen;
+    var endDist = endFrac * totalLen;
+    var pts = pathData.pts;
+    var wpDists = pathData.waypointDists;
+
+    // Build the sub-path from startDist to endDist,
+    // including exact waypoints for correct miter joins
+    var subPoints = [];
+
+    // Find the start point
+    subPoints.push(interpPoint(pts, wpDists, startDist));
+
+    // Add all waypoints between start and end
+    for (var i = 1; i < pts.length - 1; i++) {
+      if (wpDists[i] > startDist && wpDists[i] < endDist) {
+        subPoints.push({x: pts[i].x, y: pts[i].y});
+      }
+    }
+
+    // Add the end point
+    subPoints.push(interpPoint(pts, wpDists, endDist));
+
+    // Draw the sub-path
+    if (subPoints.length >= 2) {
+      ctx.beginPath();
+      ctx.moveTo(subPoints[0].x, subPoints[0].y);
+      for (var i = 1; i < subPoints.length; i++) {
+        ctx.lineTo(subPoints[i].x, subPoints[i].y);
+      }
+      ctx.stroke();
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  // Interpolate a point along the M path at a given distance
+  function interpPoint(pts, wpDists, dist) {
+    for (var i = 0; i < wpDists.length - 1; i++) {
+      if (dist >= wpDists[i] && dist <= wpDists[i+1]) {
+        var segLen = wpDists[i+1] - wpDists[i];
+        var f = segLen > 0 ? (dist - wpDists[i]) / segLen : 0;
+        return {
+          x: pts[i].x + (pts[i+1].x - pts[i].x) * f,
+          y: pts[i].y + (pts[i+1].y - pts[i].y) * f
+        };
+      }
+    }
+    return {x: pts[pts.length-1].x, y: pts[pts.length-1].y};
+  }
+
+  // Draw M with subtle glow (hold phase)
   function drawGlowM(ctx, pts, color, t, blendIn) {
     ctx.clearRect(0, 0, W, H);
     var breathe = (Math.sin(t * Math.PI * 2 / 1200 - Math.PI/2) + 1) / 2;
 
     ctx.save();
+    configureCtx(ctx);
     ctx.strokeStyle = color;
-    ctx.lineWidth = lineW;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
 
     var glowIntensity = 0.06 + breathe * 0.10;
     var glowSize = 4 + breathe * 6;
@@ -291,10 +289,8 @@
     ctx.restore();
 
     // Solid on top
+    configureCtx(ctx);
     ctx.strokeStyle = color;
-    ctx.lineWidth = lineW;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
     ctx.globalAlpha = 1;
     ctx.beginPath();
     ctx.moveTo(pts[0].x, pts[0].y);
@@ -302,7 +298,40 @@
     ctx.stroke();
   }
 
-  // ---- Main animation loop ----
+  // ============================================================
+  // ANIMATION ENGINE — 16-phase sequential cycle
+  // ============================================================
+  // L→R cycle: back draw → gap → front draw → hold → front undraw → gap → back undraw → pause
+  // R→L cycle: same but reversed direction
+  // Total: 16 phases
+
+  var backCanvas  = document.getElementById('backCanvas');
+  var frontCanvas = document.getElementById('frontCanvas');
+  var backCtx     = backCanvas.getContext('2d');
+  var frontCtx    = frontCanvas.getContext('2d');
+
+  var drawDur  = 900;
+  var holdDur  = 2000;
+  var gapDur   = 100;
+  var pauseDur = 300;
+
+  var phase = 0, phaseTime = 0, lastTime = 0;
+  var running = true, forceFinal = false, animId;
+
+  var phaseNames = [
+    'back draw L\u2192R','gap','front draw L\u2192R','hold (glow)',
+    'front undraw L\u2192R','gap','back undraw L\u2192R','pause',
+    'back draw R\u2192L','gap','front draw R\u2192L','hold (glow)',
+    'front undraw R\u2192L','gap','back undraw R\u2192L','pause'
+  ];
+
+  function phaseDuration(p) {
+    if (p === 3 || p === 11) return holdDur;
+    if (p === 1 || p === 5 || p === 9 || p === 13) return gapDur;
+    if (p === 7 || p === 15) return pauseDur;
+    return drawDur;
+  }
+
   function animate(time) {
     if (!running) return;
     if (!lastTime) lastTime = time;
@@ -317,82 +346,86 @@
     }
 
     phaseTime += dt;
-    var progress = Math.min(phaseTime / phaseDuration(phase), 1);
+    var dur = phaseDuration(phase);
+    var progress = Math.min(phaseTime / dur, 1);
     var eased = easeInOutCubic(progress);
-    var N = 200;
 
-    // Determine direction: phases 0-7 = L→R, phases 8-15 = R→L
+    // For R→L direction, we reverse the fraction (draw from 1→0 instead of 0→1)
     var isReverse = phase >= 8;
-    var bPath = isReverse ? backPath.path.slice().reverse() : backPath.path;
-    var fPath = isReverse ? frontPath.path.slice().reverse() : frontPath.path;
 
     switch (phase) {
-      // ---- DRAW BACK ----
+      // DRAW BACK
       case 0: case 8:
-        var headIdx = Math.round(eased * N);
-        var alpha = Math.min(progress / 0.15, 1);
-        drawStrokePath(backCtx, bPath, 0, headIdx, backColor, alpha);
+        if (!isReverse) {
+          drawPartialM(backCtx, backPathData, 0, eased, backColor, 1);
+        } else {
+          drawPartialM(backCtx, backPathData, 1 - eased, 1, backColor, 1);
+        }
+        frontCtx.clearRect(0, 0, W, H);
         break;
 
-      // ---- GAP (back drawn, front about to start) ----
+      // GAP (back fully drawn, front about to start)
       case 1: case 9:
         drawStaticM(backCtx, backM, backColor);
         frontCtx.clearRect(0, 0, W, H);
         break;
 
-      // ---- DRAW FRONT ----
+      // DRAW FRONT
       case 2: case 10:
         drawStaticM(backCtx, backM, backColor);
-        var headIdx = Math.round(eased * N);
-        var alpha = Math.min(progress / 0.15, 1);
-        drawStrokePath(frontCtx, fPath, 0, headIdx, frontColor, alpha);
+        if (!isReverse) {
+          drawPartialM(frontCtx, frontPathData, 0, eased, frontColor, 1);
+        } else {
+          drawPartialM(frontCtx, frontPathData, 1 - eased, 1, frontColor, 1);
+        }
         break;
 
-      // ---- HOLD WITH GLOW ----
+      // HOLD WITH GLOW
       case 3: case 11:
         var glowBlend = Math.min(phaseTime / 250, 1);
         drawGlowM(backCtx, backM, backColor, phaseTime, glowBlend);
         drawGlowM(frontCtx, frontM, frontColor, phaseTime, glowBlend);
         break;
 
-      // ---- UNDRAW FRONT ----
+      // UNDRAW FRONT
       case 4: case 12:
         drawStaticM(backCtx, backM, backColor);
-        var tailIdx = Math.round(eased * N);
-        var alpha = 1 - Math.max((progress - 0.85) / 0.15, 0);
-        drawStrokePath(frontCtx, fPath, tailIdx, N, frontColor, alpha);
+        if (!isReverse) {
+          drawPartialM(frontCtx, frontPathData, eased, 1, frontColor, 1);
+        } else {
+          drawPartialM(frontCtx, frontPathData, 0, 1 - eased, frontColor, 1);
+        }
         break;
 
-      // ---- GAP (front gone, back about to undraw) ----
+      // GAP (front gone, back about to undraw)
       case 5: case 13:
         drawStaticM(backCtx, backM, backColor);
         frontCtx.clearRect(0, 0, W, H);
         break;
 
-      // ---- UNDRAW BACK ----
+      // UNDRAW BACK
       case 6: case 14:
-        var tailIdx = Math.round(eased * N);
-        var alpha = 1 - Math.max((progress - 0.85) / 0.15, 0);
-        drawStrokePath(backCtx, bPath, tailIdx, N, backColor, alpha);
+        if (!isReverse) {
+          drawPartialM(backCtx, backPathData, eased, 1, backColor, 1);
+        } else {
+          drawPartialM(backCtx, backPathData, 0, 1 - eased, backColor, 1);
+        }
         frontCtx.clearRect(0, 0, W, H);
         break;
 
-      // ---- PAUSE ----
+      // PAUSE
       case 7: case 15:
         backCtx.clearRect(0, 0, W, H);
         frontCtx.clearRect(0, 0, W, H);
         break;
     }
 
-    // Advance phase
     if (progress >= 1) {
       phase = (phase + 1) % 16;
       phaseTime = 0;
     }
 
-    var label = document.getElementById('phaseLabel');
-    if (label) label.textContent = 'Phase: ' + phaseNames[phase];
-
+    document.getElementById('phaseLabel').textContent = 'Phase: ' + phaseNames[phase];
     animId = requestAnimationFrame(animate);
   }
 
@@ -407,19 +440,13 @@
   // ---- Controls ----
   window.restart = function() {
     if (animId) cancelAnimationFrame(animId);
-    running = true;
-    forceFinal = false;
-    phase = 0;
-    phaseTime = 0;
-    lastTime = 0;
+    running = true; forceFinal = false;
+    phase = 0; phaseTime = 0; lastTime = 0;
     backCtx.clearRect(0, 0, W, H);
     frontCtx.clearRect(0, 0, W, H);
     animId = requestAnimationFrame(animate);
   };
-
-  window.showFinal = function() {
-    forceFinal = true;
-  };
+  window.showFinal = function() { forceFinal = true; };
 
   // Boot
   renderStatic();
