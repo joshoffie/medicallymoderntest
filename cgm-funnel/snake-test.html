@@ -281,8 +281,8 @@
   // Erasure uses a wider stroke and shifted-down path to cut bigger
   // gaps in the back M, matching the logo where the gap extends further
   // and lower than the front M's visible stroke.
-  var eraseW = lineW + 10;   // wider than the actual front stroke
-  var eraseShiftY = 4;       // shift erasure path down a few px
+  var eraseW = lineW + 20;   // much wider than actual front stroke for bigger gaps
+  var eraseShiftY = 1;       // nearly centered — extends well above and slightly below
 
   function eraseFrontOverlap(ctx) {
     ctx.save();
