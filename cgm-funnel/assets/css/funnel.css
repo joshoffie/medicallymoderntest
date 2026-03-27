@@ -1249,12 +1249,14 @@ body {
 }
 
 /* Tilt animation — Dexcom G7 10-Day */
-.cgm-card[data-anim="tilt"]:hover .cgm-thumb {
+.cgm-card[data-anim="tilt"]:hover .cgm-thumb,
+.cgm-card[data-anim="tilt"].touched .cgm-thumb {
   transform: rotate(-12deg) scale(1.12);
 }
 
 /* Pulse animation — Dexcom G7 15-Day */
-.cgm-card[data-anim="pulse"]:hover .cgm-thumb {
+.cgm-card[data-anim="pulse"]:hover .cgm-thumb,
+.cgm-card[data-anim="pulse"].touched .cgm-thumb {
   animation: cgmPulse 0.6s var(--mm-ease-bounce);
 }
 
@@ -1265,7 +1267,8 @@ body {
 }
 
 /* Float animation — Libre 3 Plus */
-.cgm-card[data-anim="float"]:hover .cgm-thumb {
+.cgm-card[data-anim="float"]:hover .cgm-thumb,
+.cgm-card[data-anim="float"].touched .cgm-thumb {
   animation: cgmFloat 0.7s var(--mm-ease) forwards;
 }
 
@@ -1276,12 +1279,14 @@ body {
 }
 
 /* Spin animation — Libre 2 Plus */
-.cgm-card[data-anim="spin"]:hover .cgm-thumb {
+.cgm-card[data-anim="spin"]:hover .cgm-thumb,
+.cgm-card[data-anim="spin"].touched .cgm-thumb {
   transform: rotate(15deg) scale(1.1);
 }
 
 /* Rock animation — Medtronic */
-.cgm-card[data-anim="rock"]:hover .cgm-thumb {
+.cgm-card[data-anim="rock"]:hover .cgm-thumb,
+.cgm-card[data-anim="rock"].touched .cgm-thumb {
   animation: cgmRock 0.5s var(--mm-ease);
 }
 
@@ -1293,7 +1298,8 @@ body {
 }
 
 /* Bounce animation — Guardian 4 */
-.cgm-card[data-anim="bounce"]:hover .cgm-thumb {
+.cgm-card[data-anim="bounce"]:hover .cgm-thumb,
+.cgm-card[data-anim="bounce"].touched .cgm-thumb {
   animation: cgmBounce 0.5s var(--mm-ease-bounce);
 }
 
@@ -1960,7 +1966,7 @@ body {
   font-style: italic;
   color: var(--mm-teal);
   font-weight: 600;
-  animation: doctorHighlight 0.8s ease 0.9s forwards;
+  animation: doctorHighlight 1s ease-out 0.9s forwards;
 }
 
 @keyframes doctorReveal {
@@ -1969,9 +1975,8 @@ body {
 }
 
 @keyframes doctorHighlight {
-  0% { opacity: 0; transform: translateY(6px); }
-  60% { opacity: 1; transform: translateY(-2px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0%   { opacity: 0; filter: blur(4px); transform: translateY(4px); }
+  100% { opacity: 1; filter: blur(0);   transform: translateY(0); }
 }
 
 /* ---- DUAL-M LOGO: Shared canvas wrapper ---- */

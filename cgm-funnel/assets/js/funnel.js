@@ -1076,6 +1076,21 @@
     }, 2500);
   }
 
+  // ---- CGM card touch animation support (mobile) ----
+  function setupCgmTouchAnimations() {
+    var cards = document.querySelectorAll('.cgm-card[data-anim]');
+    cards.forEach(function(card) {
+      card.addEventListener('touchstart', function() {
+        card.classList.add('touched');
+      }, { passive: true });
+      card.addEventListener('touchend', function() {
+        setTimeout(function() {
+          card.classList.remove('touched');
+        }, 400);
+      }, { passive: true });
+    });
+  }
+
   // ---- Init ----
   function init() {
     updateProgress(0);
@@ -1084,6 +1099,7 @@
     // Setup event listeners for dynamic steps
     setupInsuranceIdStep();
     setupDoctorForm();
+    setupCgmTouchAnimations();
   }
 
   init();
