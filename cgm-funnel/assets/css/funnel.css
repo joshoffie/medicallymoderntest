@@ -518,17 +518,12 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  animation: stepFadeUp 0.4s var(--mm-ease) both;
+  animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .next-step:nth-child(1) { animation-delay: 0.15s; }
 .next-step:nth-child(2) { animation-delay: 0.25s; }
 .next-step:nth-child(3) { animation-delay: 0.35s; }
-
-@keyframes stepFadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 
 .step-number {
   display: flex;
@@ -629,6 +624,7 @@ body {
   font-weight: 500;
   font-family: inherit;
   letter-spacing: 0.01em;
+  animation: slideInRight 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .back-btn:hover {
@@ -886,13 +882,13 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 12px 28px;
-  background: var(--mm-navy);
-  color: white;
-  border: none;
+  padding: 10px 22px;
+  background: transparent;
+  color: var(--mm-gray-400);
+  border: 1px solid var(--mm-gray-200);
   border-radius: var(--mm-radius-pill);
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-size: 0.78rem;
+  font-weight: 400;
   cursor: pointer;
   transition: var(--mm-transition);
   font-family: inherit;
@@ -900,9 +896,8 @@ body {
 }
 
 .export-btn:hover {
-  background: #0a1f2d;
-  transform: translateY(-1px);
-  box-shadow: var(--mm-shadow);
+  color: var(--mm-text-secondary);
+  border-color: var(--mm-gray-300);
 }
 
 /* ---- INSURANCE PROVIDER PICKER ---- */
