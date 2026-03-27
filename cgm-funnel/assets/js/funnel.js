@@ -134,11 +134,14 @@
 
     nextEl.classList.add('active');
 
-    // Scroll to top — use rAF to ensure it fires after the browser
-    // has laid out the new step (fixes mobile landing mid-page)
+    // Scroll to top — force it immediately, after layout (rAF), and
+    // again after a short delay to beat any async content that shifts
+    // the viewport (review carousel, animations, images loading, etc.)
+    window.scrollTo(0, 0);
     requestAnimationFrame(function() {
       window.scrollTo(0, 0);
     });
+    setTimeout(function() { window.scrollTo(0, 0); }, 50);
 
     // Track step
     currentStep = stepId;
@@ -366,12 +369,11 @@
         updateInsuranceIdText();
       }
 
-      // Visual feedback + immediate advance
+      // Visual feedback — green flash for 150ms, then smooth transition
       optionBtn.style.borderColor = 'var(--mm-teal)';
       optionBtn.style.background = 'var(--mm-teal-light)';
 
-      // Use rAF to let the visual feedback paint, then navigate immediately
-      requestAnimationFrame(function() {
+      setTimeout(function() {
         optionBtn.style.borderColor = '';
         optionBtn.style.background = '';
 
@@ -380,7 +382,7 @@
         } else {
           goToStep(parseInt(nextStep));
         }
-      });
+      }, 150);
 
       return;
     }
@@ -680,13 +682,16 @@
     }, { passive: true });
 
     // Start auto-rotation when step 9 becomes visible
+    // Delay carousel init so it doesn't interfere with scroll-to-top
     var step9Observer = new MutationObserver(function() {
       var step9 = document.getElementById('step9');
       if (step9 && step9.classList.contains('active')) {
-        reviewIndex = 0;
-        scrollToReview(0);
-        reviewPaused = false;
-        startReviewAuto();
+        setTimeout(function() {
+          reviewIndex = 0;
+          reviewsTrack.scrollLeft = 0;  // instant reset, no scrollIntoView
+          reviewPaused = false;
+          startReviewAuto();
+        }, 300);
       } else {
         stopReviewAuto();
       }
