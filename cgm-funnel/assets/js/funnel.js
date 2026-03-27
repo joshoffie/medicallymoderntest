@@ -35,6 +35,20 @@
     progressFill.style.width = pct + '%';
   }
 
+  // ---- Scroll to absolute top (mobile-proof) ----
+  var pageTopAnchor = document.getElementById('pageTop');
+  function scrollToAbsoluteTop() {
+    // 1. Standard scroll reset
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    // 2. scrollIntoView on a zero-height div at the very top of <body>
+    //    This is more reliable on mobile Safari/Chrome than scrollTo
+    if (pageTopAnchor) {
+      pageTopAnchor.scrollIntoView(true);
+    }
+  }
+
   // ---- Back Button ----
   function createBackButton() {
     const backBtn = document.createElement('button');
@@ -66,18 +80,13 @@
         item.classList.remove('selected');
       });
 
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
+      scrollToAbsoluteTop();
 
       prevEl.classList.add('active');
       currentStep = prevStep;
       var progressMap = { 'welcome': 0, 'blood-sugar': 1.5, 'review': 2.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, '8b': 8.5, 'verify': 4.5 };
       updateProgress(typeof prevStep === 'number' ? prevStep : (progressMap[prevStep] || 1));
-      requestAnimationFrame(function() {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-      });
+      requestAnimationFrame(function() { scrollToAbsoluteTop(); });
       updateBackButton();
     }
   }
@@ -128,11 +137,7 @@
 
     if (!nextEl || nextEl === currentEl) return;
 
-    // Scroll to absolute top BEFORE swapping steps so browser is
-    // already at 0,0 when the new step renders
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;  // Safari fallback
+    scrollToAbsoluteTop();
 
     currentEl.classList.remove('active');
 
@@ -147,15 +152,14 @@
 
     nextEl.classList.add('active');
 
-    // Belt-and-suspenders: scroll again after layout and after paint
+    // Scroll again after layout, paint, and browser chrome animation
     requestAnimationFrame(function() {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      requestAnimationFrame(function() {
-        window.scrollTo(0, 0);
-        document.documentElement.scrollTop = 0;
-      });
+      scrollToAbsoluteTop();
+      requestAnimationFrame(function() { scrollToAbsoluteTop(); });
     });
+    // Catch mobile browser address bar collapse (happens ~100-200ms after tap)
+    setTimeout(function() { scrollToAbsoluteTop(); }, 120);
+    setTimeout(function() { scrollToAbsoluteTop(); }, 250);
 
     // Track step
     currentStep = stepId;
