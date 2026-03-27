@@ -66,11 +66,18 @@
         item.classList.remove('selected');
       });
 
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+
       prevEl.classList.add('active');
       currentStep = prevStep;
       var progressMap = { 'welcome': 0, 'blood-sugar': 1.5, 'review': 2.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, '8b': 8.5, 'verify': 4.5 };
       updateProgress(typeof prevStep === 'number' ? prevStep : (progressMap[prevStep] || 1));
-      window.scrollTo(0, 0);
+      requestAnimationFrame(function() {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+      });
       updateBackButton();
     }
   }
@@ -121,6 +128,12 @@
 
     if (!nextEl || nextEl === currentEl) return;
 
+    // Scroll to absolute top BEFORE swapping steps so browser is
+    // already at 0,0 when the new step renders
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;  // Safari fallback
+
     currentEl.classList.remove('active');
 
     // Clear any inline option selection styles on the destination step
@@ -134,14 +147,15 @@
 
     nextEl.classList.add('active');
 
-    // Scroll to top — force it immediately, after layout (rAF), and
-    // again after a short delay to beat any async content that shifts
-    // the viewport (review carousel, animations, images loading, etc.)
-    window.scrollTo(0, 0);
+    // Belt-and-suspenders: scroll again after layout and after paint
     requestAnimationFrame(function() {
       window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      requestAnimationFrame(function() {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+      });
     });
-    setTimeout(function() { window.scrollTo(0, 0); }, 50);
 
     // Track step
     currentStep = stepId;
@@ -158,21 +172,13 @@
 
     // Re-trigger animations for doctor subtitle (step 6)
     if (stepId === 6) {
-      var drEl = nextEl.querySelector('.doctor-reveal');
-      var dhEl = nextEl.querySelector('.doctor-highlight');
-      if (drEl) {
-        drEl.style.animation = 'none';
-        drEl.style.opacity = '0';
+      var subtitle = nextEl.querySelector('.doctor-subtitle');
+      if (subtitle) {
+        // Remove class to reset, force reflow, then re-add to trigger animations
+        subtitle.classList.remove('animate-in');
+        void subtitle.offsetHeight;  // force reflow
+        subtitle.classList.add('animate-in');
       }
-      if (dhEl) {
-        dhEl.style.animation = 'none';
-        dhEl.style.opacity = '0';
-      }
-      // Wait for the step transition to finish, then start doctor animations
-      setTimeout(function() {
-        if (drEl) { drEl.style.opacity = ''; drEl.style.animation = ''; }
-        if (dhEl) { dhEl.style.opacity = ''; dhEl.style.animation = ''; }
-      }, 80);
     }
 
     // Re-trigger animations for confirmation screen (step 9)
