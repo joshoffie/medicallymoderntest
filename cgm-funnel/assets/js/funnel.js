@@ -134,8 +134,11 @@
 
     nextEl.classList.add('active');
 
-    // Scroll to top
-    window.scrollTo(0, 0);
+    // Scroll to top — use rAF to ensure it fires after the browser
+    // has laid out the new step (fixes mobile landing mid-page)
+    requestAnimationFrame(function() {
+      window.scrollTo(0, 0);
+    });
 
     // Track step
     currentStep = stepId;
@@ -363,24 +366,21 @@
         updateInsuranceIdText();
       }
 
-      // Visual feedback
+      // Visual feedback + immediate advance
       optionBtn.style.borderColor = 'var(--mm-teal)';
       optionBtn.style.background = 'var(--mm-teal-light)';
 
-      // Slight delay for visual feedback, then advance
-      setTimeout(function() {
-        // Clear the inline selection styles before navigating away
-        // so they won't persist if the user comes back
+      // Use rAF to let the visual feedback paint, then navigate immediately
+      requestAnimationFrame(function() {
         optionBtn.style.borderColor = '';
         optionBtn.style.background = '';
 
-        // If it's a known string step ID, route as string; otherwise parse as number
         if (stepIdMap[nextStep]) {
           goToStep(nextStep);
         } else {
           goToStep(parseInt(nextStep));
         }
-      }, 300);
+      });
 
       return;
     }
@@ -642,7 +642,10 @@
     function scrollToReview(idx) {
       if (!reviewCards.length) return;
       reviewIndex = ((idx % reviewCards.length) + reviewCards.length) % reviewCards.length;
-      reviewCards[reviewIndex].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+      // Use scrollLeft on the track instead of scrollIntoView to avoid
+      // moving the main page viewport on mobile
+      var card = reviewCards[reviewIndex];
+      reviewsTrack.scrollTo({ left: card.offsetLeft - reviewsTrack.offsetLeft, behavior: 'smooth' });
     }
 
     function startReviewAuto() {

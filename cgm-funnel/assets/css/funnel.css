@@ -197,6 +197,7 @@ body {
   font-family: inherit;
   font-weight: 450;
   position: relative;
+  touch-action: manipulation;  /* eliminate 300ms mobile tap delay */
 }
 
 .option-btn::after {
@@ -358,6 +359,7 @@ body {
   letter-spacing: -0.01em;
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
 }
 
 .cta-btn::before {
