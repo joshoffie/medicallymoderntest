@@ -1984,14 +1984,14 @@ body {
   top: 0; left: 0;
 }
 
-/* Welcome screen: 48x48 displayed */
+/* Welcome screen: 64x64 displayed, 512 internal for retina */
 .welcome-dual-m {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
 }
 .welcome-dual-m canvas {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
 }
 
 /* ---- TEXT CENTERING: Hims-style mobile-first ---- */
@@ -2016,13 +2016,13 @@ body {
 
 /* ---- DUAL-M LOGO: Verify/Loading Screen ---- */
 .verify-dual-m {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
   margin: 0 auto;
 }
 .verify-dual-m canvas {
-  width: 64px;
-  height: 64px;
+  width: 72px;
+  height: 72px;
 }
 
 /* ---- BENEFITS HEADER: Centered Checkmark ---- */

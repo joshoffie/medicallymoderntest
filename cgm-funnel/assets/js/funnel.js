@@ -659,24 +659,25 @@
 
   // ---- Dual-M Logo Rendering (shared geometry + functions) ----
   var dualM = (function() {
-    var W = 256, H = 256;
+    var W = 512, H = 512;  // 512 internal for retina crispness
 
+    // All coordinates scaled 2x from 256-space for 512 canvas
     // Back M (lighter teal, NARROWER + TALLER)
     var backM = [
-      {x: 44,  y: 222}, {x: 44,  y: 24},
-      {x: 128, y: 118}, {x: 212, y: 24}, {x: 212, y: 222}
+      {x: 88,  y: 444}, {x: 88,  y: 48},
+      {x: 256, y: 236}, {x: 424, y: 48}, {x: 424, y: 444}
     ];
     // Front M (darker teal, WIDER + SHORTER)
     var frontM = [
-      {x: 12,  y: 222}, {x: 12,  y: 80},
-      {x: 128, y: 176}, {x: 244, y: 80}, {x: 244, y: 222}
+      {x: 24,  y: 444}, {x: 24,  y: 160},
+      {x: 256, y: 352}, {x: 488, y: 160}, {x: 488, y: 444}
     ];
 
     var frontColor = '#80adaa';
     var backColor  = '#a9d1d0';
-    var lineW = 20;
-    var eraseW = lineW + 20;
-    var eraseShiftY = 1;
+    var lineW = 40;       // 20 * 2
+    var eraseW = lineW + 40;  // (20+20) * 2
+    var eraseShiftY = 2;      // 1 * 2
 
     function dist(a, b) { var dx=b.x-a.x, dy=b.y-a.y; return Math.sqrt(dx*dx+dy*dy); }
 
@@ -780,12 +781,54 @@
     };
   })();
 
-  // ---- Welcome Screen: Static Dual-M ----
+  // ---- Welcome Screen: One-Time Draw Animation ----
   (function() {
     var bc = document.getElementById('welcomeBackCanvas');
     var fc = document.getElementById('welcomeFrontCanvas');
     if (!bc || !fc) return;
-    dualM.drawStatic(bc.getContext('2d'), fc.getContext('2d'));
+    var backCtx = bc.getContext('2d');
+    var frontCtx = fc.getContext('2d');
+    var W = dualM.W, H = dualM.H;
+
+    var drawDur = 900, gapDur = 100;
+    var phase = 0, phaseTime = 0, lastTime = 0;
+    var animId;
+
+    function animate(time) {
+      if (!lastTime) lastTime = time;
+      var dt = Math.min(time - lastTime, 50);
+      lastTime = time;
+      phaseTime += dt;
+
+      switch (phase) {
+        case 0: // Draw front (dark) M L→R
+          var p = Math.min(phaseTime / drawDur, 1);
+          var e = dualM.easeInOutCubic(p);
+          backCtx.clearRect(0, 0, W, H);
+          dualM.drawPartialM(frontCtx, dualM.frontPathData, 0, e, dualM.frontColor);
+          if (p >= 1) { phase = 1; phaseTime = 0; }
+          break;
+        case 1: // Brief gap
+          backCtx.clearRect(0, 0, W, H);
+          dualM.drawStaticM(frontCtx, dualM.frontM, dualM.frontColor);
+          if (phaseTime >= gapDur) { phase = 2; phaseTime = 0; }
+          break;
+        case 2: // Draw back (light) M L→R
+          var p = Math.min(phaseTime / drawDur, 1);
+          var e = dualM.easeInOutCubic(p);
+          dualM.drawStaticM(frontCtx, dualM.frontM, dualM.frontColor);
+          dualM.drawPartialM(backCtx, dualM.backPathData, 0, e, dualM.backColor);
+          dualM.eraseFrontOverlap(backCtx);
+          if (p >= 1) { phase = 3; } // done — hold static
+          break;
+        case 3: // Final static hold — stop animating
+          dualM.drawStatic(backCtx, frontCtx);
+          return; // don't request another frame
+      }
+      animId = requestAnimationFrame(animate);
+    }
+    // Delay start slightly so it plays after page transition
+    setTimeout(function() { animId = requestAnimationFrame(animate); }, 300);
   })();
 
   // ---- Verify Screen: Animated Dual-M Snake ----
