@@ -132,20 +132,70 @@ body {
 .step {
   display: none;
   width: 100%;
+  overflow-x: hidden;  /* hide slide-in overflow */
 }
 
 .step.active {
   display: block;
-  animation: stepReveal 0.35s ease-out both;
-}
-
-@keyframes stepReveal {
-  from { opacity: 0; }
-  to   { opacity: 1; }
 }
 
 .step-content {
   padding: 48px 0 60px;
+}
+
+/* ---- Slide-in entrance animation ---- */
+/* Question, subtitle, and option boxes slide in from right with stagger */
+.step.active .step-question {
+  animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.04s;
+}
+
+.step.active .step-subtitle {
+  animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.1s;
+}
+
+.step.active .options .option-btn:nth-child(1) { animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.14s; }
+.step.active .options .option-btn:nth-child(2) { animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.2s; }
+.step.active .options .option-btn:nth-child(3) { animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.26s; }
+.step.active .options .option-btn:nth-child(4) { animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.32s; }
+.step.active .options .option-btn:nth-child(5) { animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.38s; }
+.step.active .options .option-btn:nth-child(6) { animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: 0.44s; }
+
+/* CTA buttons also slide in */
+.step.active .cta-btn {
+  animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.18s;
+}
+
+/* Forms slide in as a block */
+.step.active .intake-form {
+  animation: slideInRight 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.15s;
+}
+
+/* Interstitial/confirmation content (badges, next-steps, etc.) */
+.step.active .interstitial > * {
+  animation: slideInRight 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.step.active .interstitial > *:nth-child(1) { animation-delay: 0.04s; }
+.step.active .interstitial > *:nth-child(2) { animation-delay: 0.1s; }
+.step.active .interstitial > *:nth-child(3) { animation-delay: 0.16s; }
+.step.active .interstitial > *:nth-child(4) { animation-delay: 0.22s; }
+.step.active .interstitial > *:nth-child(5) { animation-delay: 0.28s; }
+.step.active .interstitial > *:nth-child(6) { animation-delay: 0.34s; }
+.step.active .interstitial > *:nth-child(7) { animation-delay: 0.4s; }
+.step.active .interstitial > *:nth-child(8) { animation-delay: 0.46s; }
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* ---- QUESTIONS ---- */
@@ -948,8 +998,8 @@ body {
 .ins-item:nth-child(15) { animation-delay: 0.3s; }
 
 @keyframes insSlideIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @media (hover: hover) {

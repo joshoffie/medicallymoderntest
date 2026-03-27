@@ -82,6 +82,9 @@
 
       scrollToAbsoluteTop();
 
+      // Force reflow so slide-in animations replay fresh
+      prevEl.classList.remove('active');
+      void prevEl.offsetHeight;
       prevEl.classList.add('active');
       currentStep = prevStep;
       var progressMap = { 'welcome': 0, 'blood-sugar': 1.5, 'review': 2.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, '8b': 8.5, 'verify': 4.5 };
@@ -150,6 +153,9 @@
       item.classList.remove('selected');
     });
 
+    // Force reflow so slide-in animations replay fresh
+    nextEl.classList.remove('active');
+    void nextEl.offsetHeight;
     nextEl.classList.add('active');
 
     // Scroll again after layout, paint, and browser chrome animation
