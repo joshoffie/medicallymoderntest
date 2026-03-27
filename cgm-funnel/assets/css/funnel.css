@@ -132,22 +132,16 @@ body {
 .step {
   display: none;
   width: 100%;
-  animation: stepReveal 0.5s var(--mm-ease) both;
 }
 
 .step.active {
   display: block;
+  animation: stepReveal 0.35s ease-out both;
 }
 
 @keyframes stepReveal {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 .step-content {
