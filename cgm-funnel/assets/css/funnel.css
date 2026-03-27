@@ -1966,17 +1966,17 @@ body {
   font-style: italic;
   color: var(--mm-teal);
   font-weight: 600;
-  animation: doctorHighlight 1s ease-out 0.9s forwards;
+  animation: doctorHighlight 0.9s ease-out 1s forwards;
 }
 
 @keyframes doctorReveal {
-  from { opacity: 0; filter: blur(4px); }
-  to { opacity: 1; filter: blur(0); }
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes doctorHighlight {
-  0%   { opacity: 0; filter: blur(4px); transform: translateY(4px); }
-  100% { opacity: 1; filter: blur(0);   transform: translateY(0); }
+  from { opacity: 0; transform: translateY(3px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* ---- DUAL-M LOGO: Shared canvas wrapper ---- */

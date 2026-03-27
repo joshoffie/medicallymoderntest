@@ -70,7 +70,7 @@
       currentStep = prevStep;
       var progressMap = { 'welcome': 0, 'blood-sugar': 1.5, 'review': 2.5, 'insurance-picker': 3.5, 'not-eligible': 1.5, '5b': 5, '8b': 8.5, 'verify': 4.5 };
       updateProgress(typeof prevStep === 'number' ? prevStep : (progressMap[prevStep] || 1));
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo(0, 0);
       updateBackButton();
     }
   }
@@ -135,7 +135,7 @@
     nextEl.classList.add('active');
 
     // Scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo(0, 0);
 
     // Track step
     currentStep = stepId;
@@ -627,18 +627,71 @@
     }
   });
 
-  // ---- Reviews Carousel ----
+  // ---- Reviews Carousel (auto-rotating + user control) ----
   var reviewsTrack = document.getElementById('reviewsTrack');
   var reviewsPrev = document.getElementById('reviewsPrev');
   var reviewsNext = document.getElementById('reviewsNext');
 
   if (reviewsTrack && reviewsPrev && reviewsNext) {
-    reviewsNext.addEventListener('click', function() {
-      reviewsTrack.scrollBy({ left: 296, behavior: 'smooth' });
+    var reviewCards = reviewsTrack.querySelectorAll('.g-review-card');
+    var reviewIndex = 0;
+    var reviewAutoTimer = null;
+    var reviewPaused = false;
+    var REVIEW_INTERVAL = 4000; // 4 seconds per card
+
+    function scrollToReview(idx) {
+      if (!reviewCards.length) return;
+      reviewIndex = ((idx % reviewCards.length) + reviewCards.length) % reviewCards.length;
+      reviewCards[reviewIndex].scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+    }
+
+    function startReviewAuto() {
+      stopReviewAuto();
+      reviewAutoTimer = setInterval(function() {
+        if (!reviewPaused) scrollToReview(reviewIndex + 1);
+      }, REVIEW_INTERVAL);
+    }
+
+    function stopReviewAuto() {
+      if (reviewAutoTimer) { clearInterval(reviewAutoTimer); reviewAutoTimer = null; }
+    }
+
+    // Manual controls — pause auto-rotation for 10s after interaction
+    function onUserInteract(direction) {
+      scrollToReview(reviewIndex + direction);
+      reviewPaused = true;
+      stopReviewAuto();
+      setTimeout(function() { reviewPaused = false; startReviewAuto(); }, 10000);
+    }
+
+    reviewsNext.addEventListener('click', function() { onUserInteract(1); });
+    reviewsPrev.addEventListener('click', function() { onUserInteract(-1); });
+
+    // Pause on touch drag (mobile swipe)
+    reviewsTrack.addEventListener('touchstart', function() {
+      reviewPaused = true;
+      stopReviewAuto();
+    }, { passive: true });
+    reviewsTrack.addEventListener('touchend', function() {
+      setTimeout(function() { reviewPaused = false; startReviewAuto(); }, 10000);
+    }, { passive: true });
+
+    // Start auto-rotation when step 9 becomes visible
+    var step9Observer = new MutationObserver(function() {
+      var step9 = document.getElementById('step9');
+      if (step9 && step9.classList.contains('active')) {
+        reviewIndex = 0;
+        scrollToReview(0);
+        reviewPaused = false;
+        startReviewAuto();
+      } else {
+        stopReviewAuto();
+      }
     });
-    reviewsPrev.addEventListener('click', function() {
-      reviewsTrack.scrollBy({ left: -296, behavior: 'smooth' });
-    });
+    var step9El = document.getElementById('step9');
+    if (step9El) {
+      step9Observer.observe(step9El, { attributes: true, attributeFilter: ['class'] });
+    }
   }
 
   // ---- Password Toggle ----
@@ -1077,16 +1130,22 @@
   }
 
   // ---- CGM card touch animation support (mobile) ----
+  // Triggers animation on tap, plays it briefly before the screen advances.
+  // Uses pointerdown (works on touch + mouse) with scroll detection to avoid
+  // triggering on scroll gestures.
   function setupCgmTouchAnimations() {
     var cards = document.querySelectorAll('.cgm-card[data-anim]');
     cards.forEach(function(card) {
-      card.addEventListener('touchstart', function() {
-        card.classList.add('touched');
+      var startY = 0;
+      card.addEventListener('pointerdown', function(e) {
+        startY = e.clientY;
       }, { passive: true });
-      card.addEventListener('touchend', function() {
-        setTimeout(function() {
-          card.classList.remove('touched');
-        }, 400);
+      card.addEventListener('pointerup', function(e) {
+        // Only trigger if the finger didn't travel more than 10px (not a scroll)
+        if (Math.abs(e.clientY - startY) < 10) {
+          card.classList.add('touched');
+          setTimeout(function() { card.classList.remove('touched'); }, 600);
+        }
       }, { passive: true });
     });
   }
