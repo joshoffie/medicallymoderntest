@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MM Logo Animation</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dual-m-wrap {
+    position: relative;
+    display: inline-block;
+  }
+  .dual-m-wrap canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="dual-m-wrap" id="mWrap">
+  <canvas id="backCanvas" width="512" height="512"></canvas>
+  <canvas id="frontCanvas" width="512" height="512"></canvas>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ---- Read URL params ----
+  // ?mode=welcome  → one-shot draw-on, then hold static
+  // ?mode=snake    → looping draw/glow/undraw cycle (verify screen)
+  // ?size=72       → display size in px (default 72)
+  var params = new URLSearchParams(window.location.search);
+  var mode = params.get('mode') || 'snake';
+  var size = parseInt(params.get('size'), 10) || 72;
+
+  // ---- Size the canvases ----
+  var wrap = document.getElementById('mWrap');
+  wrap.style.width = size + 'px';
+  wrap.style.height = size + 'px';
+  var canvases = wrap.querySelectorAll('canvas');
+  canvases.forEach(function(c) { c.style.width = size + 'px'; c.style.height = size + 'px'; });
+
+  // ---- Dual-M Geometry & Rendering ----
+  var W = 512, H = 512;
+
+  // Back M (lighter teal, narrower + taller)
+  var backM = [
+    {x: 88,  y: 444}, {x: 88,  y: 48},
+    {x: 256, y: 236}, {x: 424, y: 48}, {x: 424, y: 444}
+  ];
+  // Front M (darker teal, wider + shorter)
+  var frontM = [
+    {x: 24,  y: 444}, {x: 24,  y: 160},
+    {x: 256, y: 352}, {x: 488, y: 160}, {x: 488, y: 444}
+  ];
+
+  var frontColor = '#80adaa';
+  var backColor  = '#a9d1d0';
+  var lineW = 40;
+  var eraseW = lineW + 40;
+  var eraseShiftY = 2;
+
+  function dist(a, b) { var dx = b.x - a.x, dy = b.y - a.y; return Math.sqrt(dx*dx + dy*dy); }
+
+  function buildPath(pts) {
+    var segLens = [], totalLen = 0;
+    for (var i = 1; i < pts.length; i++) { var d = dist(pts[i-1], pts[i]); segLens.push(d); totalLen += d; }
+    var waypointDists = [0]; var acc = 0;
+    for (var i = 0; i < segLens.length; i++) { acc += segLens[i]; waypointDists.push(acc); }
+    return { pts: pts, totalLen: totalLen, waypointDists: waypointDists };
+  }
+
+  var backPathData  = buildPath(backM);
+  var frontPathData = buildPath(frontM);
+
+  function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+
+  function configureCtx(ctx) {
+    ctx.lineCap = 'butt'; ctx.lineJoin = 'miter'; ctx.miterLimit = 20; ctx.lineWidth = lineW;
+  }
+
+  function interpPoint(pts, wpDists, d) {
+    for (var i = 0; i < wpDists.length - 1; i++) {
+      if (d >= wpDists[i] && d <= wpDists[i+1]) {
+        var segLen = wpDists[i+1] - wpDists[i];
+        var f = segLen > 0 ? (d - wpDists[i]) / segLen : 0;
+        return { x: pts[i].x + (pts[i+1].x - pts[i].x) * f, y: pts[i].y + (pts[i+1].y - pts[i].y) * f };
+      }
+    }
+    return { x: pts[pts.length-1].x, y: pts[pts.length-1].y };
+  }
+
+  function drawStaticM(ctx, pts, color) {
+    ctx.clearRect(0, 0, W, H); configureCtx(ctx);
+    ctx.strokeStyle = color; ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.stroke();
+  }
+
+  function drawPartialM(ctx, pathData, startFrac, endFrac, color) {
+    ctx.clearRect(0, 0, W, H);
+    if (endFrac <= startFrac + 0.005) return;
+    configureCtx(ctx); ctx.strokeStyle = color; ctx.globalAlpha = 1;
+    var totalLen = pathData.totalLen;
+    var startDist = startFrac * totalLen, endDist = endFrac * totalLen;
+    var pts = pathData.pts, wpDists = pathData.waypointDists;
+    var subPoints = [interpPoint(pts, wpDists, startDist)];
+    for (var i = 1; i < pts.length - 1; i++) {
+      if (wpDists[i] > startDist && wpDists[i] < endDist) subPoints.push({x: pts[i].x, y: pts[i].y});
+    }
+    subPoints.push(interpPoint(pts, wpDists, endDist));
+    if (subPoints.length >= 2) {
+      ctx.beginPath(); ctx.moveTo(subPoints[0].x, subPoints[0].y);
+      for (var i = 1; i < subPoints.length; i++) ctx.lineTo(subPoints[i].x, subPoints[i].y);
+      ctx.stroke();
+    }
+  }
+
+  function eraseFrontOverlap(ctx) {
+    ctx.save(); ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineCap = 'butt'; ctx.lineJoin = 'miter'; ctx.miterLimit = 20;
+    ctx.lineWidth = eraseW; ctx.strokeStyle = 'rgba(0,0,0,1)';
+    ctx.beginPath(); ctx.moveTo(frontM[0].x, frontM[0].y + eraseShiftY);
+    for (var i = 1; i < frontM.length; i++) ctx.lineTo(frontM[i].x, frontM[i].y + eraseShiftY);
+    ctx.stroke(); ctx.restore();
+  }
+
+  function drawGlowM(ctx, pts, color, t, blendIn) {
+    ctx.clearRect(0, 0, W, H);
+    var breathe = (Math.sin(t * Math.PI * 2 / 1200 - Math.PI/2) + 1) / 2;
+    ctx.save(); configureCtx(ctx); ctx.strokeStyle = color;
+    var glowIntensity = 0.06 + breathe * 0.10;
+    var glowSize = 4 + breathe * 6;
+    ctx.shadowColor = color; ctx.shadowBlur = glowSize * blendIn;
+    ctx.globalAlpha = glowIntensity * blendIn;
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.stroke();
+    ctx.shadowBlur = glowSize * 2 * blendIn; ctx.globalAlpha = glowIntensity * 0.5 * blendIn;
+    ctx.stroke(); ctx.restore();
+    configureCtx(ctx); ctx.strokeStyle = color; ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.stroke();
+  }
+
+  function drawStatic(backCtx, frontCtx) {
+    drawStaticM(backCtx, backM, backColor);
+    eraseFrontOverlap(backCtx);
+    drawStaticM(frontCtx, frontM, frontColor);
+  }
+
+  // ---- Get contexts ----
+  var backCanvas  = document.getElementById('backCanvas');
+  var frontCanvas = document.getElementById('frontCanvas');
+  var backCtx  = backCanvas.getContext('2d');
+  var frontCtx = frontCanvas.getContext('2d');
+
+  // ==========================================================
+  // MODE: WELCOME — one-shot trace-on, then hold static
+  // ==========================================================
+  if (mode === 'welcome') {
+    var drawDur = 900, gapDur = 100;
+    var phase = 0, phaseTime = 0, lastTime = 0;
+
+    function animateWelcome(time) {
+      if (!lastTime) lastTime = time;
+      var dt = Math.min(time - lastTime, 50);
+      lastTime = time;
+      phaseTime += dt;
+
+      switch (phase) {
+        case 0: // Draw front M L→R
+          var p = Math.min(phaseTime / drawDur, 1);
+          var e = easeInOutCubic(p);
+          backCtx.clearRect(0, 0, W, H);
+          drawPartialM(frontCtx, frontPathData, 0, e, frontColor);
+          if (p >= 1) { phase = 1; phaseTime = 0; }
+          break;
+        case 1: // Brief gap
+          backCtx.clearRect(0, 0, W, H);
+          drawStaticM(frontCtx, frontM, frontColor);
+          if (phaseTime >= gapDur) { phase = 2; phaseTime = 0; }
+          break;
+        case 2: // Draw back M L→R
+          var p = Math.min(phaseTime / drawDur, 1);
+          var e = easeInOutCubic(p);
+          drawStaticM(frontCtx, frontM, frontColor);
+          drawPartialM(backCtx, backPathData, 0, e, backColor);
+          eraseFrontOverlap(backCtx);
+          if (p >= 1) { phase = 3; }
+          break;
+        case 3: // Hold static — done
+          drawStatic(backCtx, frontCtx);
+          return;
+      }
+      requestAnimationFrame(animateWelcome);
+    }
+    setTimeout(function() { requestAnimationFrame(animateWelcome); }, 300);
+  }
+
+  // ==========================================================
+  // MODE: SNAKE — looping draw/glow/undraw cycle
+  // ==========================================================
+  if (mode === 'snake') {
+    var drawDur = 900, holdDur = 2000, gapDur = 100, pauseDur = 300;
+    var phase = 0, phaseTime = 0, lastTime = 0;
+
+    function phaseDuration(p) {
+      if (p === 3 || p === 11) return holdDur;
+      if (p === 1 || p === 5 || p === 9 || p === 13) return gapDur;
+      if (p === 7 || p === 15) return pauseDur;
+      return drawDur;
+    }
+
+    function animateSnake(time) {
+      if (!lastTime) lastTime = time;
+      var dt = Math.min(time - lastTime, 50);
+      lastTime = time;
+      phaseTime += dt;
+
+      var dur = phaseDuration(phase);
+      var progress = Math.min(phaseTime / dur, 1);
+      var eased = easeInOutCubic(progress);
+      var isReverse = phase >= 8;
+
+      switch (phase) {
+        case 0: case 8: // DRAW FRONT
+          backCtx.clearRect(0, 0, W, H);
+          if (!isReverse) drawPartialM(frontCtx, frontPathData, 0, eased, frontColor);
+          else drawPartialM(frontCtx, frontPathData, 1 - eased, 1, frontColor);
+          break;
+        case 1: case 9: // GAP
+          backCtx.clearRect(0, 0, W, H);
+          drawStaticM(frontCtx, frontM, frontColor);
+          break;
+        case 2: case 10: // DRAW BACK
+          drawStaticM(frontCtx, frontM, frontColor);
+          if (!isReverse) drawPartialM(backCtx, backPathData, 0, eased, backColor);
+          else drawPartialM(backCtx, backPathData, 1 - eased, 1, backColor);
+          eraseFrontOverlap(backCtx);
+          break;
+        case 3: case 11: // HOLD WITH GLOW
+          var glowBlend = Math.min(phaseTime / 250, 1);
+          drawGlowM(backCtx, backM, backColor, phaseTime, glowBlend);
+          eraseFrontOverlap(backCtx);
+          drawGlowM(frontCtx, frontM, frontColor, phaseTime, glowBlend);
+          break;
+        case 4: case 12: // UNDRAW BACK
+          drawStaticM(frontCtx, frontM, frontColor);
+          if (!isReverse) drawPartialM(backCtx, backPathData, eased, 1, backColor);
+          else drawPartialM(backCtx, backPathData, 0, 1 - eased, backColor);
+          eraseFrontOverlap(backCtx);
+          break;
+        case 5: case 13: // GAP
+          backCtx.clearRect(0, 0, W, H);
+          drawStaticM(frontCtx, frontM, frontColor);
+          break;
+        case 6: case 14: // UNDRAW FRONT
+          backCtx.clearRect(0, 0, W, H);
+          if (!isReverse) drawPartialM(frontCtx, frontPathData, eased, 1, frontColor);
+          else drawPartialM(frontCtx, frontPathData, 0, 1 - eased, frontColor);
+          break;
+        case 7: case 15: // PAUSE
+          backCtx.clearRect(0, 0, W, H);
+          frontCtx.clearRect(0, 0, W, H);
+          break;
+      }
+
+      if (progress >= 1) { phase = (phase + 1) % 16; phaseTime = 0; }
+      requestAnimationFrame(animateSnake);
+    }
+    requestAnimationFrame(animateSnake);
+  }
+
+  // ==========================================================
+  // MODE: STATIC — just render the M, no animation
+  // ==========================================================
+  if (mode === 'static') {
+    drawStatic(backCtx, frontCtx);
+  }
+
+  // ---- Listen for postMessage commands from parent ----
+  // Allows JotForm (or any parent) to control the animation
+  // e.g. parent.postMessage({ mmLogo: 'snake' }, '*')
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.mmLogo) {
+      // Reload with new mode
+      var newUrl = window.location.pathname + '?mode=' + e.data.mmLogo + '&size=' + size;
+      window.location.href = newUrl;
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
