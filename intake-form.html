@@ -1904,6 +1904,16 @@ input[type="checkbox"]:checked + label::before {
   margin-top: 0 !important;
   margin-bottom: 4px !important;
 }
+/* === F. BUTTON BOTTOM BREATHING ROOM ===
+   Mobile browser toolbars (Safari, Chrome) sit over the viewport bottom.
+   Give the buttons + page sections enough padding so Next/Submit is never clipped. */
+.form-section.page-section {
+  padding-bottom: 32px !important;
+}
+li.form-line[data-type="control_button"] {
+  margin-bottom: 36px !important;
+  padding-bottom: 12px !important;
+}
 /* === END MM MOBILE FIX PACK V2 === */
 
 
@@ -2521,6 +2531,9 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,null,null,null
             data.docAddr   = doc.address || '';
             data.docAction = doc.action || '';
           }
+        } else if (currentPage > 4) {
+          // Patient moved past the doctor page without interacting with the widget
+          data.docAction = 'no_stash';
         }
       } catch (docErr) {
         log('Could not parse doctor widget value', docErr);
@@ -2642,7 +2655,7 @@ JotForm.paymentExtrasOnTheFly([null,null,null,null,null,null,null,null,null,null
               var btns = document.querySelectorAll('.form-buttons-wrapper');
               for (var i = 0; i < btns.length; i++) {
                 if (btns[i].offsetParent !== null) { // visible
-                  btns[i].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                  btns[i].scrollIntoView({ behavior: 'smooth', block: 'end' });
                   break;
                 }
               }
