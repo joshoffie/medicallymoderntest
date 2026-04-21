@@ -1408,8 +1408,8 @@ li.form-line[data-type="control_button"] {
   display: flex !important;
   justify-content: flex-end !important;
   align-items: center !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  margin: 0 0 48px 0 !important;
+  padding: 0 0 16px 0 !important;
   min-height: 44px !important;
   position: relative !important;
   z-index: 2 !important;
@@ -1906,13 +1906,16 @@ input[type="checkbox"]:checked + label::before {
 }
 /* === F. BUTTON BOTTOM BREATHING ROOM ===
    Mobile browser toolbars (Safari, Chrome) sit over the viewport bottom.
-   Give the buttons + page sections enough padding so Next/Submit is never clipped. */
+   The slide-up animation (translateY 16→0) also needs room below the buttons
+   or the container clips them during the transition. Push the page section
+   bottom edge well past the buttons so there's always visible space. */
 .form-section.page-section {
-  padding-bottom: 32px !important;
+  padding-bottom: 64px !important;
 }
-li.form-line[data-type="control_button"] {
-  margin-bottom: 36px !important;
-  padding-bottom: 12px !important;
+/* The pagebreak row (Back + Next on intermediate pages) is the last visible
+   element in the section — give it bottom margin too. */
+li.form-input-wide:has(.form-pagebreak) {
+  margin-bottom: 48px !important;
 }
 /* === END MM MOBILE FIX PACK V2 === */
 
